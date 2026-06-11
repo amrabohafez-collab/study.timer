@@ -1,7 +1,9 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <title>Study Timer</title>
-    <style id="dynamicStyle">
+    <style>
         body { 
             background: #0f0f16; 
             color: #a6e3a1; 
@@ -49,15 +51,6 @@
             transition: 0.3s; 
         }
         button:hover { background: #a6e3a1; color: #11111b; box-shadow: 0 0 15px #a6e3a1; }
-        
-        /* أزرار الإدارة الخاصة بك */
-        #adminLoginBtn { background: #313244; color: #cdd6f4; border-color: #45475a; }
-        #editorBtn { display: none; background: #fab387; color: #11111b; border-color: #fab387; }
-        #editorBtn:hover { box-shadow: 0 0 15px #fab387; }
-
-        /* بانل المطور */
-        #editorPanel { display: none; width: 80%; margin-top: 20px; border: 2px solid #fab387; padding: 15px; background: #11111b; border-radius: 10px; }
-        #codeArea { width: 100%; height: 200px; background: #181825; color: #cdd6f4; font-family: monospace; border: 1px solid #45475a; padding: 10px; box-sizing: border-box; }
 
         /* الحقوق أسفل الموقع */
         .site-footer {
@@ -80,19 +73,11 @@
             <button onclick="pauseTimer()">Pause</button>
             <button onclick="endTimer()">End</button>
             <button onclick="requestMini()">Mini</button>
-            
-            <button id="adminLoginBtn" onclick="promptAdminLogin()" style="display: none;">Admin Access</button>
-            <button id="editorBtn" onclick="toggleEditor()" style="display: inline-block;">Code Editor</button>
-        </div>
-
-        <div id="editorPanel" style="display: block;">
-            <textarea id="codeArea"></textarea>
-            <button onclick="saveCode()" style="margin-top: 10px; width: 100%; background: #fab387; color: #11111b;">Save &amp; Download Update</button>
         </div>
     </div>
 
     <canvas id="videoCanvas" width="300" height="150" style="display:none;"></canvas>
-    <video id="pipVideo" width="300" height="150" autoplay="" muted="" style="display:none;"></video>
+    <video id="pipVideo" width="300" height="150" autoplay muted style="display:none;"></video>
 
     <div class="site-footer">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
@@ -105,7 +90,6 @@
         const ctx = canvas.getContext('2d');
         const video = document.getElementById('pipVideo');
 
-        // تحديث وعرض الوقت الأساسي
         function updateDisplay() {
             let mins = Math.floor(seconds / 60);
             let secs = seconds % 60;
@@ -134,7 +118,6 @@
             updateDisplay(); 
         }
 
-        // دالة تحديث شاشة الـ Mini (الكانفاس) وهي بتتحرك دائمًا مع العداد
         function drawCanvasTimer() {
             ctx.fillStyle = "#0f0f16"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -144,14 +127,9 @@
             ctx.fillText(document.getElementById('timerDisplay').innerText, canvas.width / 2, 95);
         }
 
-        // تشغيل ميزة الـ Mini وجعل الوقت يتحرك بداخلها
         async function requestMini() {
-            drawCanvasTimer(); // روعة أولية
-            
-            // لو كان فيه تحديث قديم شغال بنقفل عشان ميعملش زحمة
+            drawCanvasTimer(); 
             if(canvasInterval) clearInterval(canvasInterval);
-            
-            // تحديث نافذة الـ Mini كل 500 مللي ثانية عشان تتابع العداد بدقة
             canvasInterval = setInterval(drawCanvasTimer, 500);
 
             const stream = canvas.captureStream(10);
@@ -160,40 +138,7 @@
             await video.requestPictureInPicture();
         }
 
-        // نظام تسجيل دخول الأونر (عدم الحساسية لحالة الأحرف العظمى أو الصغرى)
-        function promptAdminLogin() {
-            const user = prompt("Enter Admin Username:");
-            const pass = prompt("Enter Admin Password:");
-
-            if (user && pass && user.toLowerCase() === "amr" && pass === "2010") {
-                document.getElementById('editorBtn').style.display = 'inline-block';
-                document.getElementById('adminLoginBtn').style.display = 'none'; // إخفاء زر الدخول بعد النجاح
-                alert("Welcome back Amr! Code Editor is now unlocked.");
-            } else {
-                alert("Incorrect details. Access Denied.");
-            }
-        }
-
-        // نظام تعديل الكود (الخاص بالـ Owner فقط)
-        function toggleEditor() {
-            const panel = document.getElementById('editorPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-            if(panel.style.display === 'block') {
-                document.getElementById('codeArea').value = document.documentElement.outerHTML;
-            }
-        }
-
-        function saveCode() {
-            const newCode = document.getElementById('codeArea').value;
-            const blob = new Blob([newCode], {type: 'text/html'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'StudyTimer.html';
-            a.click();
-        }
-
-        // تشغيل العرض الأولي عند فتح الصفحة
         updateDisplay();
     </script>
-
-</body></html>
+</body>
+</html>
