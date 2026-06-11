@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Study Timer</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
+    
     <style>
         body { 
             background: #0f0f16; 
@@ -90,6 +92,7 @@
         const ctx = canvas.getContext('2d');
         const video = document.getElementById('pipVideo');
 
+        // تحديث شاشة العداد وحفظ الوقت
         function updateDisplay() {
             let mins = Math.floor(seconds / 60);
             let secs = seconds % 60;
@@ -118,6 +121,7 @@
             updateDisplay(); 
         }
 
+        // رسم العداد داخل الكانفاس لميزة الـ Mini
         function drawCanvasTimer() {
             ctx.fillStyle = "#0f0f16"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -127,6 +131,7 @@
             ctx.fillText(document.getElementById('timerDisplay').innerText, canvas.width / 2, 95);
         }
 
+        // تشغيل ميزة الـ Mini (Picture-in-Picture)
         async function requestMini() {
             drawCanvasTimer(); 
             if(canvasInterval) clearInterval(canvasInterval);
@@ -138,6 +143,7 @@
             await video.requestPictureInPicture();
         }
 
+        // تشغيل العداد فور فتح الصفحة بناءً على القيمة المحفوظة
         updateDisplay();
     </script>
 </body>
