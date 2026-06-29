@@ -171,11 +171,12 @@
         let breakTimerId = null;
         let currentActiveMode = 'study'; 
 
-        // سياق الصوت للتنبيه (Audio Context)
-        let audioCtx = null;
-        let alarmInterval = null;
+        // نظام الصوت المخصص الخاص بك برابطك المباشر الجديد
+        const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
+        let customAudio = new Audio(MY_AUDIO_URL);
 
         window.onload = function() {
+            document.title = "Study Timer";
             updateStudyDisplay();
             setBreakDuration();
         }
@@ -185,7 +186,6 @@
             currentActiveMode = mode;
             const body = document.body;
             
-            // تم تنظيف هذا الجزء بالكامل ليبقى اسم التبويب "Study Timer" ثابتاً ولا يتغير أبداً لأي اسم آخر
             if(mode === 'break') {
                 body.classList.add('break-theme');
                 document.getElementById('studyContainer').classList.remove('active');
@@ -215,6 +215,12 @@
                 studyTimerId = setInterval(()=>{ 
                     studySeconds++; 
                     updateStudyDisplay(); 
+
+                    // تنبيه مخصص بصوتك عند اكتمال كل ساعة مذاكرة (3600 ثانية)
+                    if (studySeconds > 0 && studySeconds % 3600 === 0) {
+                        playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
+                    }
+
                     if(document.pictureInPictureElement && currentActiveMode === 'study') {
                         updatePipCanvas('studyDisplay');
                     }
@@ -231,6 +237,7 @@
             updateBreakDisplay();
         }
 
+        // تحديث واجهة مؤقت الاستراحة
         function updateBreakDisplay() {
             let mins = Math.floor(breakSeconds / 60);
             let secs = breakSeconds % 60;
@@ -250,7 +257,7 @@
                         }
                     } else {
                         pauseBreak();
-                        playAlarm();
+                        playAlarm("وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚");
                     }
                 }, 1000);
             }
@@ -258,61 +265,28 @@
         function pauseBreak() { clearInterval(breakTimerId); breakTimerId = null; }
         function endBreak() { pauseBreak(); setBreakDuration(); stopAlarm(); if(document.pictureInPictureElement && currentActiveMode === 'break') updatePipCanvas('breakDisplay'); }
 
-        // --- إنتاج صوت إنذار احترافي (Beep) وإرسال إشعار ---
-        function playAlarm() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // --- نظام تشغيل الصوت المخصص والإشعارات ---
+        function playAlarm(notificationText) {
+            customAudio.pause();
+            customAudio.currentTime = 0;
             
-            alarmInterval = setInterval(() => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3); 
-            }, 1000);
+            // تشغيل صوت عمرو المخصص
+            customAudio.play().catch(e => console.log("تحتاج للتفاعل مع الصفحة أولاً لتشغيل الصوت: ", e));
 
             if (Notification.permission === "granted") {
-                new Notification("Study Timer", { body: "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" });
+                new Notification("Study Timer", { body: notificationText });
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(permission => {
                     if (permission === "granted") {
-                        new Notification("Study Timer", { body: "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" });
+                        new Notification("Study Timer", { body: notificationText });
                     }
                 });
             }
         }
 
         function stopAlarm() {
-            if(alarmInterval) {
-                clearInterval(alarmInterval);
-                alarmInterval = null;
-            }
-        }
-
-        // --- نظام الـ Mini Player الذكي (Picture-in-Picture) ---
-        function updatePipCanvas(targetDisplayId) {
-            const canvas = document.getElementById('videoCanvas');
-            const ctx = canvas.getContext('2d');
-            const textColor = (targetDisplayId === 'breakDisplay') ? "#cba6f7" : "#a6e3a1";
-            
-            ctx.fillStyle = "#0f0f16"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = textColor; ctx.font = "bold 55px Courier New";
-            ctx.textAlign = "center"; ctx.fillText(document.getElementById(targetDisplayId).innerText, canvas.width/2, 95);
-        }
-
-        async function requestMini(targetDisplayId) {
-            const canvas = document.getElementById('videoCanvas');
-            const video = document.getElementById('pipVideo');
-            
-            updatePipCanvas(targetDisplayId);
-            
-            const stream = canvas.captureStream(10);
-            video.srcObject = stream;
-            await video.play();
-            await video.requestPictureInPicture();
+            customAudio.pause();
+            customAudio.currentTime = 0;
         }
     </script>
 </body>
