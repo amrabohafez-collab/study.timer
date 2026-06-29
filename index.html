@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- اسم التبويب العلوي للمتصفح -->
     <title>Study Timer</title>
     
+    <!-- كود الصورة المصغرة الخاصة بك (Favicon) للمتصفح من الأعلى -->
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -27,7 +29,7 @@
             color: #cba6f7; 
         }
 
-        /* اسم الموقع بشكل بسيط وأنيق */
+        /* اسم الموقع بشكل بسيط وأنيق وثابت */
         .brand-title {
             font-size: 2.5rem;
             font-weight: 600;
@@ -118,9 +120,11 @@
 </head>
 <body>
 
+    <!-- اسم الموقع البسيط الثابت في الصفحة -->
     <div class="brand-title" id="appTitle">Study Timer</div>
 
     <div id="mainApp">
+        <!-- مؤقت الدراسة (الافتراضي) -->
         <div id="studyContainer" class="timer-box active">
             <div id="studyDisplay" class="timer-display">00:00</div>
             <div class="controls">
@@ -132,6 +136,7 @@
             </div>
         </div>
 
+        <!-- مؤقت الاستراحة (المنفصل) -->
         <div id="breakContainer" class="timer-box">
             <div id="breakDisplay" class="timer-display">05:00</div>
             <div class="break-input-group">
@@ -148,6 +153,7 @@
         </div>
     </div>
 
+    <!-- الحقوق الاحترافية البسيطة في الأسفل خالص -->
     <div class="footer-credits">
         © 2026 Amr Abdelhalim . All Rights Reserved
     </div>
@@ -178,16 +184,14 @@
         function switchMode(mode) {
             currentActiveMode = mode;
             const body = document.body;
-            const title = document.getElementById('appTitle');
             
+            // تم إزالة السطور التي كانت تقوم بتغيير text العنوان الداخلي ليظل ثابتاً "Study Timer"
             if(mode === 'break') {
                 body.classList.add('break-theme');
-                title.innerText = "Break Time";
                 document.getElementById('studyContainer').classList.remove('active');
                 document.getElementById('breakContainer').classList.add('active');
             } else {
                 body.classList.remove('break-theme');
-                title.innerText = "Study Timer";
                 document.getElementById('breakContainer').classList.remove('active');
                 document.getElementById('studyContainer').classList.add('active');
                 stopAlarm(); 
