@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- اسم التبويب العلوي للمتصفح -->
+    <!-- اسم التبويب العلوي للمتصفح ثابت -->
     <title>Study Timer</title>
     
     <!-- كود الصورة المصغرة الخاصة بك (Favicon) للمتصفح من الأعلى -->
@@ -185,7 +185,7 @@
             currentActiveMode = mode;
             const body = document.body;
             
-            // تم إزالة السطور التي كانت تقوم بتغيير text العنوان الداخلي ليظل ثابتاً "Study Timer"
+            // تم تنظيف هذا الجزء بالكامل ليبقى اسم التبويب "Study Timer" ثابتاً ولا يتغير أبداً لأي اسم آخر
             if(mode === 'break') {
                 body.classList.add('break-theme');
                 document.getElementById('studyContainer').classList.remove('active');
