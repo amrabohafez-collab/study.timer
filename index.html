@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- اسم التبويب العلوي للمتصفح ثابت -->
     <title>Study Timer</title>
     
     <!-- كود الصورة المصغرة الخاصة بك (Favicon) للمتصفح من الأعلى -->
@@ -171,9 +170,10 @@
         let breakTimerId = null;
         let currentActiveMode = 'study'; 
 
-        // نظام الصوت المخصص الخاص بك برابطك المباشر الجديد
+        // رابط صوت عمرو المباشر من catbox
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
+        let audioStopTimeout = null; // تايمر للتحكم في الـ 12 ثانية بالملي ثانية
 
         window.onload = function() {
             document.title = "Study Timer";
@@ -237,7 +237,6 @@
             updateBreakDisplay();
         }
 
-        // تحديث واجهة مؤقت الاستراحة
         function updateBreakDisplay() {
             let mins = Math.floor(breakSeconds / 60);
             let secs = breakSeconds % 60;
@@ -265,13 +264,22 @@
         function pauseBreak() { clearInterval(breakTimerId); breakTimerId = null; }
         function endBreak() { pauseBreak(); setBreakDuration(); stopAlarm(); if(document.pictureInPictureElement && currentActiveMode === 'break') updatePipCanvas('breakDisplay'); }
 
-        // --- نظام تشغيل الصوت المخصص والإشعارات ---
+        // --- نظام تشغيل الصوت المخصص والإشعارات الذكية ---
         function playAlarm(notificationText) {
+            // تنظيف أي تايمر إيقاف قديم أو صوت شغال حالياً
+            if(audioStopTimeout) clearTimeout(audioStopTimeout);
             customAudio.pause();
             customAudio.currentTime = 0;
             
             // تشغيل صوت عمرو المخصص
-            customAudio.play().catch(e => console.log("تحتاج للتفاعل مع الصفحة أولاً لتشغيل الصوت: ", e));
+            customAudio.play().catch(e => {
+                console.log("المتصفح حظر الصوت التلقائي، اضغط Start أو أي مكان في الصفحة أولاً لتفعيله.", e);
+            });
+
+            // إيقاف التنبيه تلقائياً بعد 12 ثانية (12000 مللي ثانية) بالضبط
+            audioStopTimeout = setTimeout(() => {
+                stopAlarm();
+            }, 12000);
 
             if (Notification.permission === "granted") {
                 new Notification("Study Timer", { body: notificationText });
@@ -285,6 +293,7 @@
         }
 
         function stopAlarm() {
+            if(audioStopTimeout) clearTimeout(audioStopTimeout);
             customAudio.pause();
             customAudio.currentTime = 0;
         }
