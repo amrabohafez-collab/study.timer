@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Study Timer</title>
     
-    <!-- كود الصورة المصغرة الخاصة بك (Favicon) للمتصفح من الأعلى -->
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -119,11 +118,9 @@
 </head>
 <body>
 
-    <!-- اسم الموقع البسيط الثابت في الصفحة -->
     <div class="brand-title" id="appTitle">Study Timer</div>
 
     <div id="mainApp">
-        <!-- مؤقت الدراسة (الافتراضي) -->
         <div id="studyContainer" class="timer-box active">
             <div id="studyDisplay" class="timer-display">00:00</div>
             <div class="controls">
@@ -135,7 +132,6 @@
             </div>
         </div>
 
-        <!-- مؤقت الاستراحة (المنفصل) -->
         <div id="breakContainer" class="timer-box">
             <div id="breakDisplay" class="timer-display">05:00</div>
             <div class="break-input-group">
@@ -152,13 +148,12 @@
         </div>
     </div>
 
-    <!-- الحقوق الاحترافية البسيطة في الأسفل خالص -->
     <div class="footer-credits">
         © 2026 Amr Abdelhalim . All Rights Reserved
     </div>
 
     <canvas id="videoCanvas" width="300" height="150" style="display:none;"></canvas>
-    <video id="pipVideo" width="300" height="150" autoplay muted style="display:none;"></video>
+    <video id="pipVideo" width="300" height="150" autoplay muted loop style="display:none;"></video>
 
     <script>
         // داتا مؤقت الدراسة (تصاعدي)
@@ -173,12 +168,21 @@
         // رابط صوت عمرو المباشر من catbox
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
-        let audioStopTimeout = null; // تايمر للتحكم في الـ 12 ثانية بالملي ثانية
+        let audioStopTimeout = null;
 
         window.onload = function() {
             document.title = "Study Timer";
             updateStudyDisplay();
             setBreakDuration();
+            setupPipStream(); // تجهيز البث المباشر للشاشة العائمة فور تحميل الصفحة
+        }
+
+        // تجهيز قنوات عرض الـ Mini Player لمنع أي حظر من المتصفح
+        function setupPipStream() {
+            const canvas = document.getElementById('videoCanvas');
+            const video = document.getElementById('pipVideo');
+            const stream = canvas.captureStream(10);
+            video.srcObject = stream;
         }
 
         // --- نظام التبديل بين المودات والواجهات ---
@@ -216,7 +220,6 @@
                     studySeconds++; 
                     updateStudyDisplay(); 
 
-                    // تنبيه مخصص بصوتك عند اكتمال كل ساعة مذاكرة (3600 ثانية)
                     if (studySeconds > 0 && studySeconds % 3600 === 0) {
                         playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
                     }
@@ -266,17 +269,12 @@
 
         // --- نظام تشغيل الصوت المخصص والإشعارات الذكية ---
         function playAlarm(notificationText) {
-            // تنظيف أي تايمر إيقاف قديم أو صوت شغال حالياً
             if(audioStopTimeout) clearTimeout(audioStopTimeout);
             customAudio.pause();
             customAudio.currentTime = 0;
             
-            // تشغيل صوت عمرو المخصص
-            customAudio.play().catch(e => {
-                console.log("المتصفح حظر الصوت التلقائي، اضغط Start أو أي مكان في الصفحة أولاً لتفعيله.", e);
-            });
+            customAudio.play().catch(e => console.log("خطأ في تشغيل الصوت التلقائي: ", e));
 
-            // إيقاف التنبيه تلقائياً بعد 12 ثانية (12000 مللي ثانية) بالضبط
             audioStopTimeout = setTimeout(() => {
                 stopAlarm();
             }, 12000);
@@ -296,6 +294,45 @@
             if(audioStopTimeout) clearTimeout(audioStopTimeout);
             customAudio.pause();
             customAudio.currentTime = 0;
+        }
+
+        // --- نظام الـ Mini Player الذكي والمحدث (Picture-in-Picture) ---
+        function updatePipCanvas(targetDisplayId) {
+            const canvas = document.getElementById('videoCanvas');
+            const ctx = canvas.getContext('2d');
+            const textColor = (targetDisplayId === 'breakDisplay') ? "#cba6f7" : "#a6e3a1";
+            
+            ctx.fillStyle = "#0f0f16"; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = textColor; 
+            ctx.font = "bold 55px Courier New";
+            ctx.textAlign = "center"; 
+            ctx.fillText(document.getElementById(targetDisplayId).innerText, canvas.width/2, 95);
+        }
+
+        // تشغيل فوري للـ Mini Player بمجرد الضغط المباشر على الزر
+        async function requestMini(targetDisplayId) {
+            const video = document.getElementById('pipVideo');
+            
+            try {
+                updatePipCanvas(targetDisplayId);
+                
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else {
+                    await video.play();
+                    await video.requestPictureInPicture();
+                    // تكرار التحديث لضمان ثبات التايمر في الشاشة الصغيرة
+                    setInterval(() => {
+                        if(document.pictureInPictureElement) {
+                            updatePipCanvas(currentActiveMode === 'break' ? 'breakDisplay' : 'studyDisplay');
+                        }
+                    }, 500);
+                }
+            } catch (error) {
+                console.error("فشل وضع التايمر المصغر: ", error);
+                alert("تأكد من الضغط على زر Start أولاً لتفعيل الواجهة قبل تشغيل الـ Mini!");
+            }
         }
     </script>
 </body>
