@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Study Timer</title>
     
+    <!-- كود الصورة المصغرة الخاصة بك (Favicon) للمتصفح من الأعلى -->
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -118,11 +119,13 @@
 </head>
 <body>
 
+    <!-- اسم الموقع البسيط الثابت في الصفحة -->
     <div class="brand-title" id="appTitle">Study Timer</div>
 
     <div id="mainApp">
+        <!-- مؤقت الدراسة (الافتراضي) -->
         <div id="studyContainer" class="timer-box active">
-            <div id="studyDisplay" class="timer-display">00:00</div>
+            <div id="studyDisplay" class="timer-display">00:00:00</div>
             <div class="controls">
                 <button onclick="startStudy()">Start</button>
                 <button onclick="pauseStudy()">Pause</button>
@@ -132,11 +135,12 @@
             </div>
         </div>
 
+        <!-- مؤقت الاستراحة (المنفصل) -->
         <div id="breakContainer" class="timer-box">
-            <div id="breakDisplay" class="timer-display">05:00</div>
+            <div id="breakDisplay" class="timer-display">00:05:00</div>
             <div class="break-input-group">
                 <label>Set Minutes: </label>
-                <input type="number" id="breakMinutesInput" value="5" min="1" max="60" onchange="setBreakDuration()">
+                <input type="number" id="breakMinutesInput" value="5" min="1" max="180" onchange="setBreakDuration()">
             </div>
             <div class="controls">
                 <button onclick="startBreak()">Start</button>
@@ -148,12 +152,14 @@
         </div>
     </div>
 
+    <!-- الحقوق الاحترافية البسيطة في الأسفل خالص -->
     <div class="footer-credits">
         © 2026 Amr Abdelhalim . All Rights Reserved
     </div>
 
-    <canvas id="videoCanvas" width="300" height="150" style="display:none;"></canvas>
-    <video id="pipVideo" width="300" height="150" autoplay muted loop style="display:none;"></video>
+    <!-- العناصر المخفية المسؤولة عن الـ Mini Mode -->
+    <canvas id="videoCanvas" width="360" height="150" style="display:none;"></canvas>
+    <video id="pipVideo" width="360" height="150" autoplay muted loop style="display:none;"></video>
 
     <script>
         // داتا مؤقت الدراسة (تصاعدي)
@@ -174,10 +180,9 @@
             document.title = "Study Timer";
             updateStudyDisplay();
             setBreakDuration();
-            setupPipStream(); // تجهيز البث المباشر للشاشة العائمة فور تحميل الصفحة
+            setupPipStream();
         }
 
-        // تجهيز قنوات عرض الـ Mini Player لمنع أي حظر من المتصفح
         function setupPipStream() {
             const canvas = document.getElementById('videoCanvas');
             const video = document.getElementById('pipVideo');
@@ -205,11 +210,12 @@
             }
         }
 
-        // --- منطق مؤقت الدراسة (Study Timer - تصاعدي) ---
+        // --- منطق مؤقت الدراسة (Study Timer - نظام HH:MM:SS) ---
         function updateStudyDisplay() {
-            let mins = Math.floor(studySeconds / 60);
+            let hours = Math.floor(studySeconds / 3600);
+            let mins = Math.floor((studySeconds % 3600) / 60);
             let secs = studySeconds % 60;
-            let timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            let timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             document.getElementById('studyDisplay').innerText = timeStr;
             localStorage.setItem('savedStudySeconds', studySeconds);
         }
@@ -220,6 +226,7 @@
                     studySeconds++; 
                     updateStudyDisplay(); 
 
+                    // تنبيه مخصص بصوتك عند اكتمال كل ساعة مذاكرة بالظبط
                     if (studySeconds > 0 && studySeconds % 3600 === 0) {
                         playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
                     }
@@ -233,7 +240,7 @@
         function pauseStudy() { clearInterval(studyTimerId); studyTimerId = null; }
         function endStudy() { pauseStudy(); studySeconds = 0; updateStudyDisplay(); if(document.pictureInPictureElement && currentActiveMode === 'study') updatePipCanvas('studyDisplay'); }
 
-        // --- منطق مؤقت الاستراحة (Break Timer - تنازلـي) ---
+        // --- منطق مؤقت الاستراحة (Break Timer - نظام HH:MM:SS) ---
         function setBreakDuration() {
             const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 5;
             breakSeconds = minsInput * 60;
@@ -241,9 +248,10 @@
         }
 
         function updateBreakDisplay() {
-            let mins = Math.floor(breakSeconds / 60);
+            let hours = Math.floor(breakSeconds / 3600);
+            let mins = Math.floor((breakSeconds % 3600) / 60);
             let secs = breakSeconds % 60;
-            let timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            let timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             document.getElementById('breakDisplay').innerText = timeStr;
         }
 
@@ -296,7 +304,7 @@
             customAudio.currentTime = 0;
         }
 
-        // --- نظام الـ Mini Player الذكي والمحدث (Picture-in-Picture) ---
+        // --- نظام الـ Mini Player الذكي والمحدث (توسيع الحجم لـ 3 خانات) ---
         function updatePipCanvas(targetDisplayId) {
             const canvas = document.getElementById('videoCanvas');
             const ctx = canvas.getContext('2d');
@@ -305,12 +313,11 @@
             ctx.fillStyle = "#0f0f16"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = textColor; 
-            ctx.font = "bold 55px Courier New";
+            ctx.font = "bold 44px Courier New"; // تعديل الخط ليتناسب مع الخانات الثلاثة
             ctx.textAlign = "center"; 
-            ctx.fillText(document.getElementById(targetDisplayId).innerText, canvas.width/2, 95);
+            ctx.fillText(document.getElementById(targetDisplayId).innerText, canvas.width/2, 90);
         }
 
-        // تشغيل فوري للـ Mini Player بمجرد الضغط المباشر على الزر
         async function requestMini(targetDisplayId) {
             const video = document.getElementById('pipVideo');
             
@@ -322,7 +329,7 @@
                 } else {
                     await video.play();
                     await video.requestPictureInPicture();
-                    // تكرار التحديث لضمان ثبات التايمر في الشاشة الصغيرة
+                    
                     setInterval(() => {
                         if(document.pictureInPictureElement) {
                             updatePipCanvas(currentActiveMode === 'break' ? 'breakDisplay' : 'studyDisplay');
