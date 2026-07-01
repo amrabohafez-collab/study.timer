@@ -22,13 +22,11 @@
             transition: background 0.5s, color 0.5s;
         }
 
-        /* ثيم وضع الاستراحة المخصص */
         body.break-theme {
             background: #110f18;
             color: #cba6f7; 
         }
 
-        /* اسم الموقع بشكل بسيط وأنيق وثابت */
         .brand-title {
             font-size: 2.5rem;
             font-weight: 600;
@@ -41,7 +39,6 @@
             color: #cba6f7;
         }
 
-        /* حقوق الملكية الاحترافية البسيطة في الأسفل */
         .footer-credits {
             position: absolute;
             bottom: 25px;
@@ -51,22 +48,30 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* واجهة التايمر الرئيسية */
         #mainApp { text-align: center; width: 100%; }
         
-        /* قسم المؤقتات */
         .timer-box { display: none; }
         .timer-box.active { display: block; }
 
         .timer-display { font-size: 6rem; font-weight: bold; text-shadow: 0 0 20px rgba(166, 227, 161, 0.3); margin-bottom: 10px; }
         body.break-theme .timer-display { text-shadow: 0 0 20px rgba(203, 166, 247, 0.3); }
         
-        /* مدخلات وقت الاستراحة */
+        /* تصميم مدخلات وقت الاستراحة المطور للساعات والدقائق */
         .break-input-group {
             margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            align-items: center;
+        }
+        .break-input-group .input-field {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
         .break-input-group label {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             opacity: 0.8;
         }
         .break-input-group input {
@@ -75,7 +80,7 @@
             padding: 8px 12px;
             border-radius: 8px;
             color: #cdd6f4;
-            width: 70px;
+            width: 60px;
             text-align: center;
             font-size: 1rem;
             outline: none;
@@ -88,7 +93,6 @@
 
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         
-        /* الأزرار وتأثيراتها حسب الوضع */
         button { 
             padding: 12px 25px; 
             cursor: pointer; 
@@ -112,20 +116,18 @@
             box-shadow: 0 0 15px rgba(203, 166, 247, 0.4);
         }
 
-        /* أزرار خاصة للتحويل بين المودات */
         #breakModeBtn { background: #110f18; color: #cba6f7; border-color: #cba6f7; }
         #studyModeBtn { background: #0f0f16; color: #a6e3a1; border-color: #a6e3a1; }
     </style>
 </head>
 <body>
 
-    <!-- اسم الموقع البسيط الثابت في الصفحة -->
     <div class="brand-title" id="appTitle">Study Timer</div>
 
     <div id="mainApp">
-        <!-- مؤقت الدراسة (الافتراضي) -->
+        <!-- مؤقت الدراسة (تصاعدي ديناميكي) -->
         <div id="studyContainer" class="timer-box active">
-            <div id="studyDisplay" class="timer-display">00:00:00</div>
+            <div id="studyDisplay" class="timer-display">00:00</div>
             <div class="controls">
                 <button onclick="startStudy()">Start</button>
                 <button onclick="pauseStudy()">Pause</button>
@@ -135,12 +137,18 @@
             </div>
         </div>
 
-        <!-- مؤقت الاستراحة (المنفصل) -->
+        <!-- مؤقت الاستراحة (تنازلي ديناميكي) -->
         <div id="breakContainer" class="timer-box">
-            <div id="breakDisplay" class="timer-display">00:05:00</div>
+            <div id="breakDisplay" class="timer-display">05:00</div>
             <div class="break-input-group">
-                <label>Set Minutes: </label>
-                <input type="number" id="breakMinutesInput" value="5" min="1" max="180" onchange="setBreakDuration()">
+                <div class="input-field">
+                    <label>Hours</label>
+                    <input type="number" id="breakHoursInput" value="0" min="0" max="24" onchange="setBreakDuration()">
+                </div>
+                <div class="input-field">
+                    <label>Minutes</label>
+                    <input type="number" id="breakMinutesInput" value="5" min="0" max="59" onchange="setBreakDuration()">
+                </div>
             </div>
             <div class="controls">
                 <button onclick="startBreak()">Start</button>
@@ -152,26 +160,21 @@
         </div>
     </div>
 
-    <!-- الحقوق الاحترافية البسيطة في الأسفل خالص -->
     <div class="footer-credits">
         © 2026 Amr Abdelhalim . All Rights Reserved
     </div>
 
-    <!-- العناصر المخفية المسؤولة عن الـ Mini Mode -->
     <canvas id="videoCanvas" width="360" height="150" style="display:none;"></canvas>
     <video id="pipVideo" width="360" height="150" autoplay muted loop style="display:none;"></video>
 
     <script>
-        // داتا مؤقت الدراسة (تصاعدي)
         let studySeconds = parseInt(localStorage.getItem('savedStudySeconds')) || 0;
         let studyTimerId = null;
 
-        // داتا مؤقت الاستراحة (تنازلي)
         let breakSeconds = 300; 
         let breakTimerId = null;
         let currentActiveMode = 'study'; 
 
-        // رابط صوت عمرو المباشر من catbox
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
         let audioStopTimeout = null;
@@ -190,7 +193,6 @@
             video.srcObject = stream;
         }
 
-        // --- نظام التبديل بين المودات والواجهات ---
         function switchMode(mode) {
             currentActiveMode = mode;
             const body = document.body;
@@ -210,12 +212,27 @@
             }
         }
 
-        // --- منطق مؤقت الدراسة (Study Timer - نظام HH:MM:SS) ---
+        // دالة ذكية لتنسيق الوقت وإظهار خانة الساعات فقط عند الحاجة إليها
+        function formatDynamicTime(totalSeconds) {
+            let hours = Math.floor(totalSeconds / 3600);
+            let mins = Math.floor((totalSeconds % 3600) / 60);
+            let secs = totalSeconds % 60;
+
+            let minsStr = mins.toString().padStart(2, '0');
+            let secsStr = secs.toString().padStart(2, '0');
+
+            // إذا مرّت ساعة أو أكثر، افتح خانة الساعات تلقائياً
+            if (hours > 0) {
+                return `${hours}:${minsStr}:${secsStr}`;
+            } else {
+                // الوضع الافتراضي البسيط
+                return `${minsStr}:${secsStr}`;
+            }
+        }
+
+        // --- منطق مؤقت الدراسة ---
         function updateStudyDisplay() {
-            let hours = Math.floor(studySeconds / 3600);
-            let mins = Math.floor((studySeconds % 3600) / 60);
-            let secs = studySeconds % 60;
-            let timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            let timeStr = formatDynamicTime(studySeconds);
             document.getElementById('studyDisplay').innerText = timeStr;
             localStorage.setItem('savedStudySeconds', studySeconds);
         }
@@ -226,7 +243,6 @@
                     studySeconds++; 
                     updateStudyDisplay(); 
 
-                    // تنبيه مخصص بصوتك عند اكتمال كل ساعة مذاكرة بالظبط
                     if (studySeconds > 0 && studySeconds % 3600 === 0) {
                         playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
                     }
@@ -240,18 +256,17 @@
         function pauseStudy() { clearInterval(studyTimerId); studyTimerId = null; }
         function endStudy() { pauseStudy(); studySeconds = 0; updateStudyDisplay(); if(document.pictureInPictureElement && currentActiveMode === 'study') updatePipCanvas('studyDisplay'); }
 
-        // --- منطق مؤقت الاستراحة (Break Timer - نظام HH:MM:SS) ---
+        // --- منطق مؤقت الاستراحة ---
         function setBreakDuration() {
-            const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 5;
-            breakSeconds = minsInput * 60;
+            const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            
+            breakSeconds = (hoursInput * 3600) + (minsInput * 60);
             updateBreakDisplay();
         }
 
         function updateBreakDisplay() {
-            let hours = Math.floor(breakSeconds / 3600);
-            let mins = Math.floor((breakSeconds % 3600) / 60);
-            let secs = breakSeconds % 60;
-            let timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            let timeStr = formatDynamicTime(breakSeconds);
             document.getElementById('breakDisplay').innerText = timeStr;
         }
 
@@ -275,13 +290,13 @@
         function pauseBreak() { clearInterval(breakTimerId); breakTimerId = null; }
         function endBreak() { pauseBreak(); setBreakDuration(); stopAlarm(); if(document.pictureInPictureElement && currentActiveMode === 'break') updatePipCanvas('breakDisplay'); }
 
-        // --- نظام تشغيل الصوت المخصص والإشعارات الذكية ---
+        // --- نظام تشغيل الصوت المخصص والإشعارات ---
         function playAlarm(notificationText) {
             if(audioStopTimeout) clearTimeout(audioStopTimeout);
             customAudio.pause();
             customAudio.currentTime = 0;
             
-            customAudio.play().catch(e => console.log("خطأ في تشغيل الصوت التلقائي: ", e));
+            customAudio.play().catch(e => console.log("خطأ تشغيل الصوت: ", e));
 
             audioStopTimeout = setTimeout(() => {
                 stopAlarm();
@@ -304,32 +319,32 @@
             customAudio.currentTime = 0;
         }
 
-        // --- نظام الـ Mini Player الذكي والمحدث (توسيع الحجم لـ 3 خانات) ---
+        // --- نظام الـ Mini Player الذكي الديناميكي ---
         function updatePipCanvas(targetDisplayId) {
             const canvas = document.getElementById('videoCanvas');
             const ctx = canvas.getContext('2d');
             const textColor = (targetDisplayId === 'breakDisplay') ? "#cba6f7" : "#a6e3a1";
+            const textText = document.getElementById(targetDisplayId).innerText;
             
             ctx.fillStyle = "#0f0f16"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = textColor; 
-            ctx.font = "bold 44px Courier New"; // تعديل الخط ليتناسب مع الخانات الثلاثة
+            
+            // تصغير الخط نسبياً لو عدد الخانات كبر للساعات
+            ctx.font = textText.length > 5 ? "bold 42px Courier New" : "bold 55px Courier New";
             ctx.textAlign = "center"; 
-            ctx.fillText(document.getElementById(targetDisplayId).innerText, canvas.width/2, 90);
+            ctx.fillText(textText, canvas.width/2, 90);
         }
 
         async function requestMini(targetDisplayId) {
             const video = document.getElementById('pipVideo');
-            
             try {
                 updatePipCanvas(targetDisplayId);
-                
                 if (document.pictureInPictureElement) {
                     await document.exitPictureInPicture();
                 } else {
                     await video.play();
                     await video.requestPictureInPicture();
-                    
                     setInterval(() => {
                         if(document.pictureInPictureElement) {
                             updatePipCanvas(currentActiveMode === 'break' ? 'breakDisplay' : 'studyDisplay');
