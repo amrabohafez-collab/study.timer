@@ -307,39 +307,37 @@
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return { textTime: "--:--", periodName: "" };
 
-            let hours = dateObj.getHours();
+            let hours = dateObj.getHours(); 
             let minutes = dateObj.getMinutes();
             let totalMinutes = (hours * 60) + minutes;
 
-            const fajr = (4 * 60) + 15;      
-            const shrooq = (6 * 60) + 0;     
-            const dhuhr = (13 * 60) + 0;     
-            const asr = (16 * 60) + 30;      
-            const maghrib = (20 * 60) + 0;   
-            const isha = (21 * 60) + 30;     
-
             let periodName = "";
-            
-            // تم تصليح الشروط البرمجية بدقة لتعمل بترتيب اليوم الصحيح بنظام الـ 24 ساعة
-            if (totalMinutes >= fajr && totalMinutes < shrooq) {
-                periodName = "فجراً";
-            } else if (totalMinutes >= shrooq && totalMinutes < dhuhr) {
-                periodName = "شروق";
-            } else if (totalMinutes >= dhuhr && totalMinutes < asr) {
-                periodName = "ظهراً";
-            } else if (totalMinutes >= asr && totalMinutes < maghrib) {
-                periodName = "عصراً";
-            } else if (totalMinutes >= maghrib && totalMinutes < isha) {
-                periodName = "المغرب";
-            } else if (totalMinutes >= isha && totalMinutes < 1440) {
-                periodName = "العشاء";
-            } else {
-                periodName = "الليل"; 
-            }
 
-            // لو احنا بعد نص الليل (الساعة 0) وقبل الفجر (4:15)، تظهر "الليل"
-            if (totalMinutes >= 0 && totalMinutes < fajr) {
-                periodName = "الليل";
+            // الميقات الفعلي بالدقائق كما حددته تماماً وكل اسم يستمر حتى مجيء الذي يليه
+            let m430_am = (4 * 60) + 30;  // 4:30 ص (فجراً)
+            let m600_am = (6 * 60);       // 6:00 ص (الشروق)
+            let m800_am = (8 * 60);       // 8:00 ص (صباحاً)
+            let m1200_pm = (12 * 60);     // 12:00 م (ظهراً)
+            let m430_pm = (16 * 60) + 30; // 4:30 م (عصراً)
+            let m800_pm = (20 * 60);      // 8:00 م (المغرب)
+            let m930_pm = (21 * 60) + 30; // 9:30 م (العشاء)
+
+            if (totalMinutes >= m430_am && totalMinutes < m600_am) {
+                periodName = "فجراً";
+            } else if (totalMinutes >= m600_am && totalMinutes < m800_am) {
+                periodName = "الشروق";
+            } else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) {
+                periodName = "صباحاً";
+            } else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) {
+                periodName = "ظهراً";
+            } else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) {
+                periodName = "عصراً";
+            } else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) {
+                periodName = "المغرب";
+            } else if (totalMinutes >= m930_pm && totalMinutes < 1440) { 
+                periodName = "العشاء";
+            } else { 
+                periodName = "الليل"; // من 12:00 ص وحتى 4:30 ص
             }
 
             let displayHours = hours;
