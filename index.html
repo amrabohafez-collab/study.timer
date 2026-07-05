@@ -137,8 +137,8 @@
 <body>
 
     <div class="cairo-live-widget">
-        <div id="cairoClock" class="widget-clock">جاري حساب التوقيت...</div>
-        <div id="cairoDate">جاري حساب التاريخ...</div>
+        <div id="cairoClock" class="widget-clock">جاري الحساب...</div>
+        <div id="cairoDate">جاري الحساب...</div>
     </div>
 
     <div class="top-bar">
@@ -268,8 +268,6 @@
 
         let currentActiveMode = 'study';
         let sessionStartTime = null; 
-        
-        // كائن الوقت الداخلي
         let currentCairoGlobalDateObject = new Date(); 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
@@ -290,38 +288,41 @@
             startCairoLiveClockAndEngine(); 
         }
 
-        // الفانكشن دي تم تعديلها جذرياً لتقرأ مباشرة بتوقيت مصر الجغرافي الفعلي من نظام تشغيلك
+        // دالة الفترات الفولاذية والمحسنة لمنع تداخل نظام 12 ساعة مع الـ 24 ساعة
         function getCairoPrayerPeriodInfo(dateObj) {
-            if (!dateObj) return { textTime: "--:--", periodName: "" };
+            if (!dateObj) return "00:00";
 
-            // تحويل واستخراج الساعة والدقيقة بنظام 24 ساعة لجمهورية مصر العربية فوراً
-            let formatter = new Intl.DateTimeFormat('en-US', {
+            // فحص وتحديد الساعات بصيغة الـ 24 ساعة الإجبارية لمنع أي تلاعب من المتصفح
+            let formatter24 = new Intl.DateTimeFormat('en-US', {
                 timeZone: 'Africa/Cairo',
                 hour: 'numeric',
-                minute: 'numeric',
                 hour12: false
             });
             
-            let parts = formatter.formatToParts(dateObj);
-            let hours = 0;
-            let minutes = 0;
-            
-            parts.forEach(p => {
-                if (p.type === 'hour') hours = parseInt(p.value, 10);
-                if (p.type === 'minute') minutes = parseInt(p.value, 10);
+            let formatterMinutes = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Africa/Cairo',
+                minute: 'numeric'
             });
+
+            let hours = parseInt(formatter24.format(dateObj), 10);
+            let minutes = parseInt(formatterMinutes.format(dateObj), 10);
+
+            // تأكيد برمجي نهائي لحالة الظهر الحالية في مصر
+            let check12HourFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: true }).format(dateObj);
+            if (check12HourFormat.includes("PM") && hours < 12) {
+                hours += 12; // تحويل فوري وصحيح للتوقيت المسائي والنهاري
+            }
 
             let totalMinutes = (hours * 60) + minutes;
             let periodName = "";
 
-            // مواقيت اليوم بالدقائق
-            let m430_am = (4 * 60) + 30;  // 4:30 ص
-            let m600_am = (6 * 60);       // 6:00 ص
-            let m800_am = (8 * 60);       // 8:00 ص
-            let m1200_pm = (12 * 60);     // 12:00 م
-            let m430_pm = (16 * 60) + 30; // 4:30 م
-            let m800_pm = (20 * 60);      // 8:00 م
-            let m930_pm = (21 * 60) + 30; // 9:30 م
+            let m430_am = (4 * 60) + 30;  
+            let m600_am = (6 * 60);       
+            let m800_am = (8 * 60);       
+            let m1200_pm = (12 * 60);     
+            let m430_pm = (16 * 60) + 30; 
+            let m800_pm = (20 * 60);      
+            let m930_pm = (21 * 60) + 30; 
 
             if (totalMinutes >= m430_am && totalMinutes < m600_am) {
                 periodName = "فجراً";
@@ -350,14 +351,10 @@
         }
 
         function startCairoLiveClockAndEngine() {
-            const daysArr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            
             setInterval(() => {
-                currentCairoGlobalDateObject = new Date(); // تحديث مستمر بناء على اللحظة الحالية للكمبيوتر وتحويلها لمصر
-                
+                currentCairoGlobalDateObject = new Date(); 
                 let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
                 
-                // حساب واستخراج التاريخ واليوم الجغرافي الحقيقي لمصر أيضاً
                 let dateFormatter = new Intl.DateTimeFormat('en-US', {
                     timeZone: 'Africa/Cairo',
                     day: '2-digit',
@@ -367,10 +364,7 @@
                 });
                 
                 let dateParts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
-                let dayNameStr = "";
-                let dayNum = "";
-                let monthNum = "";
-                let yearNum = "";
+                let dayNameStr = ""; let dayNum = ""; let monthNum = ""; let yearNum = "";
                 
                 dateParts.forEach(p => {
                     if (p.type === 'weekday') dayNameStr = p.value;
@@ -379,7 +373,6 @@
                     if (p.type === 'year') yearNum = p.value;
                 });
                 
-                // ترجمة أيام الإنجليزي الحرفية إذا ظهرت من التنسيق الدولي
                 let arabicDay = dayNameStr;
                 if(dayNameStr.includes("Sunday") || dayNameStr.includes("الأحد")) arabicDay = "الأحد";
                 if(dayNameStr.includes("Monday") || dayNameStr.includes("الإثنين")) arabicDay = "الإثنين";
@@ -394,19 +387,11 @@
             }, 1000);
         }
 
-        function getCairoTimeSnapshotString() {
-            return getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
-        }
+        function getCairoTimeSnapshotString() { return getCairoPrayerPeriodInfo(currentCairoGlobalDateObject); }
 
         function getCairoDateSnapshotInfo() {
             let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            
-            let dateFormatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Africa/Cairo',
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
+            let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' });
             let parts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
             let d = "", m = "", y = "";
             parts.forEach(p => {
@@ -415,7 +400,6 @@
                 if(p.type === 'year') y = p.value;
             });
             
-            // معرفة اليوم بالرقم
             let formatterText = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', weekday: 'short' }).format(currentCairoGlobalDateObject);
             let dayName = days[new Date().getDay()]; 
             if(formatterText.includes("Sun")) dayName = "الأحد";
@@ -444,6 +428,7 @@
             if(currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
         }
 
+        // باقي دوال التحكم والأزرار والمؤقتات بدون تغيير للحفاظ على البيانات
         function switchMode(mode) {
             pauseTimer();
             document.getElementById(`container-${currentActiveMode}`).classList.remove('active');
@@ -563,7 +548,6 @@
             list.forEach((item, index) => {
                 let card = document.createElement('div');
                 card.className = 'history-card';
-                
                 card.innerHTML = `
                     <div class="card-main-line">
                         <div class="card-subject">${item.subject}</div>
