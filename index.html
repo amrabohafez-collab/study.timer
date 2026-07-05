@@ -28,181 +28,98 @@
             transition: background 0.5s, color 0.5s;
         }
 
-        /* تنسيق اسم الموقع العلوي وحقوق الملكية */
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            color: var(--current-theme);
-            transition: color 0.5s;
-        }
-        .footer-credits {
-            position: absolute;
-            bottom: 25px;
-            font-size: 0.85rem;
-            color: #585b70;
-            letter-spacing: 0.5px;
-        }
+        .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); }
+        .footer-credits { position: absolute; bottom: 25px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
 
-        /* واجهة التطبيق الرئيسية والتحكم */
-        #mainContainer {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            transition: padding-right 0.3s ease;
-        }
-        #mainContainer.sidebar-open {
-            padding-right: 380px;
-        }
-
+        #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: padding-right 0.3s ease; }
+        #mainContainer.sidebar-open { padding-right: 380px; }
         #mainApp { text-align: center; width: 100%; max-width: 600px; }
         .timer-box { display: none; }
         .timer-box.active { display: block; }
         .timer-display { font-size: 6rem; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.1); margin-bottom: 10px; }
         
-        /* مجموعات الإدخال للاستراحة */
-        .break-input-group {
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            align-items: center;
-        }
+        .break-input-group { margin-bottom: 15px; display: flex; justify-content: center; gap: 15px; align-items: center; }
         .break-input-group .input-field { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
-        .break-input-group input {
-            background: #181825; border: 1px solid #313244; padding: 8px 12px;
-            border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; outline: none;
-        }
+        .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
 
-        /* الأزرار العلوية للسجلات والمؤقتات */
-        .top-bar {
-            position: absolute;
-            top: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
-        .top-bar button {
-            background: #1e1e2e;
-            border: 1px solid #313244;
-            color: #cdd6f4;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-        }
+        .top-bar { position: absolute; top: 20px; display: flex; gap: 10px; z-index: 10; }
+        .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
 
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
-        
-        button { 
-            padding: 12px 25px; cursor: pointer; border-radius: 25px; 
-            border: 1px solid var(--current-theme); background: #1e1e2e; 
-            color: var(--current-theme); font-weight: bold; transition: 0.3s; font-family: inherit;
-        }
+        button { padding: 12px 25px; cursor: pointer; border-radius: 25px; border: 1px solid var(--current-theme); background: #1e1e2e; color: var(--current-theme); font-weight: bold; transition: 0.3s; font-family: inherit; }
         button:hover { background: var(--current-theme); color: #11111b; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        
-        /* أزرار الانتقال بين المودات والنشاطات */
         .mode-btn { background: #11111b; font-size: 0.9rem; }
         #btn-study { border-color: var(--study-color); color: var(--study-color); }
         #btn-break { border-color: var(--break-color); color: var(--break-color); }
         #btn-social { border-color: var(--social-color); color: var(--social-color); }
         #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
 
-        /* اللوحة الجانبية للسجلات (Sidebar) */
-        .sidebar {
-            position: fixed;
-            right: -400px;
-            top: 0;
-            width: 360px;
-            height: 100%;
-            background: #11111b;
-            border-left: 2px solid var(--current-theme);
-            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
-            transition: right 0.3s ease;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-        }
+        /* اللوحة الجانبية للسجلات */
+        .sidebar { position: fixed; right: -400px; top: 0; width: 360px; height: 100%; background: #11111b; border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; }
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid #313244;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .sidebar-header h2 { margin: 0; font-size: 1.4rem; color: var(--current-theme); }
-        .close-sidebar-btn { background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; padding: 0;}
-        .close-sidebar-btn:hover { color: #fff; }
+        .sidebar-header { padding: 15px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: var(--current-theme); }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-header-share { background: #313244; border: 1px solid var(--current-theme); color: #fff; padding: 4px 10px; font-size: 0.75rem; border-radius: 5px; cursor: pointer; }
+        .btn-header-share:hover { background: var(--current-theme); color: #11111b; }
+        .close-sidebar-btn { background: none; border: none; color: #888; font-size: 1.3rem; cursor: pointer; }
 
-        /* منطقة محتوى السجل المخصصة للتحريك بدون بكرة ماوس */
-        .sidebar-content {
-            padding: 15px;
-            flex-grow: 1;
-            overflow-y: scroll; /* إظهار شريط التمرير دائماً ليتم سحبه بالماوس */
-        }
-        /* تعديل تصميم شريط التمرير الجانبي (Scrollbar) ليكون عريضاً وسهل السحب باليد */
-        .sidebar-content::-webkit-scrollbar {
-            width: 14px;
-        }
-        .sidebar-content::-webkit-scrollbar-track {
-            background: #181825;
-        }
-        .sidebar-content::-webkit-scrollbar-thumb {
-            background: var(--current-theme);
-            border-radius: 7px;
-            border: 2px solid #11111b;
-        }
+        .sidebar-content { padding: 12px; flex-grow: 1; overflow-y: scroll; }
+        .sidebar-content::-webkit-scrollbar { width: 14px; }
+        .sidebar-content::-webkit-scrollbar-track { background: #181825; }
+        .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* كروت السجلات الاحترافية داخل القائمة */
-        .history-card {
-            background: #181825;
-            border: 1px solid #313244;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            color: #cdd6f4;
-            position: relative;
-        }
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;}
-        .card-title { font-weight: bold; font-size: 1.1rem; color: #fff; max-width: 180px; word-wrap: break-word;}
-        .card-duration { font-weight: bold; font-size: 1.1rem; color: var(--current-theme); }
-        .card-details { font-size: 0.8rem; color: #a6adc8; line-height: 1.4; }
-        .card-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end;}
-        .card-actions button { padding: 5px 10px; font-size: 0.75rem; border-radius: 5px; border: 1px solid #313244;}
+        /* تصميم الكروت الصغير المطور (المدمج) */
+        .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; }
+        .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
+        .card-subject { font-weight: bold; color: #fff; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+        .card-duration { font-weight: bold; color: var(--current-theme); }
+        .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: #11111b; padding: 4px 6px; border-radius: 4px; text-align: right; direction: rtl; word-wrap: break-word; }
+        
+        /* حل مشكلة تداخل الوقت بالإنجليزي الثابت الصافي */
+        .card-time-row { display: flex; gap: 8px; font-size: 0.75rem; margin-top: 3px; font-family: 'Courier New', monospace; color: #94e2d5; }
+        .time-tag { padding: 1px 4px; border-radius: 3px; font-weight: bold; }
+        .time-tag.start { background: rgba(166, 227, 161, 0.15); color: #a6e3a1; }
+        .time-tag.end { background: rgba(243, 139, 168, 0.15); color: #f38ba8; }
+        
+        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 4px; }
+        .card-actions { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; align-items: center;}
+        .card-actions button { padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #313244; background: none;}
         .btn-edit { color: #f9e2af; border-color: #f9e2af !important; }
         .btn-delete { color: #f38ba8; border-color: #f38ba8 !important; }
-        .btn-share { color: #89b4fa; border-color: #89b4fa !important; }
+        .btn-recovery { color: #a6e3a1; border-color: #a6e3a1 !important; }
 
-        /* نوافذ الإدخال المنبثقة البسيطة لحفظ وتعديل البيانات */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center;
+        /* النوافذ المنبثقة للادخال */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .modal-content { background: #1e1e2e; border: 2px solid var(--current-theme); padding: 20px; border-radius: 12px; width: 320px; text-align: right; direction: rtl; color: #cdd6f4; }
+        .modal-content h3 { margin-top: 0; color: var(--current-theme); text-align: center; font-size: 1.1rem;}
+        .modal-content label { display: block; margin: 8px 0 4px; font-size: 0.85rem;}
+        .modal-content input, .modal-content textarea { width: 100%; padding: 8px; background: #11111b; border: 1px solid #313244; border-radius: 6px; color: #fff; box-sizing: border-box; outline: none; font-family: inherit;}
+        .modal-content textarea { resize: none; height: 60px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
+        .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
+
+        /* إعدادات وطباعة السجل المخصصة لملفات الـ PDF */
+        @media print {
+            body * { visibility: hidden; background: white !important; color: black !important; }
+            #sidebarHistory, #sidebarHistory * { visibility: visible; }
+            #sidebarHistory { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            .close-sidebar-btn, .btn-header-share, .card-actions { display: none !important; }
+            .history-card { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; page-break-inside: avoid; margin-bottom: 15px; }
+            .card-subject, .card-duration, .card-desc { color: #000 !important; background: #fff !important; }
+            .time-tag.start, .time-tag.end { background: none !important; border: 1px solid #000; color: #000 !important; }
         }
-        .modal-content {
-            background: #1e1e2e; border: 2px solid var(--current-theme); padding: 25px;
-            border-radius: 15px; width: 320px; text-align: right; direction: rtl; color: #cdd6f4;
-        }
-        .modal-content h3 { margin-top: 0; color: var(--current-theme); text-align: center;}
-        .modal-content label { display: block; margin: 10px 0 5px; font-size: 0.9rem;}
-        .modal-content input {
-            width: 100%; padding: 8px; background: #11111b; border: 1px solid #313244;
-            border-radius: 6px; color: #fff; box-sizing: border-box; outline: none;
-        }
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: center;}
-        .modal-actions button { padding: 8px 20px; font-size: 0.9rem;}
     </style>
 </head>
 <body>
 
-    <!-- البار العلوي لفتح السجلات المنفصلة -->
     <div class="top-bar">
         <button onclick="openHistory('study')">Study History 📚</button>
         <button onclick="openHistory('break')">Break History ☕</button>
         <button onclick="openHistory('social')">Social History 📱</button>
         <button onclick="openHistory('afk')">AFK History ⏳</button>
+        <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openHistory('trash')">Trash / Recovery 🗑️</button>
     </div>
 
     <div id="mainContainer">
@@ -261,7 +178,6 @@
                 </div>
             </div>
 
-            <!-- صف الأزرار السفلية للتحويل السلس والكامل بين المودات -->
             <div class="controls" style="margin-top: 35px; border-top: 1px solid #181825; padding-top: 20px;">
                 <button id="btn-study" class="mode-btn" onclick="switchMode('study')">Study Mode 📚</button>
                 <button id="btn-break" class="mode-btn" onclick="switchMode('break')">Break Mode ☕</button>
@@ -271,23 +187,26 @@
         </div>
     </div>
 
-    <!-- لوحة السجلات الجانبية الاحترافية ذات السحب اليدوي المريح بالماوس -->
+    <!-- لوحة السجلات الجانبية الاحترافية -->
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
             <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
-            <h2 id="sidebarTitle">Study History</h2>
+            <div class="header-actions">
+                <button id="printHistoryBtn" class="btn-header-share" onclick="printFullHistory()">Share PDF 📄</button>
+                <h2 id="sidebarTitle">Study History</h2>
+            </div>
         </div>
-        <div id="sidebarContent" class="sidebar-content">
-            <!-- كروت السجلات ستظهر برمجياً هنا -->
-        </div>
+        <div id="sidebarContent" class="sidebar-content"></div>
     </div>
 
-    <!-- نافذة منبثقة لحفظ السجل وإدخال اسم المادة -->
+    <!-- نافذة منبثقة لحفظ السجل وإدخال اسم المادة ووصف دقيق للمذاكرة -->
     <div id="saveModal" class="modal">
         <div class="modal-content">
             <h3 id="modalHeaderTitle">حفظ السجل الجديد</h3>
-            <label id="modalInputLabel">اسم المادة المذاكرة:</label>
-            <input type="text" id="modalSubjectInput" placeholder="اكتب الاسم هنا...">
+            <label>اسم المادة / النشاط:</label>
+            <input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
+            <label>وصف المذاكرة (كتبت وذاكرت إيه فيها؟):</label>
+            <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا..."></textarea>
             <div class="modal-actions">
                 <button onclick="confirmSaveSession()">حفظ السجل</button>
                 <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button>
@@ -295,12 +214,14 @@
         </div>
     </div>
 
-    <!-- نافذة منبثقة لتعديل السجل (الاسم واليوم والتاريخ فقط دون المساس بالأوقات) -->
+    <!-- نافذة منبثقة لتعديل السجل -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>تعديل بيانات السجل</h3>
             <label>اسم المادة / النشاط:</label>
             <input type="text" id="editSubjectInput">
+            <label>وصف النشاط:</label>
+            <textarea id="editDescInput"></textarea>
             <label>اليوم:</label>
             <input type="text" id="editDayInput">
             <label>التاريخ:</label>
@@ -312,15 +233,12 @@
         </div>
     </div>
 
-    <div class="footer-credits">
-        © 2026 Amr Abdelhalim . All Rights Reserved
-    </div>
+    <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
     <canvas id="videoCanvas" width="360" height="150" style="display:none;"></canvas>
     <video id="pipVideo" width="360" height="150" autoplay muted loop style="display:none;"></video>
 
     <script>
-        // داتا المؤقتات الأربعة المستقلة
         let timers = {
             study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up', id: null },
             break: { seconds: 300, type: 'down', id: null },
@@ -331,8 +249,10 @@
         let currentActiveMode = 'study';
         let sessionStartTime = null; 
 
-        // نظام قواعد تخزين السجلات الدائمة
-        let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [] };
+        // إضافة مصفوفة خاصة للمحذوفات (Trash) لاسترجاعها في أي وقت
+        let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
+        if(!historyData.trash) historyData.trash = []; // حماية برمجية
+        
         let activeHistoryView = 'study'; 
         let currentEditingIndex = null;
 
@@ -341,7 +261,6 @@
         let audioStopTimeout = null;
 
         window.onload = function() {
-            document.title = "Study Timer";
             updateDisplay('study');
             setBreakDuration();
             setupPipStream();
@@ -355,7 +274,6 @@
             video.srcObject = stream;
         }
 
-        // تحديث الألوان المخصصة حسب النشاط الحالي المفتوح
         function updateThemeColors() {
             const root = document.documentElement;
             if(currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
@@ -366,28 +284,20 @@
 
         function switchMode(mode) {
             pauseTimer();
-            // إخفاء الواجهة القديمة
             document.getElementById(`container-${currentActiveMode}`).classList.remove('active');
-            
             currentActiveMode = mode;
-            // إظهار الواجهة الجديدة وتحديث الألوان
             document.getElementById(`container-${currentActiveMode}`).classList.add('active');
             updateThemeColors();
             updateDisplay(currentActiveMode);
             stopAlarm();
-
-            if(document.pictureInPictureElement) {
-                updatePipCanvas(`display-${currentActiveMode}`);
-            }
+            if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
         }
 
         function formatDynamicTime(totalSeconds) {
             let hours = Math.floor(totalSeconds / 3600);
             let mins = Math.floor((totalSeconds % 3600) / 60);
             let secs = totalSeconds % 60;
-            let minsStr = mins.toString().padStart(2, '0');
-            let secsStr = secs.toString().padStart(2, '0');
-            return hours > 0 ? `${hours}:${minsStr}:${secsStr}` : `${minsStr}:${secsStr}`;
+            return hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` : `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
         function updateDisplay(mode) {
@@ -396,7 +306,7 @@
             if(mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
         }
 
-        // تحسين التقاط ساعة البدء والانتهاء بصيغة 12 ساعة احترافية
+        // إرجاع التوقيت بصيغة إنجليزية صرفة ثابتة لمنع اللخبطة
         function getFormattedTimeOnly() {
             let date = new Date();
             let hours = date.getHours();
@@ -410,25 +320,18 @@
         function getEgyptianDateInfo() {
             let date = new Date();
             let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            let dayName = days[date.getDay()];
-            let dateStr = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-            return { day: dayName, date: dateStr };
+            return { day: days[date.getDay()], date: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` };
         }
 
-        // --- التحكم الموحد للمؤقتات الأربعة الفعالة ---
         function startTimer() {
             let t = timers[currentActiveMode];
-            if(!sessionStartTime) {
-                sessionStartTime = getFormattedTimeOnly(); // تسجيل توقيت البداية الفعلي لحظة الضغط على أول ستارت
-            }
+            if(!sessionStartTime) sessionStartTime = getFormattedTimeOnly();
             if(!t.id) {
                 t.id = setInterval(() => {
                     if(t.type === 'up') {
                         t.seconds++;
                         updateDisplay(currentActiveMode);
-                        if(currentActiveMode === 'study' && t.seconds > 0 && t.seconds % 3600 === 0) {
-                            playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
-                        }
+                        if(currentActiveMode === 'study' && t.seconds > 0 && t.seconds % 3600 === 0) playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
                     } else {
                         if(t.seconds > 0) {
                             t.seconds--;
@@ -438,75 +341,35 @@
                             playAlarm(currentActiveMode === 'break' ? "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" : "انتهى الوقت!");
                         }
                     }
-                    if(document.pictureInPictureElement) {
-                        updatePipCanvas(`display-${currentActiveMode}`);
-                    }
+                    if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
                 }, 1000);
             }
         }
 
-        function pauseTimer() {
-            let t = timers[currentActiveMode];
-            clearInterval(t.id);
-            t.id = null;
-        }
+        function pauseTimer() { let t = timers[currentActiveMode]; clearInterval(t.id); t.id = null; }
+        function endTimer() { pauseTimer(); sessionStartTime = null; if(timers[currentActiveMode].type === 'up') timers[currentActiveMode].seconds = 0; else setBreakDuration(); updateDisplay(currentActiveMode); if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }
+        function setBreakDuration() { const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0; const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0; timers.break.seconds = (hoursInput * 3600) + (minsInput * 60); updateDisplay('break'); }
 
-        function endTimer() {
-            pauseTimer();
-            sessionStartTime = null;
-            if(timers[currentActiveMode].type === 'up') {
-                timers[currentActiveMode].seconds = 0;
-            } else {
-                setBreakDuration();
-            }
-            updateDisplay(currentActiveMode);
-            if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
-        }
-
-        function setBreakDuration() {
-            const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0;
-            const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-            timers.break.seconds = (hoursInput * 3600) + (minsInput * 60);
-            updateDisplay('break');
-        }
-
-        // --- نظام فتح وحفظ وإدارة السجلات المنبثقة والجانبية ---
         function saveSessionPrompt() {
             pauseTimer();
-            if(timers[currentActiveMode].seconds === 0) {
-                alert("المؤقت فارغ! لا يمكن حفظ سجل بدون وقت.");
-                return;
-            }
-            
-            // تخصيص عناوين المدخلات حسب التايمر الحالي
-            const inputLabel = document.getElementById('modalInputLabel');
-            const headerTitle = document.getElementById('modalHeaderTitle');
-            const inputField = document.getElementById('modalSubjectInput');
-            
-            inputField.value = "";
-            
-            if(currentActiveMode === 'study') { headerTitle.innerText = "حفظ سجل المذاكرة 📚"; inputLabel.innerText = "اسم المادة الدراسية:"; inputField.placeholder = "مثال: لغة عربية (بلاغة)..."; }
-            if(currentActiveMode === 'break') { headerTitle.innerText = "حفظ سجل الاستراحة ☕"; inputLabel.innerText = "ماذا فعلت في الاستراحة:"; inputField.placeholder = "مثال: شرب قهوة، مكالمة سريعة..."; }
-            if(currentActiveMode === 'social') { headerTitle.innerText = "حفظ سجل السوشيال ميديا 📱"; inputLabel.innerText = "التطبيق المستهلك:"; inputField.placeholder = "مثال: فيسبوك، يوتيوب..."; }
-            if(currentActiveMode === 'afk') { headerTitle.innerText = "حفظ سجل الوقت الضائع ⏳"; inputLabel.innerText = "سبب الابتعاد عن الجهاز:"; inputField.placeholder = "مثال: تناول الغداء، شراء طلبات..."; }
-
+            if(timers[currentActiveMode].seconds === 0) { alert("المؤقت فارغ! لا يمكن حفظ سجل بدون وقت."); return; }
+            document.getElementById('modalSubjectInput').value = "";
+            document.getElementById('modalDescInput').value = "";
             document.getElementById('saveModal').style.display = 'flex';
         }
 
         function confirmSaveSession() {
-            let subjectInput = document.getElementById('modalSubjectInput').value.trim();
-            if(!subjectInput) subjectInput = "نشاط غير مسمى";
-
+            let subjectInput = document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى";
+            let descInput = document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل وصفية لهذه الجلسة.";
             let endTime = getFormattedTimeOnly();
             let dateInfo = getEgyptianDateInfo();
-            
-            // حساب المدة المستغرقة الفعالة للنشاط وتثبيتها
-            let durationStr = formatDynamicTime(timers[currentActiveMode].seconds);
 
             let newRecord = {
                 id: Date.now(),
+                originMode: currentActiveMode, // حفظ مكان التايمر الأصلي عشان الاسترجاع
                 subject: subjectInput,
-                duration: durationStr,
+                desc: descInput,
+                duration: formatDynamicTime(timers[currentActiveMode].seconds),
                 date: dateInfo.date,
                 day: dateInfo.day,
                 startTime: sessionStartTime || getFormattedTimeOnly(),
@@ -515,11 +378,8 @@
 
             historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-
             document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ السجل بنجاح في ذاكرة النظام! 🎉");
-            
-            // تصفير وتهيئة المؤقت المكتمل تلقائياً
+            alert("تم حفظ السجل بنجاح ووصف المذاكرة! 🎉");
             endTimer();
         }
 
@@ -528,19 +388,20 @@
             const sidebar = document.getElementById('sidebarHistory');
             const title = document.getElementById('sidebarTitle');
             const mainCont = document.getElementById('mainContainer');
+            const printBtn = document.getElementById('printHistoryBtn');
 
-            let typeNames = { study: 'Study History 📚', break: 'Break History ☕', social: 'Social History 📱', afk: 'AFK History ⏳' };
+            let typeNames = { study: 'Study History 📚', break: 'Break History ☕', social: 'Social History 📱', afk: 'AFK History ⏳', trash: 'Trash / Recovery 🗑️' };
             title.innerText = typeNames[type];
+
+            // إخفاء زر الطباعة لو كنا بنعرض سلة المحذوفات
+            printBtn.style.display = (type === 'trash') ? 'none' : 'block';
 
             renderHistoryCards();
             sidebar.classList.add('open');
             mainCont.classList.add('sidebar-open');
         }
 
-        function closeHistory() {
-            document.getElementById('sidebarHistory').classList.remove('open');
-            document.getElementById('mainContainer').classList.remove('sidebar-open');
-        }
+        function closeHistory() { document.getElementById('sidebarHistory').classList.remove('open'); document.getElementById('mainContainer').classList.remove('sidebar-open'); }
 
         function renderHistoryCards() {
             const container = document.getElementById('sidebarContent');
@@ -548,26 +409,36 @@
             let list = historyData[activeHistoryView];
 
             if(list.length === 0) {
-                container.innerHTML = `<p style="text-align:center; color:#585b70; margin-top:40px;">لا توجد سجلات محفوظة هنا حتى الآن.</p>`;
+                container.innerHTML = `<p style="text-align:center; color:#585b70; margin-top:40px;">لا توجد سجلات محفوظة هنا حالياً.</p>`;
                 return;
             }
 
             list.forEach((item, index) => {
                 let card = document.createElement('div');
                 card.className = 'history-card';
+                
+                // هيكل الكارت الصغير المطور
                 card.innerHTML = `
-                    <div class="card-top">
-                        <div class="card-title">${item.subject}</div>
+                    <div class="card-main-line">
+                        <div class="card-subject">${item.subject}</div>
                         <div class="card-duration">${item.duration}</div>
                     </div>
-                    <div class="card-details">
-                        <div>التاريخ واليوم: ${item.day} - ${item.date}</div>
-                        <div>وقت البدء والانتهاء: من ${item.startTime} إلى ${item.endTime}</div>
+                    <div class="card-desc">${item.desc}</div>
+                    <div class="card-time-row">
+                        <span class="time-tag start">Start: ${item.startTime}</span>
+                        <span class="time-tag end">End: ${item.endTime}</span>
+                    </div>
+                    <div class="card-bottom-info">
+                        <span>${item.day}</span>
+                        <span>${item.date}</span>
                     </div>
                     <div class="card-actions">
-                        <button class="btn-share" onclick="shareRecord(${index})">Share 🔗</button>
-                        <button class="btn-edit" onclick="openEditModal(${index})">Edit ✏️</button>
-                        <button class="btn-delete" onclick="deleteRecord(${index})">Delete 🗑️</button>
+                        ${activeHistoryView === 'trash' ? 
+                            `<button class="btn-recovery" onclick="recoverRecord(${index})">Recovery ↩️</button>
+                             <button class="btn-delete" style="color:#f38ba8;" onclick="hardDeleteRecord(${index})">حذف نهائي ❌</button>` :
+                            `<button class="btn-edit" onclick="openEditModal(${index})">Edit ✏️</button>
+                             <button class="btn-delete" onclick="deleteRecord(${index})">Delete 🗑️</button>`
+                        }
                     </div>
                 `;
                 container.appendChild(card);
@@ -575,8 +446,32 @@
         }
 
         function deleteRecord(index) {
-            if(confirm("هل أنت متأكد تماماً من رغبتك في حذف هذا السجل نهائياً؟")) {
-                historyData[activeHistoryView].splice(index, 1);
+            let record = historyData[activeHistoryView][index];
+            // نقل الكارت إلى سلة المحذوفات
+            historyData.trash.unshift(record);
+            // حذفه من القائمة الحالية
+            historyData[activeHistoryView].splice(index, 1);
+            
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+        }
+
+        // دالة الـ Recovery لاسترجاع الداتا المحذوفة فوراً لمكانها الأصلي
+        function recoverRecord(index) {
+            let record = historyData.trash[index];
+            let targetMode = record.originMode || 'study';
+            
+            historyData[targetMode].unshift(record);
+            historyData.trash.splice(index, 1);
+            
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+            alert("تم استرجاع السجل وإعادته لقائمته الأصلية بنجاح! ↩️");
+        }
+
+        function hardDeleteRecord(index) {
+            if(confirm("هل تريد حذف هذا السجل من المهملات بشكل نهائي تماماً؟ لا يمكن استرجاعه مرة أخرى.")) {
+                historyData.trash.splice(index, 1);
                 localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
                 renderHistoryCards();
             }
@@ -585,116 +480,69 @@
         function openEditModal(index) {
             currentEditingIndex = index;
             let record = historyData[activeHistoryView][index];
-            
             document.getElementById('editSubjectInput').value = record.subject;
+            document.getElementById('editDescInput').value = record.desc || "";
             document.getElementById('editDayInput').value = record.day;
             document.getElementById('editDateInput').value = record.date;
-            
             document.getElementById('editModal').style.display = 'flex';
         }
 
         function confirmEditSession() {
             let record = historyData[activeHistoryView][currentEditingIndex];
-            
             record.subject = document.getElementById('editSubjectInput').value.trim() || record.subject;
+            record.desc = document.getElementById('editDescInput').value.trim() || record.desc;
             record.day = document.getElementById('editDayInput').value.trim() || record.day;
             record.date = document.getElementById('editDateInput').value.trim() || record.date;
 
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             document.getElementById('editModal').style.display = 'none';
             renderHistoryCards();
-            alert("تم تحديث البيانات المسموح بها بنجاح!");
+            alert("تم التعديل بنجاح!");
         }
 
-        // إتاحة مشاركة احترافية منسقة بصيغة نصية لنسخها فوراً
-        function shareRecord(index) {
-            let record = historyData[activeHistoryView][index];
-            let typeTitle = { study: 'تقرير جلسة المذاكرة 📚', break: 'سجل فترة الاستراحة ☕', social: 'سجل وقت السوشيال ميديا 📱', afk: 'سجل الوقت خارج الجهاز ⏳' }[activeHistoryView];
-
-            let shareText = `📊 *${typeTitle}*\n` +
-                            `━━━━━━━━━━━━━━━━━━━\n` +
-                            `🏷️ *النشاط / المادة:* ${record.subject}\n` +
-                            `⏱️ *المدة المستغرقة:* ${record.duration}\n` +
-                            `📅 *اليوم والتاريخ:* ${record.day} (${record.date})\n` +
-                            `⏰ *توقيت الجلسة:* من [ ${record.startTime} ] إلى [ ${record.endTime} ]\n\n` +
-                            `💪 تم الإرسال والمشاركة عبر منصة تطبيق Study Timer الاحترافي الخارق!`;
-
-            navigator.clipboard.writeText(shareText).then(() => {
-                alert("تم نسخ تقرير النشاط الكامل بالتفاصيل إلى الحافظة بنجاح! يمكنك الآن لصقه وإرساله مباشرة لأخيك. 🔗🚀");
-            }).catch(err => {
-                alert("تعذر النسخ التلقائي، يمكنك التقاط صورة للشاشة كبديل.");
-            });
+        // تشغيل نظام الطباعة والتصدير كـ PDF احترافي كامل للسجل الحالي المفتوح
+        function printFullHistory() {
+            window.print();
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- تشغيل التنبيهات والصوت المخصص ---
         function playAlarm(notificationText) {
             if(audioStopTimeout) clearTimeout(audioStopTimeout);
-            customAudio.pause();
-            customAudio.currentTime = 0;
-            
-            customAudio.play().catch(e => console.log("المتصفح حظر الصوت التلقائي: ", e));
-
+            customAudio.pause(); customAudio.currentTime = 0;
+            customAudio.play().catch(e => console.log(e));
             audioStopTimeout = setTimeout(() => { stopAlarm(); }, 12000);
-
             if (Notification.permission === "granted") {
                 new Notification("Study Timer", { body: notificationText });
             } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") new Notification("Study Timer", { body: notificationText });
-                });
+                Notification.requestPermission().then(permission => { if (permission === "granted") new Notification("Study Timer", { body: notificationText }); });
             }
         }
 
-        function stopAlarm() {
-            if(audioStopTimeout) clearTimeout(audioStopTimeout);
-            customAudio.pause();
-            customAudio.currentTime = 0;
-        }
+        function stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
 
-        // --- نظام الـ Mini Player الصغير العائم ---
         function updatePipCanvas(targetDisplayId) {
-            const canvas = document.getElementById('videoCanvas');
-            const ctx = canvas.getContext('2d');
-            
+            const canvas = document.getElementById('videoCanvas'); const ctx = canvas.getContext('2d');
             let textColor = "#a6e3a1";
             if(currentActiveMode === 'break') textColor = "#cba6f7";
             if(currentActiveMode === 'social') textColor = "#89b4fa";
             if(currentActiveMode === 'afk') textColor = "#f9e2af";
-
             const textText = document.getElementById(targetDisplayId).innerText;
-            
-            ctx.fillStyle = "#0f0f16"; 
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = textColor; 
-            
-            ctx.font = textText.length > 5 ? "bold 42px Courier New" : "bold 55px Courier New";
-            ctx.textAlign = "center"; 
-            ctx.fillText(textText, canvas.width/2, 90);
+            ctx.fillStyle = "#0f0f16"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = textColor; ctx.font = textText.length > 5 ? "bold 42px Courier New" : "bold 55px Courier New";
+            ctx.textAlign = "center"; ctx.fillText(textText, canvas.width/2, 90);
         }
 
         async function requestMini(targetDisplayId) {
             const video = document.getElementById('pipVideo');
             try {
                 updatePipCanvas(targetDisplayId);
-                if (document.pictureInPictureElement) {
-                    await document.exitPictureInPicture();
-                } else {
-                    await video.play();
-                    await video.requestPictureInPicture();
-                    setInterval(() => {
-                        if(document.pictureInPictureElement) {
-                            updatePipCanvas(`display-${currentActiveMode}`);
-                        }
-                    }, 500);
+                if (document.pictureInPictureElement) { await document.exitPictureInPicture(); } 
+                else {
+                    await video.play(); await video.requestPictureInPicture();
+                    setInterval(() => { if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }, 500);
                 }
-            } catch (error) {
-                console.error("فشل التايمر المصغر: ", error);
-                alert("تأكد من الضغط على زر Start أولاً لتفعيل الواجهة قبل تشغيل الـ Mini!");
-            }
+            } catch (error) { alert("تأكد من الضغط على زر Start أولاً لتفعيل الواجهة قبل تشغيل الـ Mini!"); }
         }
     </script>
 </body>
