@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Study Timer & Notebook</title>
+    <title>Study System: Timer, Notebook & Lessons</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -14,7 +14,7 @@
             --clock-color: #a6adc8; 
             --current-theme: var(--study-color);
             
-            /* ألوان المواد الخاصة بالمفكرة */
+            /* ألوان المواد الخاصة بالمفكرة والدروس */
             --arabic-color: #89b4fa;
             --english-color: #a6e3a1;
             --history-color: #f9e2af;
@@ -67,8 +67,9 @@
 
         #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
         #mainContainer.sidebar-open { padding-right: 380px; }
-        #mainContainer.notebook-open { padding-left: 50vw; } /* إزاحة محاذاة المؤقت عند فتح المفكرة الكبيرة */
-        
+        #mainContainer.notebook-open { padding-left: 50vw; } 
+        #mainContainer.lessons-open { padding-right: 50vw; }
+
         #mainApp { text-align: center; width: 100%; max-width: 600px; transition: all 0.3s ease; }
         .timer-box { display: none; }
         .timer-box.active { display: block; }
@@ -82,9 +83,11 @@
         .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; transition: opacity 0.3s ease; }
         .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
         
-        /* زر المفكرة المميز */
         .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
         .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
+        
+        .btn-lessons-trigger { border-color: #89b4fa !important; color: #89b4fa !important; font-weight: bold; }
+        .btn-lessons-trigger:hover { background: #89b4fa !important; color: #11111b !important; }
 
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; transition: opacity 0.3s ease; }
         #bottomModeSelectors { transition: opacity 0.3s ease; }
@@ -97,7 +100,7 @@
         #btn-social { border-color: var(--social-color); color: var(--social-color); }
         #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
 
-        /* القائمة الجانبية للسجلات (اليمين) */
+        /* القائمة الجانبية للسجلات العادية (اليمين) */
         .sidebar { position: fixed; right: -400px; top: 0; width: 360px; height: 100%; background: #11111b; border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
@@ -107,12 +110,17 @@
         .btn-header-share:hover { background: var(--current-theme); color: #11111b; }
         .close-sidebar-btn { background: none; border: none; color: #888; font-size: 1.3rem; cursor: pointer; }
 
+        /* أزرار التنقل الداخلي المدمج لـ Social & AFK داخل السجل */
+        .history-split-tabs { display: flex; width: 90%; margin: 10px auto 0; gap: 8px; direction: rtl; }
+        .hist-tab-btn { flex: 1; padding: 6px; font-size: 0.8rem; border-radius: 6px; border: 1px solid #313244; background: #181825; color: #a6adc8; cursor: pointer; font-weight: bold; }
+        .hist-tab-btn.active-subview { background: #313244; color: #fff; border-color: var(--current-theme); }
+
         .sidebar-content { padding: 12px; flex-grow: 1; overflow-y: scroll; }
         .sidebar-content::-webkit-scrollbar { width: 14px; }
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* ==================== تصميم قائمة المفكرة الاحترافية الجديدة (اليسار) ==================== */
+        /* قائمة المفكرة (اليسار) */
         .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; border-right: 2px solid #cba6f7; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; }
         .notebook-sidebar.open { left: 0; }
         
@@ -127,7 +135,6 @@
         .nb-content::-webkit-scrollbar { width: 8px; }
         .nb-content::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
 
-        /* كارت المادة */
         .subject-block { background: #181825; border: 1px solid #313244; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; }
         .subject-block.arabic { border-top: 4px solid var(--arabic-color); }
         .subject-block.english { border-top: 4px solid var(--english-color); }
@@ -140,7 +147,6 @@
         .subject-block.history .sub-block-title { color: var(--history-color); }
         .subject-block.physics .sub-block-title { color: var(--physics-color); }
 
-        /* أزرار Done / Remaining العلويين لكل مادة */
         .nb-tabs-row { display: flex; gap: 10px; width: 100%; direction: rtl; }
         .nb-tab-btn { flex: 1; padding: 8px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; border: 1px solid #313244; background: #11111b; cursor: pointer; transition: 0.2s; }
         .nb-tab-btn.btn-done-tab { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.3); }
@@ -148,19 +154,46 @@
         .nb-tab-btn.btn-remaining-tab { color: #f38ba8; border-color: rgba(243, 139, 168, 0.3); }
         .nb-tab-btn.btn-remaining-tab.active-tab { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
 
-        /* مساحات الكتابة الذكية بالألوان المشروطة */
         .nb-text-container { width: 100%; display: none; direction: rtl; }
         .nb-text-container.active-pane { display: block; }
-        
         .nb-textarea { width: 100%; height: 110px; background: #11111b; border: 1px solid #313244; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 0.95rem; line-height: 1.5; outline: none; transition: border-color 0.2s; text-align: right; }
         
-        /* تلوين نصوص الكتابة تلقائياً بناء على نوع الخانة */
         .nb-text-container.done-pane .nb-textarea { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.2); }
         .nb-text-container.done-pane .nb-textarea:focus { border-color: #a6e3a1; }
         .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
         .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
 
-        /* حالة إخفاء العناصر عند دخول وضع المفكرة الكبيرة */
+        /* ==================== قائمة الدروس الجديدة والعملاقة (اليمين) ==================== */
+        .lessons-sidebar { position: fixed; right: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; border-left: 2px solid #89b4fa; box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 160; display: flex; flex-direction: column; }
+        .lessons-sidebar.open { right: 0; }
+        
+        .ls-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; direction: rtl; }
+        .ls-header-left { display: flex; align-items: center; gap: 15px; }
+        .ls-title { margin: 0; font-size: 1.4rem; color: #89b4fa; font-weight: bold; }
+        .btn-ls-share { background: #181825; border: 1px solid #89b4fa; color: #89b4fa; padding: 6px 14px; font-size: 0.85rem; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-ls-share:hover { background: #89b4fa; color: #11111b; }
+        .close-ls-btn { background: none; border: none; color: #f38ba8; font-size: 1.5rem; cursor: pointer; }
+
+        .ls-content { padding: 20px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 25px; box-sizing: border-box; }
+        .ls-content::-webkit-scrollbar { width: 8px; }
+        .ls-content::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
+
+        /* حقول إضافة الدرس الجديد */
+        .ls-inputs-row { display: flex; gap: 10px; direction: rtl; margin-top: 5px; }
+        .ls-inputs-row input { flex: 2; padding: 8px 12px; background: #11111b; border: 1px solid #313244; border-radius: 6px; color: #fff; outline: none; font-family: inherit; font-size: 0.85rem; }
+        .ls-inputs-row input.ls-url-input { flex: 3; text-align: left; direction: ltr; }
+        .ls-add-btn { padding: 6px 14px; background: #1e1e2e; border: 1px solid var(--current-theme); border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #fff; }
+        
+        /* حاوية عرض الدروس المضافة */
+        .lessons-list-display { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px; }
+        .lesson-item-card { background: #11111b; border: 1px solid #222538; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; direction: rtl; gap: 10px; }
+        .lesson-info-txt { font-size: 0.9rem; color: #cdd6f4; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lesson-actions-area { display: flex; gap: 10px; align-items: center; }
+        .lesson-anchor-link { color: #89b4fa; text-decoration: none; font-size: 0.8rem; background: rgba(137, 180, 250, 0.15); padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        .lesson-anchor-link:hover { background: #89b4fa; color: #11111b; }
+        .btn-delete-lesson { background: none; border: none; color: #f38ba8; cursor: pointer; font-size: 0.9rem; padding: 2px 5px; }
+
+        /* التعتيم الشامل عند تفعيل المفكرات */
         .hide-in-notebook { opacity: 0 !important; pointer-events: none !important; }
 
         /* ========================================================================================= */
@@ -192,10 +225,8 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
         .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
 
-        /* تنسيقات الطباعة لـ PDF تدعم المفكرة والسجلات بشكل احترافي */
         @media print {
             body * { visibility: hidden; background: white !important; color: black !important; }
-            #sidebarHistory, #sidebarHistory * { visibility: hidden; }
             
             /* طباعة الـ Notebook */
             body.printing-notebook #notebookSidebar, body.printing-notebook #notebookSidebar * { visibility: visible; }
@@ -206,10 +237,17 @@
             body.printing-notebook .nb-text-container { display: block !important; margin-top: 10px; }
             body.printing-notebook .nb-tabs-row { display: none !important; }
 
+            /* طباعة الـ Lessons */
+            body.printing-lessons #lessonsSidebar, body.printing-lessons #lessonsSidebar * { visibility: visible; }
+            body.printing-lessons #lessonsSidebar { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            body.printing-lessons .close-ls-btn, body.printing-lessons .btn-ls-share, body.printing-lessons .ls-inputs-row, body.printing-lessons .btn-delete-lesson { display: none !important; }
+            body.printing-lessons .subject-block { border: 1px solid #000 !important; background: #fff !important; page-break-inside: avoid; margin-bottom: 20px; }
+            body.printing-lessons .lesson-item-card { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; }
+
             /* طباعة السجل العادي */
             body.printing-history #sidebarHistory, body.printing-history #sidebarHistory * { visibility: visible; }
             body.printing-history #sidebarHistory { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
-            body.printing-history .close-sidebar-btn, body.printing-history .btn-header-share, body.printing-history .card-actions, body.printing-history .cairo-live-widget { display: none !important; }
+            body.printing-history .close-sidebar-btn, body.printing-history .btn-header-share, body.printing-history .card-actions, body.printing-history .cairo-live-widget, body.printing-history .history-split-tabs { display: none !important; }
             body.printing-history .history-card { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; page-break-inside: avoid; margin-bottom: 15px; }
         }
     </style>
@@ -222,11 +260,11 @@
     </div>
 
     <div id="topBarNav" class="top-bar">
+        <button class="btn-lessons-trigger" onclick="openLessons()">Lessons 🎥</button>
         <button class="btn-notebook-trigger" onclick="openNotebook()">Notebook 📓</button>
         <button onclick="openHistory('study')">Study History 📚</button>
         <button onclick="openHistory('break')">Break History ☕</button>
-        <button onclick="openHistory('social')">Social History 📱</button>
-        <button onclick="openHistory('afk')">AFK History ⏳</button>
+        <button onclick="openHistory('social_afk')">Social&AFK History 📱⏳</button>
         <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openHistory('trash')">Trash / Recovery 🗑️</button>
     </div>
 
@@ -245,6 +283,7 @@
                 </div>
             </div>
 
+            <!-- مؤقت الاستراحة بقية المؤقتات مجهزة للاستجابة التلقائية خلف الكواليس -->
             <div id="container-break" class="timer-box">
                 <div id="display-break" class="timer-display">05:00</div>
                 <div class="break-input-group">
@@ -291,7 +330,7 @@
         </div>
     </div>
 
-    <!-- ==================== واجهة المفكرة الذكية الإحترافية الجديدة (اليسار) ==================== -->
+    <!-- ==================== واجهة المفكرة الاحترافية (اليسار) ==================== -->
     <div id="notebookSidebar" class="notebook-sidebar">
         <div class="nb-header">
             <button class="close-nb-btn" onclick="closeNotebook()">✕</button>
@@ -300,116 +339,110 @@
                 <h2 class="nb-title">Notebook 📓</h2>
             </div>
         </div>
-        
         <div class="nb-content">
-            <!-- خانة 1: اللغة العربية -->
+            <div class="subject-block arabic"><p class="sub-block-title">1. اللغة العربية 📚</p><div class="nb-tabs-row"><button id="tab-arabic-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('arabic', 'done')">Done ✅</button><button id="tab-arabic-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('arabic', 'rem')">Remaining ⏳</button></div><div id="pane-arabic-done" class="nb-text-container done-pane active-pane"><textarea id="note-arabic-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea></div><div id="pane-arabic-rem" class="nb-text-container remaining-pane"><textarea id="note-arabic-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea></div></div>
+            <div class="subject-block english"><p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p><div class="nb-tabs-row"><button id="tab-english-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('english', 'done')">Done ✅</button><button id="tab-english-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('english', 'rem')">Remaining ⏳</button></div><div id="pane-english-done" class="nb-text-container done-pane active-pane"><textarea id="note-english-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea></div><div id="pane-english-rem" class="nb-text-container remaining-pane"><textarea id="note-english-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea></div></div>
+            <div class="subject-block history"><p class="sub-block-title">3. التاريخ 🏛️</p><div class="nb-tabs-row"><button id="tab-history-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('history', 'done')">Done ✅</button><button id="tab-history-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('history', 'rem')">Remaining ⏳</button></div><div id="pane-history-done" class="nb-text-container done-pane active-pane"><textarea id="note-history-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea></div><div id="pane-history-rem" class="nb-text-container remaining-pane"><textarea id="note-history-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea></div></div>
+            <div class="subject-block physics"><p class="sub-block-title">4. الفيزياء ⚡</p><div class="nb-tabs-row"><button id="tab-physics-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('physics', 'done')">Done ✅</button><button id="tab-physics-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('physics', 'rem')">Remaining ⏳</button></div><div id="pane-physics-done" class="nb-text-container done-pane active-pane"><textarea id="note-physics-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea></div><div id="pane-physics-rem" class="nb-text-container remaining-pane"><textarea id="note-physics-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea></div></div>
+        </div>
+    </div>
+
+    <!-- ==================== واجهة الدروس العملاقة الجديدة (اليمين) ==================== -->
+    <div id="lessonsSidebar" class="lessons-sidebar">
+        <div class="ls-header">
+            <button class="close-ls-btn" onclick="closeLessons()">✕</button>
+            <div class="ls-header-left">
+                <button class="btn-ls-share" onclick="printLessons()">Share PDF 📄</button>
+                <h2 class="ls-title">Lessons Hub 🎥</h2>
+            </div>
+        </div>
+        
+        <div class="ls-content">
+            <!-- مادة 1: اللغة العربية -->
             <div class="subject-block arabic">
                 <p class="sub-block-title">1. اللغة العربية 📚</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-arabic-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('arabic', 'done')">Done ✅</button>
-                    <button id="tab-arabic-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('arabic', 'rem')">Remaining ⏳</button>
+                <div class="ls-inputs-row">
+                    <input type="text" id="input-arabic-title" placeholder="اسم الدرس الجديد...">
+                    <input type="text" id="input-arabic-url" class="ls-url-input" placeholder="رابط فيديو اليوتيوب...">
+                    <button class="ls-add-btn" style="border-color:var(--arabic-color);" onclick="addLessonItem('arabic')">إضافة</button>
                 </div>
-                <div id="pane-arabic-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-arabic-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في اللغة العربية..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-arabic-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-arabic-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في اللغة العربية..." oninput="saveNotebookData()"></textarea>
-                </div>
+                <div id="list-arabic-lessons" class="lessons-list-display"></div>
             </div>
 
-            <!-- خانة 2: اللغة الإنجليزية -->
+            <!-- مادة 2: اللغة الإنجليزية -->
             <div class="subject-block english">
                 <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-english-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('english', 'done')">Done ✅</button>
-                    <button id="tab-english-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('english', 'rem')">Remaining ⏳</button>
+                <div class="ls-inputs-row">
+                    <input type="text" id="input-english-title" placeholder="اسم الدرس الجديد...">
+                    <input type="text" id="input-english-url" class="ls-url-input" placeholder="رابط فيديو اليوتيوب...">
+                    <button class="ls-add-btn" style="border-color:var(--english-color);" onclick="addLessonItem('english')">إضافة</button>
                 </div>
-                <div id="pane-english-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-english-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في اللغة الإنجليزية..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-english-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-english-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في اللغة الإنجليزية..." oninput="saveNotebookData()"></textarea>
-                </div>
+                <div id="list-english-lessons" class="lessons-list-display"></div>
             </div>
 
-            <!-- خانة 3: التاريخ -->
+            <!-- مادة 3: التاريخ -->
             <div class="subject-block history">
                 <p class="sub-block-title">3. التاريخ 🏛️</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-history-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('history', 'done')">Done ✅</button>
-                    <button id="tab-history-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('history', 'rem')">Remaining ⏳</button>
+                <div class="ls-inputs-row">
+                    <input type="text" id="input-history-title" placeholder="اسم الدرس الجديد...">
+                    <input type="text" id="input-history-url" class="ls-url-input" placeholder="رابط فيديو اليوتيوب...">
+                    <button class="ls-add-btn" style="border-color:var(--history-color);" onclick="addLessonItem('history')">إضافة</button>
                 </div>
-                <div id="pane-history-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-history-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في التاريخ..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-history-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-history-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في التاريخ..." oninput="saveNotebookData()"></textarea>
-                </div>
+                <div id="list-history-lessons" class="lessons-list-display"></div>
             </div>
 
-            <!-- خانة 4: الفيزياء -->
+            <!-- مادة 4: الفيزياء -->
             <div class="subject-block physics">
                 <p class="sub-block-title">4. الفيزياء ⚡</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-physics-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('physics', 'done')">Done ✅</button>
-                    <button id="tab-physics-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('physics', 'rem')">Remaining ⏳</button>
+                <div class="ls-inputs-row">
+                    <input type="text" id="input-physics-title" placeholder="اسم الدرس الجديد...">
+                    <input type="text" id="input-physics-url" class="ls-url-input" placeholder="رابط فيديو اليوتيوب...">
+                    <button class="ls-add-btn" style="border-color:var(--physics-color);" onclick="addLessonItem('physics')">إضافة</button>
                 </div>
-                <div id="pane-physics-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-physics-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في الفيزياء..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-physics-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-physics-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في الفيزياء..." oninput="saveNotebookData()"></textarea>
-                </div>
+                <div id="list-physics-lessons" class="lessons-list-display"></div>
             </div>
         </div>
     </div>
-    <!-- ========================================================================= -->
 
+    <!-- قائمة السجلات العادية (اليمين) -->
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
             <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
             <div class="header-actions">
                 <button id="printHistoryBtn" class="btn-header-share" onclick="printFullHistory()">Share PDF 📄</button>
-                <h2 id="sidebarTitle">Study History</h2>
+                <h2 id="sidebarTitle">History</h2>
             </div>
+        </div>
+        <!-- أزرار الاختيار الفرعية المدمجة لـ Social & AFK -->
+        <div id="historySubTabsRow" class="history-split-tabs" style="display:none;">
+            <button id="subViewSocialBtn" class="hist-tab-btn active-subview" onclick="switchHistorySubView('social')">Social History 📱</button>
+            <button id="subViewAfkBtn" class="hist-tab-btn" onclick="switchHistorySubView('afk')">AFK History ⏳</button>
         </div>
         <div id="sidebarContent" class="sidebar-content"></div>
     </div>
 
+    <!-- Modals التعديل والحفظ -->
     <div id="saveModal" class="modal">
         <div class="modal-content">
             <h3 id="modalHeaderTitle">حفظ السجل الجديد</h3>
-            <label>اسم المادة / النشاط:</label>
-            <input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
-            <label>وصف المذاكرة (كتبت وذاكرت إيه فيها؟):</label>
-            <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا..."></textarea>
-            <div class="modal-actions">
-                <button onclick="confirmSaveSession()">حفظ السجل</button>
-                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button>
-            </div>
+            <label>اسم المادة / النشاط:</label><input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
+            <label>وصف المذاكرة:</label><textarea id="modalDescInput" placeholder="اكتب تفاصيل الإنجاز هنا..."></textarea>
+            <div class="modal-actions"><button onclick="confirmSaveSession()">حفظ الجلسة</button><button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button></div>
         </div>
     </div>
 
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>تعديل بيانات السجل</h3>
-            <label>اسم المادة / النشاط:</label>
-            <input type="text" id="editSubjectInput">
-            <label>وصف النشاط:</label>
-            <textarea id="editDescInput"></textarea>
-            <label>اليوم:</label>
-            <input type="text" id="editDayInput">
-            <label>التاريخ:</label>
-            <input type="text" id="editDateInput">
-            <div class="modal-actions">
-                <button onclick="confirmEditSession()">تحديث</button>
-                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('editModal')">إلغاء</button>
-            </div>
+            <label>اسم المادة / النشاط:</label><input type="text" id="editSubjectInput">
+            <label>وصف النشاط:</label><textarea id="editDescInput"></textarea>
+            <label>اليوم:</label><input type="text" id="editDayInput">
+            <label>التاريخ:</label><input type="text" id="editDateInput">
+            <div class="modal-actions"><button onclick="confirmEditSession()">تحديث</button><button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('editModal')">إلغاء</button></div>
         </div>
     </div>
 
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
-
     <canvas id="videoCanvas" width="360" height="150" style="display:none;"></canvas>
     <video id="pipVideo" width="360" height="150" autoplay muted loop style="display:none;"></video>
 
@@ -429,7 +462,11 @@
         if(!historyData.trash) historyData.trash = []; 
         
         let activeHistoryView = 'study'; 
+        let currentHistorySubView = 'social'; // للتنقل داخل المدمج
         let currentEditingIndex = null;
+
+        // مستودع البيانات الديناميكي غير المحدود لقسم الدروس
+        let lessonsData = JSON.parse(localStorage.getItem('amrLessonsData')) || { arabic: [], english: [], history: [], physics: [] };
 
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
@@ -441,35 +478,24 @@
             setupPipStream();
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
-            loadNotebookData(); // تحميل نصوص المفكرة المحفوظة تلقائياً
+            loadNotebookData();
+            renderAllLessons();
         }
 
-        // دالة الفترات بالهندسة العكسية المتوافقة مع جهازك بنسبة 100%
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
-
             let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
             let formatterMinutes = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', minute: 'numeric' });
-
             let hours = parseInt(formatter24.format(dateObj), 10);
             let minutes = parseInt(formatterMinutes.format(dateObj), 10);
 
-            if (hours >= 0 && hours < 12) {
-                hours += 12; 
-            } else if (hours >= 12) {
-                hours -= 12; 
-            }
+            if (hours >= 0 && hours < 12) hours += 12; 
+            else if (hours >= 12) hours -= 12; 
 
             let totalMinutes = (hours * 60) + minutes;
             let periodName = "";
-
-            let m430_am = (4 * 60) + 30;  
-            let m600_am = (6 * 60);       
-            let m800_am = (8 * 60);       
-            let m1200_pm = (12 * 60);     
-            let m430_pm = (16 * 60) + 30; 
-            let m800_pm = (20 * 60);      
-            let m930_pm = (21 * 60) + 30; 
+            let m430_am = (4 * 60) + 30; let m600_am = (6 * 60); let m800_am = (8 * 60); let m1200_pm = (12 * 60);     
+            let m430_pm = (16 * 60) + 30; let m800_pm = (20 * 60); let m930_pm = (21 * 60) + 30; 
 
             if (totalMinutes >= m430_am && totalMinutes < m600_am) periodName = "فجراً";
             else if (totalMinutes >= m600_am && totalMinutes < m800_am) periodName = "الشروق";
@@ -483,27 +509,22 @@
             let realHours = parseInt(formatter24.format(dateObj), 10);
             if (realHours > 12) realHours -= 12;
             if (realHours === 0) realHours = 12;
-
-            let displayMinutes = minutes === 0 ? "" : ":" + minutes.toString().padStart(2, '0');
-            return `${realHours}${displayMinutes} ${periodName}`;
+            return `${realHours}${minutes === 0 ? "" : ":" + minutes.toString().padStart(2, '0')} ${periodName}`;
         }
 
         function startCairoLiveClockAndEngine() {
             setInterval(() => {
                 currentCairoGlobalDateObject = new Date(); 
                 let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
-                
                 let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
                 let dateParts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
                 let dayNameStr = ""; let dayNum = ""; let monthNum = ""; let yearNum = "";
-                
                 dateParts.forEach(p => {
                     if (p.type === 'weekday') dayNameStr = p.value;
                     if (p.type === 'day') dayNum = p.value;
                     if (p.type === 'month') monthNum = p.value;
                     if (p.type === 'year') yearNum = p.value;
                 });
-                
                 let arabicDay = dayNameStr;
                 if(dayNameStr.includes("Sunday") || dayNameStr.includes("الأحد")) arabicDay = "الأحد";
                 if(dayNameStr.includes("Monday") || dayNameStr.includes("الإثنين")) arabicDay = "الإثنين";
@@ -512,59 +533,69 @@
                 if(dayNameStr.includes("Thursday") || dayNameStr.includes("الخميس")) arabicDay = "الخميس";
                 if(dayNameStr.includes("Friday") || dayNameStr.includes("الجمعة")) arabicDay = "الجمعة";
                 if(dayNameStr.includes("Saturday") || dayNameStr.includes("السبت")) arabicDay = "السبت";
-
                 document.getElementById('cairoClock').innerText = prayerFormattedTime;
                 document.getElementById('cairoDate').innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
             }, 1000);
         }
 
-        /* ==================== دوال تشغيل وإدارة المفكرة الاحترافية ==================== */
+        /* ==================== إدارة واجهة المفكرة والدروس الكبيرة ==================== */
         function openNotebook() {
-            // 1. تحويل فوري وإجباري إلى Study Mode
             switchMode('study');
-            
-            // 2. تطبيق تأثير الاختفاء على الأزرار والعناصر الجانبية لتصفية الواجهة
+            closeLessons();
             document.getElementById('cairoWidget').classList.add('hide-in-notebook');
             document.getElementById('topBarNav').classList.add('hide-in-notebook');
             document.getElementById('appTitle').classList.add('hide-in-notebook');
             document.getElementById('bottomModeSelectors').classList.add('hide-in-notebook');
-            
-            // إخفاء الأزرار الفرعية لمؤقت الدراسة وترك الأزرار الأساسية فقط (Start / Pause)
             document.getElementById('saveBtnStudy').style.display = 'none';
             document.getElementById('resetBtnStudy').style.display = 'none';
             document.getElementById('miniBtnStudy').style.display = 'none';
-
-            // 3. فتح قائمة المفكرة من اليسار بحجم كبير وإزاحة المؤقت
             document.getElementById('notebookSidebar').classList.add('open');
             document.getElementById('mainContainer').classList.add('notebook-open');
         }
 
         function closeNotebook() {
-            // 1. إرجاع كل العناصر المخفية للظهور فوراً وبشكل طبيعي
             document.getElementById('cairoWidget').classList.remove('hide-in-notebook');
             document.getElementById('topBarNav').classList.remove('hide-in-notebook');
             document.getElementById('appTitle').classList.remove('hide-in-notebook');
             document.getElementById('bottomModeSelectors').classList.remove('hide-in-notebook');
-            
             document.getElementById('saveBtnStudy').style.display = 'inline-block';
             document.getElementById('resetBtnStudy').style.display = 'inline-block';
             document.getElementById('miniBtnStudy').style.display = 'inline-block';
-
-            // 2. إغلاق القائمة الجانبية وإعادة محاذاة المؤقت للمركز
             document.getElementById('notebookSidebar').classList.remove('open');
             document.getElementById('mainContainer').classList.remove('notebook-open');
         }
 
+        function openLessons() {
+            switchMode('study');
+            closeNotebook();
+            document.getElementById('cairoWidget').classList.add('hide-in-notebook');
+            document.getElementById('topBarNav').classList.add('hide-in-notebook');
+            document.getElementById('appTitle').classList.add('hide-in-notebook');
+            document.getElementById('bottomModeSelectors').classList.add('hide-in-notebook');
+            document.getElementById('saveBtnStudy').style.display = 'none';
+            document.getElementById('resetBtnStudy').style.display = 'none';
+            document.getElementById('miniBtnStudy').style.display = 'none';
+            document.getElementById('lessonsSidebar').classList.add('open');
+            document.getElementById('mainContainer').classList.add('lessons-open');
+        }
+
+        function closeLessons() {
+            document.getElementById('cairoWidget').classList.remove('hide-in-notebook');
+            document.getElementById('topBarNav').classList.remove('hide-in-notebook');
+            document.getElementById('appTitle').classList.remove('hide-in-notebook');
+            document.getElementById('bottomModeSelectors').classList.remove('hide-in-notebook');
+            document.getElementById('saveBtnStudy').style.display = 'inline-block';
+            document.getElementById('resetBtnStudy').style.display = 'inline-block';
+            document.getElementById('miniBtnStudy').style.display = 'inline-block';
+            document.getElementById('lessonsSidebar').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('lessons-open');
+        }
+
         function switchNbPane(subject, paneType) {
-            // تغيير حالة الأزرار النشطة (Tabs)
             document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
             document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
-            
-            // إخفاء مساحات الكتابة القديمة للمادة المحددة
             document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
             document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
-
-            // تفعيل التبويب والمساحة المطلوبة
             if(paneType === 'done') {
                 document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
                 document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
@@ -576,14 +607,10 @@
 
         function saveNotebookData() {
             let notebookPayload = {
-                arabicDone: document.getElementById('note-arabic-done').value,
-                arabicRem: document.getElementById('note-arabic-rem').value,
-                englishDone: document.getElementById('note-english-done').value,
-                englishRem: document.getElementById('note-english-rem').value,
-                historyDone: document.getElementById('note-history-done').value,
-                historyRem: document.getElementById('note-history-rem').value,
-                physicsDone: document.getElementById('note-physics-done').value,
-                physicsRem: document.getElementById('note-physics-rem').value
+                arabicDone: document.getElementById('note-arabic-done').value, arabicRem: document.getElementById('note-arabic-rem').value,
+                englishDone: document.getElementById('note-english-done').value, englishRem: document.getElementById('note-english-rem').value,
+                historyDone: document.getElementById('note-history-done').value, historyRem: document.getElementById('note-history-rem').value,
+                physicsDone: document.getElementById('note-physics-done').value, physicsRem: document.getElementById('note-physics-rem').value
             };
             localStorage.setItem('amrNotebookData', JSON.stringify(notebookPayload));
         }
@@ -591,57 +618,184 @@
         function loadNotebookData() {
             let savedData = JSON.parse(localStorage.getItem('amrNotebookData'));
             if(savedData) {
-                document.getElementById('note-arabic-done').value = savedData.arabicDone || "";
-                document.getElementById('note-arabic-rem').value = savedData.arabicRem || "";
-                document.getElementById('note-english-done').value = savedData.englishDone || "";
-                document.getElementById('note-english-rem').value = savedData.englishRem || "";
-                document.getElementById('note-history-done').value = savedData.historyDone || "";
-                document.getElementById('note-history-rem').value = savedData.historyRem || "";
-                document.getElementById('note-physics-done').value = savedData.physicsDone || "";
-                document.getElementById('note-physics-rem').value = savedData.physicsRem || "";
+                document.getElementById('note-arabic-done').value = savedData.arabicDone || ""; document.getElementById('note-arabic-rem').value = savedData.arabicRem || "";
+                document.getElementById('note-english-done').value = savedData.englishDone || ""; document.getElementById('note-english-rem').value = savedData.englishRem || "";
+                document.getElementById('note-history-done').value = savedData.historyDone || ""; document.getElementById('note-history-rem').value = savedData.historyRem || "";
+                document.getElementById('note-physics-done').value = savedData.physicsDone || ""; document.getElementById('note-physics-rem').value = savedData.physicsRem || "";
             }
         }
 
-        function printNotebook() {
-            document.body.classList.add('printing-notebook');
-            window.print();
-            document.body.classList.remove('printing-notebook');
+        /* ==================== محرك إدارة الدروس والروابط الديناميكي الديناميكي ==================== */
+        function addLessonItem(subject) {
+            let titleInput = document.getElementById(`input-${subject}-title`);
+            let urlInput = document.getElementById(`input-${subject}-url`);
+            let title = titleInput.value.trim();
+            let url = urlInput.value.trim();
+
+            if(!title || !url) { alert("من فضلك أدخل اسم الدرس ورابط الفيديو بشكل كامل!"); return; }
+            if(!url.toLowerCase().startsWith("http")) url = "https://" + url;
+
+            let newLesson = { id: Date.now(), title: title, url: url };
+            lessonsData[subject].push(newLesson);
+            localStorage.setItem('amrLessonsData', JSON.stringify(lessonsData));
+            
+            titleInput.value = "";
+            urlInput.value = "";
+            renderSubjectLessons(subject);
         }
-        /* ========================================================================= */
+
+        function deleteLessonItem(subject, id) {
+            lessonsData[subject] = lessonsData[subject].filter(item => item.id !== id);
+            localStorage.setItem('amrLessonsData', JSON.stringify(lessonsData));
+            renderSubjectLessons(subject);
+        }
+
+        function renderSubjectLessons(subject) {
+            let container = document.getElementById(`list-${subject}-lessons`);
+            container.innerHTML = "";
+            let items = lessonsData[subject];
+            if(items.length === 0) { container.innerHTML = `<p style="color:#585b70; font-size:0.75rem; text-align:center; margin:5px 0;">لا توجد دروس مضافة حالياً.</p>`; return; }
+            
+            items.forEach(item => {
+                let card = document.createElement('div');
+                card.className = 'lesson-item-card';
+                card.innerHTML = `
+                    <div class="lesson-info-txt" title="${item.title}">${item.title}</div>
+                    <div class="lesson-actions-area">
+                        <a href="${item.url}" target="_blank" class="lesson-anchor-link">يوتيوب 🎥</a>
+                        <button class="btn-delete-lesson" onclick="deleteLessonItem('${subject}', ${item.id})">✕</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderAllLessons() { renderSubjectLessons('arabic'); renderSubjectLessons('english'); renderSubjectLessons('history'); renderSubjectLessons('physics'); }
+        function printNotebook() { document.body.classList.add('printing-notebook'); window.print(); document.body.classList.remove('printing-notebook'); }
+        function printLessons() { document.body.classList.add('printing-lessons'); window.print(); document.body.classList.remove('printing-lessons'); }
+
+        /* ==================== إدارة السجلات المدمجة والمطورة ==================== */
+        function openHistory(type) {
+            activeHistoryView = type;
+            closeNotebook(); closeLessons();
+            const sidebar = document.getElementById('sidebarHistory');
+            const title = document.getElementById('sidebarTitle');
+            const mainCont = document.getElementById('mainContainer');
+            const printBtn = document.getElementById('printHistoryBtn');
+            const subTabs = document.getElementById('historySubTabsRow');
+
+            subTabs.style.display = (type === 'social_afk') ? 'flex' : 'none';
+            printBtn.style.display = (type === 'trash') ? 'none' : 'block';
+
+            if(type === 'social_afk') title.innerText = 'Social & AFK History 📱⏳';
+            else if(type === 'study') title.innerText = 'Study History 📚';
+            else if(type === 'break') title.innerText = 'Break History ☕';
+            else title.innerText = 'Trash / Recovery 🗑️';
+
+            renderHistoryCards();
+            sidebar.classList.add('open');
+            mainCont.classList.add('sidebar-open');
+        }
+
+        function switchHistorySubView(subView) {
+            currentHistorySubView = subView;
+            document.getElementById('subViewSocialBtn').classList.remove('active-subview');
+            document.getElementById('subViewAfkBtn').classList.remove('active-subview');
+            if(subView === 'social') document.getElementById('subViewSocialBtn').classList.add('active-subview');
+            else document.getElementById('subViewAfkBtn').classList.add('active-subview');
+            renderHistoryCards();
+        }
+
+        function closeHistory() { document.getElementById('sidebarHistory').classList.remove('open'); document.getElementById('mainContainer').classList.remove('sidebar-open'); }
+
+        function renderHistoryCards() {
+            const container = document.getElementById('sidebarContent');
+            container.innerHTML = "";
+            let list = [];
+
+            if(activeHistoryView === 'social_afk') {
+                list = historyData[currentHistorySubView] || [];
+            } else {
+                list = historyData[activeHistoryView] || [];
+            }
+
+            if(list.length === 0) { container.innerHTML = `<p style="text-align:center; color:#585b70; margin-top:40px;">لا توجد سجلات محفوظة هنا حالياً.</p>`; return; }
+
+            list.forEach((item, index) => {
+                let card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="card-main-line"><div class="card-subject">${item.subject}</div><div class="card-duration">${item.duration}</div></div>
+                    <div class="card-desc">${item.desc}</div>
+                    <div class="card-time-row"><span class="time-tag start">البداية: ${item.startTime}</span><span class="time-tag end">النهاية: ${item.endTime}</span></div>
+                    <div class="card-bottom-info"><span>${item.day}</span><span>${item.date}</span></div>
+                    <div class="card-actions">
+                        ${activeHistoryView === 'trash' ? 
+                            `<button class="btn-recovery" onclick="recoverRecord(${index})">Recovery ↩️</button><button class="btn-delete" style="color:#f38ba8;" onclick="hardDeleteRecord(${index})">حذف نهائي ❌</button>` :
+                            `<button class="btn-edit" onclick="openEditModal(${index})">Edit ✏️</button><button class="btn-delete" onclick="deleteRecord(${index})">Delete 🗑️</button>`
+                        }
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteRecord(index) {
+            let targetList = (activeHistoryView === 'social_afk') ? historyData[currentHistorySubView] : historyData[activeHistoryView];
+            let record = targetList[index];
+            historyData.trash.unshift(record);
+            targetList.splice(index, 1);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+        }
+
+        function recoverRecord(index) {
+            let record = historyData.trash[index];
+            let targetMode = record.originMode || 'study';
+            historyData[targetMode].unshift(record);
+            historyData.trash.splice(index, 1);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+            alert("تم استرجاع السجل بنجاح! ↩️");
+        }
+
+        function hardDeleteRecord(index) {
+            if(confirm("هل تريد حذف هذا السجل بشكل نهائي؟")) { historyData.trash.splice(index, 1); localStorage.setItem('timerHistoryData', JSON.stringify(historyData)); renderHistoryCards(); }
+        }
+
+        function openEditModal(index) {
+            currentEditingIndex = index;
+            let targetList = (activeHistoryView === 'social_afk') ? historyData[currentHistorySubView] : historyData[activeHistoryView];
+            let record = targetList[index];
+            document.getElementById('editSubjectInput').value = record.subject;
+            document.getElementById('editDescInput').value = record.desc || "";
+            document.getElementById('editDayInput').value = record.day;
+            document.getElementById('editDateInput').value = record.date;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function confirmEditSession() {
+            let targetList = (activeHistoryView === 'social_afk') ? historyData[currentHistorySubView] : historyData[activeHistoryView];
+            let record = targetList[currentEditingIndex];
+            record.subject = document.getElementById('editSubjectInput').value.trim() || record.subject;
+            record.desc = document.getElementById('editDescInput').value.trim() || record.desc;
+            record.day = document.getElementById('editDayInput').value.trim() || record.day;
+            record.date = document.getElementById('editDateInput').value.trim() || record.date;
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            document.getElementById('editModal').style.display = 'none';
+            renderHistoryCards();
+        }
 
         function getCairoTimeSnapshotString() { return getCairoPrayerPeriodInfo(currentCairoGlobalDateObject); }
-
         function getCairoDateSnapshotInfo() {
             let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' });
             let parts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
-            let d = "", m = "", y = "";
-            parts.forEach(p => {
-                if(p.type === 'day') d = p.value;
-                if(p.type === 'month') m = p.value;
-                if(p.type === 'year') y = p.value;
-            });
-            
-            let formatterText = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', weekday: 'short' }).format(currentCairoGlobalDateObject);
-            let dayName = days[new Date().getDay()]; 
-            if(formatterText.includes("Sun")) dayName = "الأحد";
-            if(formatterText.includes("Mon")) dayName = "الإثنين";
-            if(formatterText.includes("Tue")) dayName = "الثلاثاء";
-            if(formatterText.includes("Wed")) dayName = "الأربعاء";
-            if(formatterText.includes("Thu")) dayName = "الخميس";
-            if(formatterText.includes("Fri")) dayName = "الجمعة";
-            if(formatterText.includes("Sat")) dayName = "السبت";
-
-            return { day: dayName, date: `${d}/${m}/${y}` };
+            let d = "", m = "", y = ""; parts.forEach(p => { if(p.type === 'day') d = p.value; if(p.type === 'month') m = p.value; if(p.type === 'year') y = p.value; });
+            return { day: days[new Date().getDay()], date: `${d}/${m}/${y}` };
         }
 
-        function setupPipStream() {
-            const canvas = document.getElementById('videoCanvas');
-            const video = document.getElementById('pipVideo');
-            const stream = canvas.captureStream(10);
-            video.srcObject = stream;
-        }
-
+        function setupPipStream() { const canvas = document.getElementById('videoCanvas'); const video = document.getElementById('pipVideo'); video.srcObject = canvas.captureStream(10); }
         function updateThemeColors() {
             const root = document.documentElement;
             if(currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
@@ -662,233 +816,58 @@
         }
 
         function formatDynamicTime(totalSeconds) {
-            let hours = Math.floor(totalSeconds / 3600);
-            let mins = Math.floor((totalSeconds % 3600) / 60);
-            let secs = totalSeconds % 60;
+            let hours = Math.floor(totalSeconds / 3600); let mins = Math.floor((totalSeconds % 3600) / 60); let secs = totalSeconds % 60;
             return hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` : `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
         function updateDisplay(mode) {
-            let timeStr = formatDynamicTime(timers[mode].seconds);
-            document.getElementById(`display-${mode}`).innerText = timeStr;
+            document.getElementById(`display-${mode}`).innerText = formatDynamicTime(timers[mode].seconds);
             if(mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
         }
 
         function startTimer() {
             let t = timers[currentActiveMode];
-            if(!sessionStartTime || timers[currentActiveMode].seconds === 0) {
-                sessionStartTime = getCairoTimeSnapshotString();
-            }
+            if(!sessionStartTime || timers[currentActiveMode].seconds === 0) sessionStartTime = getCairoTimeSnapshotString();
             if(!t.id) {
                 t.id = setInterval(() => {
                     if(t.type === 'up') {
-                        t.seconds++;
-                        updateDisplay(currentActiveMode);
-                        if(currentActiveMode === 'study' && t.seconds > 0 && t.seconds % 3600 === 0) playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
+                        t.seconds++; updateDisplay(currentActiveMode);
+                        if(currentActiveMode === 'study' && t.seconds > 0 && t.seconds % 3600 === 0) playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. 🎯");
                     } else {
-                        if(t.seconds > 0) {
-                            t.seconds--;
-                            updateDisplay(currentActiveMode);
-                        } else {
-                            pauseTimer();
-                            playAlarm(currentActiveMode === 'break' ? "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" : "انتهى الوقت!");
-                        }
+                        if(t.seconds > 0) { t.seconds--; updateDisplay(currentActiveMode); } 
+                        else { pauseTimer(); playAlarm(currentActiveMode === 'break' ? "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" : "انتهى الوقت!"); }
                     }
-                    if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
                 }, 1000);
             }
         }
 
-        function pauseTimer() { let t = timers[currentActiveMode]; clearInterval(t.id); t.id = null; }
-        function endTimer() { pauseTimer(); sessionStartTime = null; if(timers[currentActiveMode].type === 'up') timers[currentActiveMode].seconds = 0; else setBreakDuration(); updateDisplay(currentActiveMode); if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }
-        function setBreakDuration() { const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0; const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0; timers.break.seconds = (hoursInput * 3600) + (minsInput * 60); updateDisplay('break'); }
+        function pauseTimer() { clearInterval(timers[currentActiveMode].id); timers[currentActiveMode].id = null; }
+        function endTimer() { pauseTimer(); sessionStartTime = null; if(timers[currentActiveMode].type === 'up') timers[currentActiveMode].seconds = 0; else setBreakDuration(); updateDisplay(currentActiveMode); }
+        function setBreakDuration() { timers.break.seconds = ((parseInt(document.getElementById('breakHoursInput').value) || 0) * 3600) + ((parseInt(document.getElementById('breakMinutesInput').value) || 0) * 60); updateDisplay('break'); }
 
-        function saveSessionPrompt() {
-            pauseTimer();
-            if(timers[currentActiveMode].seconds === 0) { alert("المؤقت فارغ! لا يمكن حفظ سجل بدون وقت."); return; }
-            document.getElementById('modalSubjectInput').value = "";
-            document.getElementById('modalDescInput').value = "";
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
+        function saveSessionPrompt() { pauseTimer(); if(timers[currentActiveMode].seconds === 0) { alert("لا يمكن حفظ سجل بدون وقت."); return; } document.getElementById('modalSubjectInput').value = ""; document.getElementById('modalDescInput').value = ""; document.getElementById('saveModal').style.display = 'flex'; }
+        
         function confirmSaveSession() {
-            let subjectInput = document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى";
-            let descInput = document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل وصفية لهذه الجلسة.";
-            
-            let endTime = getCairoTimeSnapshotString();
-            let dateInfo = getCairoDateSnapshotInfo();
-
             let newRecord = {
-                id: Date.now(),
-                originMode: currentActiveMode, 
-                subject: subjectInput,
-                desc: descInput,
+                id: Date.now(), originMode: currentActiveMode, 
+                subject: document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى",
+                desc: document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل.",
                 duration: formatDynamicTime(timers[currentActiveMode].seconds),
-                date: dateInfo.date,
-                day: dateInfo.day, 
-                startTime: sessionStartTime || getCairoTimeSnapshotString(), 
-                endTime: endTime
+                date: getCairoDateSnapshotInfo().date, day: getCairoDateSnapshotInfo().day, 
+                startTime: sessionStartTime || getCairoTimeSnapshotString(), endTime: getCairoTimeSnapshotString()
             };
-
             historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ الجلسة بنظام التوقيت الفعلي لجمهورية مصر العربية! 🌍");
             endTimer();
         }
 
-        function openHistory(type) {
-            activeHistoryView = type;
-            const sidebar = document.getElementById('sidebarHistory');
-            const title = document.getElementById('sidebarTitle');
-            const mainCont = document.getElementById('mainContainer');
-            const printBtn = document.getElementById('printHistoryBtn');
-
-            let typeNames = { study: 'Study History 📚', break: 'Break History ☕', social: 'Social History 📱', afk: 'AFK History ⏳', trash: 'Trash / Recovery 🗑️' };
-            title.innerText = typeNames[type];
-
-            printBtn.style.display = (type === 'trash') ? 'none' : 'block';
-
-            renderHistoryCards();
-            sidebar.classList.add('open');
-            mainCont.classList.add('sidebar-open');
-        }
-
-        function closeHistory() { document.getElementById('sidebarHistory').classList.remove('open'); document.getElementById('mainContainer').classList.remove('sidebar-open'); }
-
-        function renderHistoryCards() {
-            const container = document.getElementById('sidebarContent');
-            container.innerHTML = "";
-            let list = historyData[activeHistoryView];
-
-            if(list.length === 0) {
-                container.innerHTML = `<p style="text-align:center; color:#585b70; margin-top:40px;">لا توجد سجلات محفوظة هنا حالياً.</p>`;
-                return;
-            }
-
-            list.forEach((item, index) => {
-                let card = document.createElement('div');
-                card.className = 'history-card';
-                card.innerHTML = `
-                    <div class="card-main-line">
-                        <div class="card-subject">${item.subject}</div>
-                        <div class="card-duration">${item.duration}</div>
-                    </div>
-                    <div class="card-desc">${item.desc}</div>
-                    <div class="card-time-row">
-                        <span class="time-tag start">البداية: ${item.startTime}</span>
-                        <span class="time-tag end">النهاية: ${item.endTime}</span>
-                    </div>
-                    <div class="card-bottom-info">
-                        <span>${item.day}</span>
-                        <span>${item.date}</span>
-                    </div>
-                    <div class="card-actions">
-                        ${activeHistoryView === 'trash' ? 
-                            `<button class="btn-recovery" onclick="recoverRecord(${index})">Recovery ↩️</button>
-                             <button class="btn-delete" style="color:#f38ba8;" onclick="hardDeleteRecord(${index})">حذف نهائي ❌</button>` :
-                            `<button class="btn-edit" onclick="openEditModal(${index})">Edit ✏️</button>
-                             <button class="btn-delete" onclick="deleteRecord(${index})">Delete 🗑️</button>`
-                        }
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function deleteRecord(index) {
-            let record = historyData[activeHistoryView][index];
-            historyData.trash.unshift(record);
-            historyData[activeHistoryView].splice(index, 1);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-        }
-
-        function recoverRecord(index) {
-            let record = historyData.trash[index];
-            let targetMode = record.originMode || 'study';
-            historyData[targetMode].unshift(record);
-            historyData.trash.splice(index, 1);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-            alert("تم استرجاع السجل وإعادته لقائمته الأصلية بنجاح! ↩️");
-        }
-
-        function hardDeleteRecord(index) {
-            if(confirm("هل تريد حذف هذا السجل من المهملات بشكل نهائي تماماً؟ لا يمكن استرجاعه مرة أخرى.")) {
-                historyData.trash.splice(index, 1);
-                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-                renderHistoryCards();
-            }
-        }
-
-        function openEditModal(index) {
-            currentEditingIndex = index;
-            let record = historyData[activeHistoryView][index];
-            document.getElementById('editSubjectInput').value = record.subject;
-            document.getElementById('editDescInput').value = record.desc || "";
-            document.getElementById('editDayInput').value = record.day;
-            document.getElementById('editDateInput').value = record.date;
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function confirmEditSession() {
-            let record = historyData[activeHistoryView][currentEditingIndex];
-            record.subject = document.getElementById('editSubjectInput').value.trim() || record.subject;
-            record.desc = document.getElementById('editDescInput').value.trim() || record.desc;
-            record.day = document.getElementById('editDayInput').value.trim() || record.day;
-            record.date = document.getElementById('editDateInput').value.trim() || record.date;
-
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            document.getElementById('editModal').style.display = 'none';
-            renderHistoryCards();
-            alert("تم التعديل بنجاح!");
-        }
-
-        function printFullHistory() { 
-            document.body.classList.add('printing-history');
-            window.print(); 
-            document.body.classList.remove('printing-history');
-        }
+        function printFullHistory() { document.body.classList.add('printing-history'); window.print(); document.body.classList.remove('printing-history'); }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function playAlarm(notificationText) {
-            if(audioStopTimeout) clearTimeout(audioStopTimeout);
-            customAudio.pause(); customAudio.currentTime = 0;
-            customAudio.play().catch(e => console.log(e));
-            audioStopTimeout = setTimeout(() => { stopAlarm(); }, 12000);
-            if (Notification.permission === "granted") {
-                new Notification("Study Timer", { body: notificationText });
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => { if (permission === "granted") new Notification("Study Timer", { body: notificationText }); });
-            }
-        }
-
+        function playAlarm(txt) { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; customAudio.play().catch(e=>console.log(e)); audioStopTimeout = setTimeout(()=>stopAlarm(), 12000); if(Notification.permission==="granted") new Notification("Study Timer", {body:txt}); }
         function stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
-
-        function updatePipCanvas(targetDisplayId) {
-            const canvas = document.getElementById('videoCanvas'); const ctx = canvas.getContext('2d');
-            let textColor = "#a6e3a1";
-            if(currentActiveMode === 'break') textColor = "#cba6f7";
-            if(currentActiveMode === 'social') textColor = "#89b4fa";
-            if(currentActiveMode === 'afk') textColor = "#f9e2af";
-            const textText = document.getElementById(targetDisplayId).innerText;
-            ctx.fillStyle = "#0f0f16"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = textColor; ctx.font = textText.length > 5 ? "bold 42px Courier New" : "bold 55px Courier New";
-            ctx.textAlign = "center"; ctx.fillText(textText, canvas.width/2, 90);
-        }
-
-        async function requestMini(targetDisplayId) {
-            const video = document.getElementById('pipVideo');
-            try {
-                updatePipCanvas(targetDisplayId);
-                if (document.pictureInPictureElement) { await document.exitPictureInPicture(); } 
-                else {
-                    await video.play(); await video.requestPictureInPicture();
-                    setInterval(() => { if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }, 500);
-                }
-            } catch (error) { alert("تأكد من الضغط على زر Start أولاً لتفعيل الواجهة قبل تشغيل الـ Mini!"); }
-        }
+        function updatePipCanvas(id) { const canvas = document.getElementById('videoCanvas'); const ctx = canvas.getContext('2d'); ctx.fillStyle = "#0f0f16"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "#a6e3a1"; ctx.font = "bold 45px Courier New"; ctx.textAlign="center"; ctx.fillText(document.getElementById(id).innerText, canvas.width/2, 90); }
+        async function requestMini(id) { const video = document.getElementById('pipVideo'); try { updatePipCanvas(id); if(document.pictureInPictureElement) await document.exitPictureInPicture(); else { await video.play(); await video.requestPictureInPicture(); setInterval(()=>{ if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }, 500); } } catch(e) { alert("اضغط Start أولاً!"); } }
     </script>
 </body>
 </html>
