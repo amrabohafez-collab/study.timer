@@ -37,7 +37,7 @@
             border: 1px solid #313244;
             padding: 8px 14px;
             border-radius: 10px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Segoe UI', sans-serif;
             font-size: 0.85rem;
             color: #6c7086; 
             display: flex;
@@ -45,12 +45,14 @@
             gap: 2px;
             z-index: 15;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: left;
         }
         .cairo-live-widget .widget-clock {
             color: var(--clock-color);
-            font-weight: 500;
-            font-size: 1rem;
-            letter-spacing: 1px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            direction: rtl;
         }
 
         .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); }
@@ -100,8 +102,8 @@
         .card-duration { font-weight: bold; color: var(--current-theme); }
         .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: #11111b; padding: 4px 6px; border-radius: 4px; text-align: right; direction: rtl; word-wrap: break-word; }
         
-        .card-time-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 5px; font-family: 'Courier New', monospace; direction: rtl; }
-        .time-tag { padding: 2px 5px; border-radius: 4px; font-weight: 500; }
+        .card-time-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 5px; font-family: inherit; direction: rtl; gap: 5px; }
+        .time-tag { padding: 2px 5px; border-radius: 4px; font-weight: 500; white-space: nowrap; }
         .time-tag.start { background: rgba(166, 227, 161, 0.1); color: #a6e3a1; }
         .time-tag.end { background: rgba(243, 139, 168, 0.1); color: #f38ba8; }
         
@@ -135,8 +137,8 @@
 <body>
 
     <div class="cairo-live-widget">
-        <div id="cairoClock" class="widget-clock">Loading Clock...</div>
-        <div id="cairoDate">Loading Date...</div>
+        <div id="cairoClock" class="widget-clock">جاري تحميل التوقيت...</div>
+        <div id="cairoDate">جاري تحميل التاريخ...</div>
     </div>
 
     <div class="top-bar">
@@ -267,7 +269,6 @@
         let currentActiveMode = 'study';
         let sessionStartTime = null; 
         
-        // المتغير الحرج: يحمل الكائن الزمني الحقيقي والكامل القادم من السيرفر والمحدث ذاتياً بدون ساعة الجهاز
         let currentCairoGlobalDateObject = null; 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
@@ -290,7 +291,6 @@
 
         async function fetchCairoGlobalTime() {
             try {
-                // جلب دقيق وتام للتوقيت العالمي الرسمي لجمهورية مصر العربية - محافظة القاهرة
                 let response = await fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo');
                 if (response.ok) {
                     let data = await response.json();
@@ -304,27 +304,66 @@
             startCairoLiveClockAndEngine(); 
         }
 
+        function getCairoPrayerPeriodInfo(dateObj) {
+            if (!dateObj) return { textTime: "--:--", periodName: "" };
+
+            let hours = dateObj.getHours();
+            let minutes = dateObj.getMinutes();
+            let totalMinutes = (hours * 60) + minutes;
+
+            const fajr = (4 * 60) + 15;      
+            const shrooq = (6 * 60) + 0;     
+            const dhuhr = (13 * 60) + 0;     
+            const asr = (16 * 60) + 30;      
+            const maghrib = (20 * 60) + 0;   
+            const isha = (21 * 60) + 30;     
+            const midnight = (24 * 60);      
+
+            let periodName = "";
+            if (totalMinutes >= fajr && totalMinutes < shrooq) {
+                periodName = "فجراً";
+            } else if (totalMinutes >= shrooq && totalMinutes < dhuhr) {
+                periodName = "شروق";
+            } else if (totalMinutes >= dhuhr && totalMinutes < asr) {
+                periodName = "ظهراً";
+            } else if (totalMinutes >= asr && totalMinutes < maghrib) {
+                periodName = "عصراً";
+            } else if (totalMinutes >= maghrib && totalMinutes < isha) {
+                periodName = "المغرب";
+            } else if (totalMinutes >= isha && totalMinutes < midnight) {
+                periodName = "العشاء";
+            } else {
+                periodName = "الليل"; 
+            }
+
+            let displayHours = hours;
+            if (displayHours > 12) displayHours -= 12;
+            if (displayHours === 0) displayHours = 12;
+
+            let displayMinutes = minutes === 0 ? "" : ":" + minutes.toString().padStart(2, '0');
+            return `${displayHours}${displayMinutes} ${periodName}`;
+        }
+
         function startCairoLiveClockAndEngine() {
-            const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            // تحويل مصفوفة الأيام بالكامل إلى لغتنا العربية الفصيحة والمألوفة
+            const daysArr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             
-            // هذا التكرار يعمل كمحاكي سيرفر مستقل، يزيد الوقت بمقدار 1 ثانية حقيقية تماماً معزولة عن نظام التشغيل
             setInterval(() => {
                 if (currentCairoGlobalDateObject) {
                     currentCairoGlobalDateObject.setSeconds(currentCairoGlobalDateObject.getSeconds() + 1);
                     
-                    let cairoTimeString = currentCairoGlobalDateObject.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
                     let cairoDateParts = currentCairoGlobalDateObject.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
                     let cairoDayName = daysArr[currentCairoGlobalDateObject.getDay()];
                     
-                    document.getElementById('cairoClock').innerText = cairoTimeString;
-                    document.getElementById('cairoDate').innerText = `${cairoDayName}, ${cairoDateParts[1]}/${cairoDateParts[0]}/${cairoDateParts[2]}`;
+                    document.getElementById('cairoClock').innerText = prayerFormattedTime;
+                    document.getElementById('cairoDate').innerText = `${cairoDayName}، ${cairoDateParts[1]}/${cairoDateParts[0]}/${cairoDateParts[2]}`;
                 }
             }, 1000);
         }
 
         function getCairoTimeSnapshotString() {
-            if (!currentCairoGlobalDateObject) return new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
-            return currentCairoGlobalDateObject.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            return getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
         }
 
         function getCairoDateSnapshotInfo() {
@@ -428,7 +467,7 @@
                 desc: descInput,
                 duration: formatDynamicTime(timers[currentActiveMode].seconds),
                 date: dateInfo.date,
-                day: dateInfo.day,
+                day: dateInfo.day, // سيحفظ اليوم بالعربي هنا تلقائياً
                 startTime: sessionStartTime || getCairoTimeSnapshotString(), 
                 endTime: endTime
             };
@@ -436,7 +475,7 @@
             historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ الجلسة بنظام الحماية العالمي بنجاح! 🌍 التوقيت الآن معزول بالكامل عن جهازك.");
+            alert("تم حفظ الجلسة بنظام التوقيت الإسلامي لجمهورية مصر العربية! 🌍");
             endTimer();
         }
 
