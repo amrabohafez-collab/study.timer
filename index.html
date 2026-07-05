@@ -317,9 +317,10 @@
             const asr = (16 * 60) + 30;      
             const maghrib = (20 * 60) + 0;   
             const isha = (21 * 60) + 30;     
-            const midnight = (24 * 60);      
 
             let periodName = "";
+            
+            // تم تصليح الشروط البرمجية بدقة لتعمل بترتيب اليوم الصحيح بنظام الـ 24 ساعة
             if (totalMinutes >= fajr && totalMinutes < shrooq) {
                 periodName = "فجراً";
             } else if (totalMinutes >= shrooq && totalMinutes < dhuhr) {
@@ -330,10 +331,15 @@
                 periodName = "عصراً";
             } else if (totalMinutes >= maghrib && totalMinutes < isha) {
                 periodName = "المغرب";
-            } else if (totalMinutes >= isha && totalMinutes < midnight) {
+            } else if (totalMinutes >= isha && totalMinutes < 1440) {
                 periodName = "العشاء";
             } else {
                 periodName = "الليل"; 
+            }
+
+            // لو احنا بعد نص الليل (الساعة 0) وقبل الفجر (4:15)، تظهر "الليل"
+            if (totalMinutes >= 0 && totalMinutes < fajr) {
+                periodName = "الليل";
             }
 
             let displayHours = hours;
@@ -345,7 +351,6 @@
         }
 
         function startCairoLiveClockAndEngine() {
-            // تحويل مصفوفة الأيام بالكامل إلى لغتنا العربية الفصيحة والمألوفة
             const daysArr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             
             setInterval(() => {
@@ -467,7 +472,7 @@
                 desc: descInput,
                 duration: formatDynamicTime(timers[currentActiveMode].seconds),
                 date: dateInfo.date,
-                day: dateInfo.day, // سيحفظ اليوم بالعربي هنا تلقائياً
+                day: dateInfo.day, 
                 startTime: sessionStartTime || getCairoTimeSnapshotString(), 
                 endTime: endTime
             };
