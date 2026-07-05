@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Study Timer</title>
+    <title>Study Timer & Notebook</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -13,6 +13,12 @@
             --afk-color: #f9e2af;
             --clock-color: #a6adc8; 
             --current-theme: var(--study-color);
+            
+            /* ألوان المواد الخاصة بالمفكرة */
+            --arabic-color: #89b4fa;
+            --english-color: #a6e3a1;
+            --history-color: #f9e2af;
+            --physics-color: #f38ba8;
         }
 
         body { 
@@ -46,6 +52,7 @@
             z-index: 15;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             text-align: left;
+            transition: opacity 0.3s ease;
         }
         .cairo-live-widget .widget-clock {
             color: var(--clock-color);
@@ -55,12 +62,14 @@
             direction: rtl;
         }
 
-        .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); }
+        .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
         .footer-credits { position: absolute; bottom: 25px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
 
-        #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: padding-right 0.3s ease; }
+        #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
         #mainContainer.sidebar-open { padding-right: 380px; }
-        #mainApp { text-align: center; width: 100%; max-width: 600px; }
+        #mainContainer.notebook-open { padding-left: 50vw; } /* إزاحة محاذاة المؤقت عند فتح المفكرة الكبيرة */
+        
+        #mainApp { text-align: center; width: 100%; max-width: 600px; transition: all 0.3s ease; }
         .timer-box { display: none; }
         .timer-box.active { display: block; }
         .timer-display { font-size: 6rem; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.1); margin-bottom: 10px; }
@@ -70,10 +79,16 @@
         .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
         .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
 
-        .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; }
+        .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; transition: opacity 0.3s ease; }
         .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
+        
+        /* زر المفكرة المميز */
+        .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
+        .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
 
-        .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; transition: opacity 0.3s ease; }
+        #bottomModeSelectors { transition: opacity 0.3s ease; }
+        
         button { padding: 12px 25px; cursor: pointer; border-radius: 25px; border: 1px solid var(--current-theme); background: #1e1e2e; color: var(--current-theme); font-weight: bold; transition: 0.3s; font-family: inherit; }
         button:hover { background: var(--current-theme); color: #11111b; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
         .mode-btn { background: #11111b; font-size: 0.9rem; }
@@ -82,6 +97,7 @@
         #btn-social { border-color: var(--social-color); color: var(--social-color); }
         #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
 
+        /* القائمة الجانبية للسجلات (اليمين) */
         .sidebar { position: fixed; right: -400px; top: 0; width: 360px; height: 100%; background: #11111b; border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
@@ -95,6 +111,59 @@
         .sidebar-content::-webkit-scrollbar { width: 14px; }
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
+
+        /* ==================== تصميم قائمة المفكرة الاحترافية الجديدة (اليسار) ==================== */
+        .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; border-right: 2px solid #cba6f7; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; }
+        .notebook-sidebar.open { left: 0; }
+        
+        .nb-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; direction: rtl; }
+        .nb-header-right { display: flex; align-items: center; gap: 15px; }
+        .nb-title { margin: 0; font-size: 1.4rem; color: #cba6f7; font-weight: bold; }
+        .btn-nb-share { background: #181825; border: 1px solid #a6e3a1; color: #a6e3a1; padding: 6px 14px; font-size: 0.85rem; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-nb-share:hover { background: #a6e3a1; color: #11111b; }
+        .close-nb-btn { background: none; border: none; color: #f38ba8; font-size: 1.5rem; cursor: pointer; }
+
+        .nb-content { padding: 20px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
+        .nb-content::-webkit-scrollbar { width: 8px; }
+        .nb-content::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
+
+        /* كارت المادة */
+        .subject-block { background: #181825; border: 1px solid #313244; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; }
+        .subject-block.arabic { border-top: 4px solid var(--arabic-color); }
+        .subject-block.english { border-top: 4px solid var(--english-color); }
+        .subject-block.history { border-top: 4px solid var(--history-color); }
+        .subject-block.physics { border-top: 4px solid var(--physics-color); }
+        
+        .sub-block-title { font-size: 1.15rem; font-weight: bold; text-align: right; margin: 0; direction: rtl; }
+        .subject-block.arabic .sub-block-title { color: var(--arabic-color); }
+        .subject-block.english .sub-block-title { color: var(--english-color); }
+        .subject-block.history .sub-block-title { color: var(--history-color); }
+        .subject-block.physics .sub-block-title { color: var(--physics-color); }
+
+        /* أزرار Done / Remaining العلويين لكل مادة */
+        .nb-tabs-row { display: flex; gap: 10px; width: 100%; direction: rtl; }
+        .nb-tab-btn { flex: 1; padding: 8px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; border: 1px solid #313244; background: #11111b; cursor: pointer; transition: 0.2s; }
+        .nb-tab-btn.btn-done-tab { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.3); }
+        .nb-tab-btn.btn-done-tab.active-tab { background: rgba(166, 227, 161, 0.15); border-color: #a6e3a1; }
+        .nb-tab-btn.btn-remaining-tab { color: #f38ba8; border-color: rgba(243, 139, 168, 0.3); }
+        .nb-tab-btn.btn-remaining-tab.active-tab { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
+
+        /* مساحات الكتابة الذكية بالألوان المشروطة */
+        .nb-text-container { width: 100%; display: none; direction: rtl; }
+        .nb-text-container.active-pane { display: block; }
+        
+        .nb-textarea { width: 100%; height: 110px; background: #11111b; border: 1px solid #313244; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 0.95rem; line-height: 1.5; outline: none; transition: border-color 0.2s; text-align: right; }
+        
+        /* تلوين نصوص الكتابة تلقائياً بناء على نوع الخانة */
+        .nb-text-container.done-pane .nb-textarea { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.2); }
+        .nb-text-container.done-pane .nb-textarea:focus { border-color: #a6e3a1; }
+        .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
+        .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
+
+        /* حالة إخفاء العناصر عند دخول وضع المفكرة الكبيرة */
+        .hide-in-notebook { opacity: 0 !important; pointer-events: none !important; }
+
+        /* ========================================================================================= */
 
         .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; }
         .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
@@ -123,25 +192,37 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
         .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
 
+        /* تنسيقات الطباعة لـ PDF تدعم المفكرة والسجلات بشكل احترافي */
         @media print {
             body * { visibility: hidden; background: white !important; color: black !important; }
-            #sidebarHistory, #sidebarHistory * { visibility: visible; }
-            #sidebarHistory { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
-            .close-sidebar-btn, .btn-header-share, .card-actions, .cairo-live-widget { display: none !important; }
-            .history-card { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; page-break-inside: avoid; margin-bottom: 15px; }
-            .card-subject, .card-duration, .card-desc { color: #000 !important; background: #fff !important; }
-            .time-tag.start, .time-tag.end { background: none !important; border: 1px solid #000; color: #000 !important; }
+            #sidebarHistory, #sidebarHistory * { visibility: hidden; }
+            
+            /* طباعة الـ Notebook */
+            body.printing-notebook #notebookSidebar, body.printing-notebook #notebookSidebar * { visibility: visible; }
+            body.printing-notebook #notebookSidebar { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            body.printing-notebook .close-nb-btn, body.printing-notebook .btn-nb-share { display: none !important; }
+            body.printing-notebook .subject-block { border: 1px solid #000 !important; background: #fff !important; page-break-inside: avoid; margin-bottom: 20px; }
+            body.printing-notebook .nb-textarea { border: 1px solid #000 !important; color: #000 !important; background: #fff !important; height: auto !important; }
+            body.printing-notebook .nb-text-container { display: block !important; margin-top: 10px; }
+            body.printing-notebook .nb-tabs-row { display: none !important; }
+
+            /* طباعة السجل العادي */
+            body.printing-history #sidebarHistory, body.printing-history #sidebarHistory * { visibility: visible; }
+            body.printing-history #sidebarHistory { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            body.printing-history .close-sidebar-btn, body.printing-history .btn-header-share, body.printing-history .card-actions, body.printing-history .cairo-live-widget { display: none !important; }
+            body.printing-history .history-card { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; page-break-inside: avoid; margin-bottom: 15px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="cairo-live-widget">
+    <div id="cairoWidget" class="cairo-live-widget">
         <div id="cairoClock" class="widget-clock">جاري الحساب...</div>
         <div id="cairoDate">جاري الحساب...</div>
     </div>
 
-    <div class="top-bar">
+    <div id="topBarNav" class="top-bar">
+        <button class="btn-notebook-trigger" onclick="openNotebook()">Notebook 📓</button>
         <button onclick="openHistory('study')">Study History 📚</button>
         <button onclick="openHistory('break')">Break History ☕</button>
         <button onclick="openHistory('social')">Social History 📱</button>
@@ -158,9 +239,9 @@
                 <div class="controls">
                     <button onclick="startTimer()">Start</button>
                     <button onclick="pauseTimer()">Pause</button>
-                    <button onclick="saveSessionPrompt()">Save</button>
-                    <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini('display-study')">Mini</button>
+                    <button id="saveBtnStudy" onclick="saveSessionPrompt()">Save</button>
+                    <button id="resetBtnStudy" onclick="endTimer()">Reset</button>
+                    <button id="miniBtnStudy" onclick="requestMini('display-study')">Mini</button>
                 </div>
             </div>
 
@@ -201,7 +282,7 @@
                 </div>
             </div>
 
-            <div class="controls" style="margin-top: 35px; border-top: 1px solid #181825; padding-top: 20px;">
+            <div id="bottomModeSelectors" class="controls" style="margin-top: 35px; border-top: 1px solid #181825; padding-top: 20px;">
                 <button id="btn-study" class="mode-btn" onclick="switchMode('study')">Study Mode 📚</button>
                 <button id="btn-break" class="mode-btn" onclick="switchMode('break')">Break Mode ☕</button>
                 <button id="btn-social" class="mode-btn" onclick="switchMode('social')">Social Timer 📱</button>
@@ -209,6 +290,80 @@
             </div>
         </div>
     </div>
+
+    <!-- ==================== واجهة المفكرة الذكية الإحترافية الجديدة (اليسار) ==================== -->
+    <div id="notebookSidebar" class="notebook-sidebar">
+        <div class="nb-header">
+            <button class="close-nb-btn" onclick="closeNotebook()">✕</button>
+            <div class="nb-header-right">
+                <button class="btn-nb-share" onclick="printNotebook()">Share PDF 📄</button>
+                <h2 class="nb-title">Notebook 📓</h2>
+            </div>
+        </div>
+        
+        <div class="nb-content">
+            <!-- خانة 1: اللغة العربية -->
+            <div class="subject-block arabic">
+                <p class="sub-block-title">1. اللغة العربية 📚</p>
+                <div class="nb-tabs-row">
+                    <button id="tab-arabic-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('arabic', 'done')">Done ✅</button>
+                    <button id="tab-arabic-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('arabic', 'rem')">Remaining ⏳</button>
+                </div>
+                <div id="pane-arabic-done" class="nb-text-container done-pane active-pane">
+                    <textarea id="note-arabic-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في اللغة العربية..." oninput="saveNotebookData()"></textarea>
+                </div>
+                <div id="pane-arabic-rem" class="nb-text-container remaining-pane">
+                    <textarea id="note-arabic-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في اللغة العربية..." oninput="saveNotebookData()"></textarea>
+                </div>
+            </div>
+
+            <!-- خانة 2: اللغة الإنجليزية -->
+            <div class="subject-block english">
+                <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
+                <div class="nb-tabs-row">
+                    <button id="tab-english-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('english', 'done')">Done ✅</button>
+                    <button id="tab-english-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('english', 'rem')">Remaining ⏳</button>
+                </div>
+                <div id="pane-english-done" class="nb-text-container done-pane active-pane">
+                    <textarea id="note-english-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في اللغة الإنجليزية..." oninput="saveNotebookData()"></textarea>
+                </div>
+                <div id="pane-english-rem" class="nb-text-container remaining-pane">
+                    <textarea id="note-english-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في اللغة الإنجليزية..." oninput="saveNotebookData()"></textarea>
+                </div>
+            </div>
+
+            <!-- خانة 3: التاريخ -->
+            <div class="subject-block history">
+                <p class="sub-block-title">3. التاريخ 🏛️</p>
+                <div class="nb-tabs-row">
+                    <button id="tab-history-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('history', 'done')">Done ✅</button>
+                    <button id="tab-history-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('history', 'rem')">Remaining ⏳</button>
+                </div>
+                <div id="pane-history-done" class="nb-text-container done-pane active-pane">
+                    <textarea id="note-history-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في التاريخ..." oninput="saveNotebookData()"></textarea>
+                </div>
+                <div id="pane-history-rem" class="nb-text-container remaining-pane">
+                    <textarea id="note-history-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في التاريخ..." oninput="saveNotebookData()"></textarea>
+                </div>
+            </div>
+
+            <!-- خانة 4: الفيزياء -->
+            <div class="subject-block physics">
+                <p class="sub-block-title">4. الفيزياء ⚡</p>
+                <div class="nb-tabs-row">
+                    <button id="tab-physics-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('physics', 'done')">Done ✅</button>
+                    <button id="tab-physics-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('physics', 'rem')">Remaining ⏳</button>
+                </div>
+                <div id="pane-physics-done" class="nb-text-container done-pane active-pane">
+                    <textarea id="note-physics-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في الفيزياء..." oninput="saveNotebookData()"></textarea>
+                </div>
+                <div id="pane-physics-rem" class="nb-text-container remaining-pane">
+                    <textarea id="note-physics-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في الفيزياء..." oninput="saveNotebookData()"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ========================================================================= -->
 
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
@@ -286,32 +441,23 @@
             setupPipStream();
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
+            loadNotebookData(); // تحميل نصوص المفكرة المحفوظة تلقائياً
         }
 
-        // تطبيق الخطة العكسية بالكامل هنا بناء على معطيات جهازك
+        // دالة الفترات بالهندسة العكسية المتوافقة مع جهازك بنسبة 100%
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
 
-            let formatter24 = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Africa/Cairo',
-                hour: 'numeric',
-                hour12: false
-            });
-            
-            let formatterMinutes = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Africa/Cairo',
-                minute: 'numeric'
-            });
+            let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
+            let formatterMinutes = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', minute: 'numeric' });
 
             let hours = parseInt(formatter24.format(dateObj), 10);
             let minutes = parseInt(formatterMinutes.format(dateObj), 10);
 
-            // الهندسة العكسية: إذا كانت الساعة تقرأ 2 فجراً، سنعاملها برمجياً على أنها 14 (أي الظهر)
-            // وإذا كانت 14 سنعاملها على أنها فجراً، لحل مشكلة قلب الفترات بجهازك تماماً.
             if (hours >= 0 && hours < 12) {
-                hours += 12; // دفع التوقيت الصباحي ليصبح مسائياً/نهارياً
+                hours += 12; 
             } else if (hours >= 12) {
-                hours -= 12; // سحب التوقيت المسائي ليصبح صباحياً
+                hours -= 12; 
             }
 
             let totalMinutes = (hours * 60) + minutes;
@@ -325,25 +471,15 @@
             let m800_pm = (20 * 60);      
             let m930_pm = (21 * 60) + 30; 
 
-            if (totalMinutes >= m430_am && totalMinutes < m600_am) {
-                periodName = "فجراً";
-            } else if (totalMinutes >= m600_am && totalMinutes < m800_am) {
-                periodName = "الشروق";
-            } else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) {
-                periodName = "صباحاً";
-            } else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) {
-                periodName = "ظهراً";
-            } else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) {
-                periodName = "عصراً";
-            } else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) {
-                periodName = "المغرب";
-            } else if (totalMinutes >= m930_pm && totalMinutes < 1440) { 
-                periodName = "العشاء";
-            } else { 
-                periodName = "الليل"; 
-            }
+            if (totalMinutes >= m430_am && totalMinutes < m600_am) periodName = "فجراً";
+            else if (totalMinutes >= m600_am && totalMinutes < m800_am) periodName = "الشروق";
+            else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) periodName = "صباحاً";
+            else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) periodName = "ظهراً";
+            else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) periodName = "عصراً";
+            else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) periodName = "المغرب";
+            else if (totalMinutes >= m930_pm && totalMinutes < 1440) periodName = "العشاء";
+            else periodName = "الليل"; 
 
-            // الحفاظ على العرض الجمالي للساعة الحقيقية بدون تغيير لعينك
             let realHours = parseInt(formatter24.format(dateObj), 10);
             if (realHours > 12) realHours -= 12;
             if (realHours === 0) realHours = 12;
@@ -357,14 +493,7 @@
                 currentCairoGlobalDateObject = new Date(); 
                 let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
                 
-                let dateFormatter = new Intl.DateTimeFormat('en-US', {
-                    timeZone: 'Africa/Cairo',
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    weekday: 'long'
-                });
-                
+                let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
                 let dateParts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
                 let dayNameStr = ""; let dayNum = ""; let monthNum = ""; let yearNum = "";
                 
@@ -388,6 +517,97 @@
                 document.getElementById('cairoDate').innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
             }, 1000);
         }
+
+        /* ==================== دوال تشغيل وإدارة المفكرة الاحترافية ==================== */
+        function openNotebook() {
+            // 1. تحويل فوري وإجباري إلى Study Mode
+            switchMode('study');
+            
+            // 2. تطبيق تأثير الاختفاء على الأزرار والعناصر الجانبية لتصفية الواجهة
+            document.getElementById('cairoWidget').classList.add('hide-in-notebook');
+            document.getElementById('topBarNav').classList.add('hide-in-notebook');
+            document.getElementById('appTitle').classList.add('hide-in-notebook');
+            document.getElementById('bottomModeSelectors').classList.add('hide-in-notebook');
+            
+            // إخفاء الأزرار الفرعية لمؤقت الدراسة وترك الأزرار الأساسية فقط (Start / Pause)
+            document.getElementById('saveBtnStudy').style.display = 'none';
+            document.getElementById('resetBtnStudy').style.display = 'none';
+            document.getElementById('miniBtnStudy').style.display = 'none';
+
+            // 3. فتح قائمة المفكرة من اليسار بحجم كبير وإزاحة المؤقت
+            document.getElementById('notebookSidebar').classList.add('open');
+            document.getElementById('mainContainer').classList.add('notebook-open');
+        }
+
+        function closeNotebook() {
+            // 1. إرجاع كل العناصر المخفية للظهور فوراً وبشكل طبيعي
+            document.getElementById('cairoWidget').classList.remove('hide-in-notebook');
+            document.getElementById('topBarNav').classList.remove('hide-in-notebook');
+            document.getElementById('appTitle').classList.remove('hide-in-notebook');
+            document.getElementById('bottomModeSelectors').classList.remove('hide-in-notebook');
+            
+            document.getElementById('saveBtnStudy').style.display = 'inline-block';
+            document.getElementById('resetBtnStudy').style.display = 'inline-block';
+            document.getElementById('miniBtnStudy').style.display = 'inline-block';
+
+            // 2. إغلاق القائمة الجانبية وإعادة محاذاة المؤقت للمركز
+            document.getElementById('notebookSidebar').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('notebook-open');
+        }
+
+        function switchNbPane(subject, paneType) {
+            // تغيير حالة الأزرار النشطة (Tabs)
+            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
+            
+            // إخفاء مساحات الكتابة القديمة للمادة المحددة
+            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
+
+            // تفعيل التبويب والمساحة المطلوبة
+            if(paneType === 'done') {
+                document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
+                document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
+            } else {
+                document.getElementById(`tab-${subject}-rem`).classList.add('active-tab');
+                document.getElementById(`pane-${subject}-rem`).classList.add('active-pane');
+            }
+        }
+
+        function saveNotebookData() {
+            let notebookPayload = {
+                arabicDone: document.getElementById('note-arabic-done').value,
+                arabicRem: document.getElementById('note-arabic-rem').value,
+                englishDone: document.getElementById('note-english-done').value,
+                englishRem: document.getElementById('note-english-rem').value,
+                historyDone: document.getElementById('note-history-done').value,
+                historyRem: document.getElementById('note-history-rem').value,
+                physicsDone: document.getElementById('note-physics-done').value,
+                physicsRem: document.getElementById('note-physics-rem').value
+            };
+            localStorage.setItem('amrNotebookData', JSON.stringify(notebookPayload));
+        }
+
+        function loadNotebookData() {
+            let savedData = JSON.parse(localStorage.getItem('amrNotebookData'));
+            if(savedData) {
+                document.getElementById('note-arabic-done').value = savedData.arabicDone || "";
+                document.getElementById('note-arabic-rem').value = savedData.arabicRem || "";
+                document.getElementById('note-english-done').value = savedData.englishDone || "";
+                document.getElementById('note-english-rem').value = savedData.englishRem || "";
+                document.getElementById('note-history-done').value = savedData.historyDone || "";
+                document.getElementById('note-history-rem').value = savedData.historyRem || "";
+                document.getElementById('note-physics-done').value = savedData.physicsDone || "";
+                document.getElementById('note-physics-rem').value = savedData.physicsRem || "";
+            }
+        }
+
+        function printNotebook() {
+            document.body.classList.add('printing-notebook');
+            window.print();
+            document.body.classList.remove('printing-notebook');
+        }
+        /* ========================================================================= */
 
         function getCairoTimeSnapshotString() { return getCairoPrayerPeriodInfo(currentCairoGlobalDateObject); }
 
@@ -625,7 +845,11 @@
             alert("تم التعديل بنجاح!");
         }
 
-        function printFullHistory() { window.print(); }
+        function printFullHistory() { 
+            document.body.classList.add('printing-history');
+            window.print(); 
+            document.body.classList.remove('printing-history');
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function playAlarm(notificationText) {
