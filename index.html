@@ -11,7 +11,7 @@
             --break-color: #cba6f7;
             --social-color: #89b4fa;
             --afk-color: #f9e2af;
-            --clock-color: #fab387; /* لون مميز بسيط خاص بساعة القاهرة */
+            --clock-color: #a6adc8; /* لون أبيض غامق خافت وهادئ جداً غير ملفت */
             --current-theme: var(--study-color);
         }
 
@@ -29,7 +29,7 @@
             transition: background 0.5s, color 0.5s;
         }
 
-        /* تنسيق ساعة القاهرة والتاريخ العلوي الاحترافي */
+        /* تنسيق ودجت ساعة القاهرة والتاريخ الهادئ */
         .cairo-live-widget {
             position: absolute;
             top: 20px;
@@ -40,7 +40,7 @@
             border-radius: 10px;
             font-family: 'Courier New', monospace;
             font-size: 0.85rem;
-            color: #cdd6f4;
+            color: #6c7086; 
             display: flex;
             flex-direction: column;
             gap: 2px;
@@ -49,7 +49,7 @@
         }
         .cairo-live-widget .widget-clock {
             color: var(--clock-color);
-            font-weight: bold;
+            font-weight: 500;
             font-size: 1rem;
             letter-spacing: 1px;
         }
@@ -69,7 +69,6 @@
         .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
         .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
 
-        /* البار العلوي المحاذى لليمين */
         .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; }
         .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
 
@@ -102,12 +101,12 @@
         .card-duration { font-weight: bold; color: var(--current-theme); }
         .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: #11111b; padding: 4px 6px; border-radius: 4px; text-align: right; direction: rtl; word-wrap: break-word; }
         
-        .card-time-row { display: flex; gap: 8px; font-size: 0.75rem; margin-top: 3px; font-family: 'Courier New', monospace; }
-        .time-tag { padding: 1px 4px; border-radius: 3px; font-weight: bold; }
-        .time-tag.start { background: rgba(166, 227, 161, 0.15); color: #a6e3a1; }
-        .time-tag.end { background: rgba(243, 139, 168, 0.15); color: #f38ba8; }
+        .card-time-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 5px; font-family: 'Courier New', monospace; direction: rtl; }
+        .time-tag { padding: 2px 5px; border-radius: 4px; font-weight: 500; }
+        .time-tag.start { background: rgba(166, 227, 161, 0.1); color: #a6e3a1; }
+        .time-tag.end { background: rgba(243, 139, 168, 0.1); color: #f38ba8; }
         
-        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 4px; }
+        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
         .card-actions { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; align-items: center;}
         .card-actions button { padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #313244; background: none;}
         .btn-edit { color: #f9e2af; border-color: #f9e2af !important; }
@@ -136,10 +135,10 @@
 </head>
 <body>
 
-    <!-- ودجت ساعة القاهرة والتاريخ الفورية -->
+    <!-- ودجت التوقيت العالمي للقاهرة باللون الأبيض الخافت الهادئ -->
     <div class="cairo-live-widget">
-        <div id="cairoClock" class="widget-clock">00:00:00 AM</div>
-        <div id="cairoDate">Sunday, 00/00/0000</div>
+        <div id="cairoClock" class="widget-clock">Loading Clock...</div>
+        <div id="cairoDate">Loading Date...</div>
     </div>
 
     <div class="top-bar">
@@ -154,7 +153,6 @@
         <div id="appTitle" class="brand-title">Study Timer</div>
 
         <div id="mainApp">
-            <!-- 1. واجهة مؤقت الدراسة -->
             <div id="container-study" class="timer-box active">
                 <div id="display-study" class="timer-display">00:00</div>
                 <div class="controls">
@@ -166,7 +164,6 @@
                 </div>
             </div>
 
-            <!-- 2. واجهة مؤقت الاستراحة -->
             <div id="container-break" class="timer-box">
                 <div id="display-break" class="timer-display">05:00</div>
                 <div class="break-input-group">
@@ -182,7 +179,6 @@
                 </div>
             </div>
 
-            <!-- 3. واجهة مؤقت السوشيال ميديا -->
             <div id="container-social" class="timer-box">
                 <div id="display-social" class="timer-display">00:00</div>
                 <div class="controls">
@@ -194,7 +190,6 @@
                 </div>
             </div>
 
-            <!-- 4. واجهة مؤقت AFK خارج الجهاز -->
             <div id="container-afk" class="timer-box">
                 <div id="display-afk" class="timer-display">00:00</div>
                 <div class="controls">
@@ -273,6 +268,7 @@
 
         let currentActiveMode = 'study';
         let sessionStartTime = null; 
+        let globalTimeOffsetMilliseconds = 0; 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
         if(!historyData.trash) historyData.trash = []; 
@@ -289,24 +285,39 @@
             setBreakDuration();
             setupPipStream();
             updateThemeColors();
-            startCairoLiveClock(); // تشغيل ساعة القاهرة الحية فوراً
+            fetchCairoGlobalTime(); 
         }
 
-        // دالة تشغيل وإدارة ساعة القاهرة الحية مع الثواني
+        async function fetchCairoGlobalTime() {
+            try {
+                let response = await fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo');
+                if (response.ok) {
+                    let data = await response.json();
+                    let apiTime = new Date(data.datetime);
+                    let localTime = new Date();
+                    globalTimeOffsetMilliseconds = apiTime.getTime() - localTime.getTime();
+                }
+            } catch (error) {
+                console.log("تعذر الاتصال بالسيرفر العالمي مؤقتاً، سيتم الاعتماد على توقيت القاهرة الافتراضي.");
+            }
+            startCairoLiveClock(); 
+        }
+
+        function getCairoCorrectedDate() {
+            let localNow = new Date();
+            return new Date(localNow.getTime() + globalTimeOffsetMilliseconds);
+        }
+
         function startCairoLiveClock() {
             const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             
             setInterval(() => {
-                let now = new Date();
+                let correctedNow = getCairoCorrectedDate();
                 
-                // تحويل الوقت بشكل مباشر ودقيق إلى توقيت القاهرة
-                let cairoTimeString = now.toLocaleTimeString('en-US', { timeZone: 'Africa/Cairo', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                let cairoDateParts = now.toLocaleDateString('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
+                let cairoTimeString = correctedNow.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                let cairoDateParts = correctedNow.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
+                let cairoDayName = daysArr[correctedNow.getDay()];
                 
-                // استخراج اسم اليوم الفعلي بالقاهرة
-                let cairoDayName = daysArr[new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Cairo' })).getDay()];
-                
-                // تحديث واجهة العرض
                 document.getElementById('cairoClock').innerText = cairoTimeString;
                 document.getElementById('cairoDate').innerText = `${cairoDayName}, ${cairoDateParts[1]}/${cairoDateParts[0]}/${cairoDateParts[2]}`;
             }, 1000);
@@ -351,23 +362,25 @@
             if(mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
         }
 
-        // التقاط الوقت الحالي الدقيق بتوقيت القاهرة بالثانية
         function getFormattedTimeOnly() {
-            return new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Cairo', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            let correctedNow = getCairoCorrectedDate();
+            return correctedNow.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
         function getEgyptianDateInfo() {
-            let now = new Date();
+            let correctedNow = getCairoCorrectedDate();
             let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            let dayName = days[new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Cairo' })).getDay()];
-            let dateParts = now.toLocaleDateString('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
+            let dayName = days[correctedNow.getDay()];
+            let dateParts = correctedNow.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
             return { day: dayName, date: `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}` };
         }
 
         function startTimer() {
             let t = timers[currentActiveMode];
-            // التقاط وقت البدء الدقيق فور بدء التشغيل
-            if(!sessionStartTime || timers[currentActiveMode].seconds === 0) sessionStartTime = getFormattedTimeOnly();
+            // التقاط وقت البداية الحقيقي من السيرفر فوراً عند الضغط على Start لأول مرة
+            if(!sessionStartTime || timers[currentActiveMode].seconds === 0) {
+                sessionStartTime = getFormattedTimeOnly();
+            }
             if(!t.id) {
                 t.id = setInterval(() => {
                     if(t.type === 'up') {
@@ -404,7 +417,7 @@
             let subjectInput = document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى";
             let descInput = document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل وصفية لهذه الجلسة.";
             
-            // التقاط وقت الانتهاء الدقيق عند الضغط الفعلي على الحفظ
+            // جلب وقت الانتهاء والتاريخ الفعلي للسيرفر في لحظة الحفظ
             let endTime = getFormattedTimeOnly();
             let dateInfo = getEgyptianDateInfo();
 
@@ -416,14 +429,14 @@
                 duration: formatDynamicTime(timers[currentActiveMode].seconds),
                 date: dateInfo.date,
                 day: dateInfo.day,
-                startTime: sessionStartTime || getFormattedTimeOnly(),
+                startTime: sessionStartTime || getFormattedTimeOnly(), // الاعتماد الكامل على توقيت البداية المحفوظ
                 endTime: endTime
             };
 
             historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ السجل بنجاح مع توقيت البداية والانتهاء الفعلي! 🎉");
+            alert("تم حفظ السجل بنجاح مع توقيت البداية والانتهاء بناءً على الوقت العالمي الفعلي! 🎉");
             endTimer();
         }
 
@@ -467,8 +480,8 @@
                     </div>
                     <div class="card-desc">${item.desc}</div>
                     <div class="card-time-row">
-                        <span class="time-tag start">Start: ${item.startTime}</span>
-                        <span class="time-tag end">End: ${item.endTime}</span>
+                        <span class="time-tag start">البداية: ${item.startTime}</span>
+                        <span class="time-tag end">النهاية: ${item.endTime}</span>
                     </div>
                     <div class="card-bottom-info">
                         <span>${item.day}</span>
@@ -551,7 +564,7 @@
             }
         }
 
-        function stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
+        fnction stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
 
         function updatePipCanvas(targetDisplayId) {
             const canvas = document.getElementById('videoCanvas'); const ctx = canvas.getContext('2d');
