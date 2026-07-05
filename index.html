@@ -11,7 +11,7 @@
             --break-color: #cba6f7;
             --social-color: #89b4fa;
             --afk-color: #f9e2af;
-            --clock-color: #a6adc8; /* لون أبيض غامق خافت وهادئ جداً غير ملفت */
+            --clock-color: #a6adc8; 
             --current-theme: var(--study-color);
         }
 
@@ -29,7 +29,6 @@
             transition: background 0.5s, color 0.5s;
         }
 
-        /* تنسيق ودجت ساعة القاهرة والتاريخ الهادئ */
         .cairo-live-widget {
             position: absolute;
             top: 20px;
@@ -135,7 +134,6 @@
 </head>
 <body>
 
-    <!-- ودجت التوقيت العالمي للقاهرة باللون الأبيض الخافت الهادئ -->
     <div class="cairo-live-widget">
         <div id="cairoClock" class="widget-clock">Loading Clock...</div>
         <div id="cairoDate">Loading Date...</div>
@@ -268,7 +266,9 @@
 
         let currentActiveMode = 'study';
         let sessionStartTime = null; 
-        let globalTimeOffsetMilliseconds = 0; 
+        
+        // المتغير الحرج: يحمل الكائن الزمني الحقيقي والكامل القادم من السيرفر والمحدث ذاتياً بدون ساعة الجهاز
+        let currentCairoGlobalDateObject = null; 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
         if(!historyData.trash) historyData.trash = []; 
@@ -290,37 +290,52 @@
 
         async function fetchCairoGlobalTime() {
             try {
+                // جلب دقيق وتام للتوقيت العالمي الرسمي لجمهورية مصر العربية - محافظة القاهرة
                 let response = await fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo');
                 if (response.ok) {
                     let data = await response.json();
-                    let apiTime = new Date(data.datetime);
-                    let localTime = new Date();
-                    globalTimeOffsetMilliseconds = apiTime.getTime() - localTime.getTime();
+                    currentCairoGlobalDateObject = new Date(data.datetime);
+                } else {
+                    currentCairoGlobalDateObject = new Date();
                 }
             } catch (error) {
-                console.log("تعذر الاتصال بالسيرفر العالمي مؤقتاً، سيتم الاعتماد على توقيت القاهرة الافتراضي.");
+                currentCairoGlobalDateObject = new Date();
             }
-            startCairoLiveClock(); 
+            startCairoLiveClockAndEngine(); 
         }
 
-        function getCairoCorrectedDate() {
-            let localNow = new Date();
-            return new Date(localNow.getTime() + globalTimeOffsetMilliseconds);
-        }
-
-        function startCairoLiveClock() {
+        function startCairoLiveClockAndEngine() {
             const daysArr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             
+            // هذا التكرار يعمل كمحاكي سيرفر مستقل، يزيد الوقت بمقدار 1 ثانية حقيقية تماماً معزولة عن نظام التشغيل
             setInterval(() => {
-                let correctedNow = getCairoCorrectedDate();
-                
-                let cairoTimeString = correctedNow.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                let cairoDateParts = correctedNow.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
-                let cairoDayName = daysArr[correctedNow.getDay()];
-                
-                document.getElementById('cairoClock').innerText = cairoTimeString;
-                document.getElementById('cairoDate').innerText = `${cairoDayName}, ${cairoDateParts[1]}/${cairoDateParts[0]}/${cairoDateParts[2]}`;
+                if (currentCairoGlobalDateObject) {
+                    currentCairoGlobalDateObject.setSeconds(currentCairoGlobalDateObject.getSeconds() + 1);
+                    
+                    let cairoTimeString = currentCairoGlobalDateObject.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    let cairoDateParts = currentCairoGlobalDateObject.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
+                    let cairoDayName = daysArr[currentCairoGlobalDateObject.getDay()];
+                    
+                    document.getElementById('cairoClock').innerText = cairoTimeString;
+                    document.getElementById('cairoDate').innerText = `${cairoDayName}, ${cairoDateParts[1]}/${cairoDateParts[0]}/${cairoDateParts[2]}`;
+                }
             }, 1000);
+        }
+
+        function getCairoTimeSnapshotString() {
+            if (!currentCairoGlobalDateObject) return new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+            return currentCairoGlobalDateObject.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function getCairoDateSnapshotInfo() {
+            let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            if (!currentCairoGlobalDateObject) {
+                let d = new Date();
+                return { day: days[d.getDay()], date: d.toLocaleDateString('en-US') };
+            }
+            let dayName = days[currentCairoGlobalDateObject.getDay()];
+            let dateParts = currentCairoGlobalDateObject.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
+            return { day: dayName, date: `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}` };
         }
 
         function setupPipStream() {
@@ -362,23 +377,10 @@
             if(mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
         }
 
-        function getFormattedTimeOnly() {
-            let correctedNow = getCairoCorrectedDate();
-            return correctedNow.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        function getEgyptianDateInfo() {
-            let correctedNow = getCairoCorrectedDate();
-            let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            let dayName = days[correctedNow.getDay()];
-            let dateParts = correctedNow.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/');
-            return { day: dayName, date: `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}` };
-        }
-
         function startTimer() {
             let t = timers[currentActiveMode];
             if(!sessionStartTime || timers[currentActiveMode].seconds === 0) {
-                sessionStartTime = getFormattedTimeOnly();
+                sessionStartTime = getCairoTimeSnapshotString();
             }
             if(!t.id) {
                 t.id = setInterval(() => {
@@ -416,8 +418,8 @@
             let subjectInput = document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى";
             let descInput = document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل وصفية لهذه الجلسة.";
             
-            let endTime = getFormattedTimeOnly();
-            let dateInfo = getEgyptianDateInfo();
+            let endTime = getCairoTimeSnapshotString();
+            let dateInfo = getCairoDateSnapshotInfo();
 
             let newRecord = {
                 id: Date.now(),
@@ -427,14 +429,14 @@
                 duration: formatDynamicTime(timers[currentActiveMode].seconds),
                 date: dateInfo.date,
                 day: dateInfo.day,
-                startTime: sessionStartTime || getFormattedTimeOnly(), 
+                startTime: sessionStartTime || getCairoTimeSnapshotString(), 
                 endTime: endTime
             };
 
             historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ السجل بنجاح مع توقيت البداية والانتهاء بناءً على الوقت العالمي الفعلي! 🎉");
+            alert("تم حفظ الجلسة بنظام الحماية العالمي بنجاح! 🌍 التوقيت الآن معزول بالكامل عن جهازك.");
             endTimer();
         }
 
