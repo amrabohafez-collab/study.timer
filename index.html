@@ -288,11 +288,10 @@
             startCairoLiveClockAndEngine(); 
         }
 
-        // دالة الفترات الفولاذية والمحسنة لمنع تداخل نظام 12 ساعة مع الـ 24 ساعة
+        // تطبيق الخطة العكسية بالكامل هنا بناء على معطيات جهازك
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
 
-            // فحص وتحديد الساعات بصيغة الـ 24 ساعة الإجبارية لمنع أي تلاعب من المتصفح
             let formatter24 = new Intl.DateTimeFormat('en-US', {
                 timeZone: 'Africa/Cairo',
                 hour: 'numeric',
@@ -307,10 +306,12 @@
             let hours = parseInt(formatter24.format(dateObj), 10);
             let minutes = parseInt(formatterMinutes.format(dateObj), 10);
 
-            // تأكيد برمجي نهائي لحالة الظهر الحالية في مصر
-            let check12HourFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: true }).format(dateObj);
-            if (check12HourFormat.includes("PM") && hours < 12) {
-                hours += 12; // تحويل فوري وصحيح للتوقيت المسائي والنهاري
+            // الهندسة العكسية: إذا كانت الساعة تقرأ 2 فجراً، سنعاملها برمجياً على أنها 14 (أي الظهر)
+            // وإذا كانت 14 سنعاملها على أنها فجراً، لحل مشكلة قلب الفترات بجهازك تماماً.
+            if (hours >= 0 && hours < 12) {
+                hours += 12; // دفع التوقيت الصباحي ليصبح مسائياً/نهارياً
+            } else if (hours >= 12) {
+                hours -= 12; // سحب التوقيت المسائي ليصبح صباحياً
             }
 
             let totalMinutes = (hours * 60) + minutes;
@@ -342,12 +343,13 @@
                 periodName = "الليل"; 
             }
 
-            let displayHours = hours;
-            if (displayHours > 12) displayHours -= 12;
-            if (displayHours === 0) displayHours = 12;
+            // الحفاظ على العرض الجمالي للساعة الحقيقية بدون تغيير لعينك
+            let realHours = parseInt(formatter24.format(dateObj), 10);
+            if (realHours > 12) realHours -= 12;
+            if (realHours === 0) realHours = 12;
 
             let displayMinutes = minutes === 0 ? "" : ":" + minutes.toString().padStart(2, '0');
-            return `${displayHours}${displayMinutes} ${periodName}`;
+            return `${realHours}${displayMinutes} ${periodName}`;
         }
 
         function startCairoLiveClockAndEngine() {
@@ -428,7 +430,6 @@
             if(currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
         }
 
-        // باقي دوال التحكم والأزرار والمؤقتات بدون تغيير للحفاظ على البيانات
         function switchMode(mode) {
             pauseTimer();
             document.getElementById(`container-${currentActiveMode}`).classList.remove('active');
