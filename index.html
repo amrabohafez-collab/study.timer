@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Study Timer</title>
-    
-    <!-- كود الصورة المصغرة الخاصة بك (Favicon) للمتصفح من الأعلى -->
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
+        :root {
+            --study-color: #a6e3a1;
+            --break-color: #cba6f7;
+            --social-color: #89b4fa;
+            --afk-color: #f9e2af;
+            --current-theme: var(--study-color);
+        }
+
         body { 
             background: #0f0f16; 
-            color: #a6e3a1; 
+            color: var(--current-theme); 
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
             display: flex; 
             flex-direction: column; 
@@ -22,41 +28,42 @@
             transition: background 0.5s, color 0.5s;
         }
 
-        body.break-theme {
-            background: #110f18;
-            color: #cba6f7; 
-        }
-
+        /* تنسيق اسم الموقع العلوي وحقوق الملكية */
         .brand-title {
             font-size: 2.5rem;
             font-weight: 600;
             letter-spacing: 2px;
             margin-bottom: 30px;
-            color: #a6e3a1;
+            color: var(--current-theme);
             transition: color 0.5s;
         }
-        body.break-theme .brand-title {
-            color: #cba6f7;
-        }
-
         .footer-credits {
             position: absolute;
             bottom: 25px;
             font-size: 0.85rem;
             color: #585b70;
             letter-spacing: 0.5px;
-            font-family: 'Segoe UI', sans-serif;
         }
 
-        #mainApp { text-align: center; width: 100%; }
-        
+        /* واجهة التطبيق الرئيسية والتحكم */
+        #mainContainer {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            transition: padding-right 0.3s ease;
+        }
+        #mainContainer.sidebar-open {
+            padding-right: 380px;
+        }
+
+        #mainApp { text-align: center; width: 100%; max-width: 600px; }
         .timer-box { display: none; }
         .timer-box.active { display: block; }
-
-        .timer-display { font-size: 6rem; font-weight: bold; text-shadow: 0 0 20px rgba(166, 227, 161, 0.3); margin-bottom: 10px; }
-        body.break-theme .timer-display { text-shadow: 0 0 20px rgba(203, 166, 247, 0.3); }
+        .timer-display { font-size: 6rem; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.1); margin-bottom: 10px; }
         
-        /* تصميم مدخلات وقت الاستراحة المطور للساعات والدقائق */
+        /* مجموعات الإدخال للاستراحة */
         .break-input-group {
             margin-bottom: 15px;
             display: flex;
@@ -64,98 +71,243 @@
             gap: 15px;
             align-items: center;
         }
-        .break-input-group .input-field {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        .break-input-group label {
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
+        .break-input-group .input-field { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
         .break-input-group input {
-            background: #181825;
-            border: 1px solid #313244;
-            padding: 8px 12px;
-            border-radius: 8px;
-            color: #cdd6f4;
-            width: 60px;
-            text-align: center;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-            font-family: inherit;
+            background: #181825; border: 1px solid #313244; padding: 8px 12px;
+            border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; outline: none;
         }
-        .break-input-group input:focus {
-            border-color: #cba6f7;
+
+        /* الأزرار العلوية للسجلات والمؤقتات */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        .top-bar button {
+            background: #1e1e2e;
+            border: 1px solid #313244;
+            color: #cdd6f4;
+            padding: 8px 16px;
+            font-size: 0.85rem;
         }
 
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         
         button { 
-            padding: 12px 25px; 
-            cursor: pointer; 
-            border-radius: 25px; 
-            border: 1px solid #a6e3a1; 
-            background: #1e1e2e; 
-            color: #a6e3a1; 
-            font-weight: bold; 
-            transition: 0.3s; 
-            font-family: inherit;
+            padding: 12px 25px; cursor: pointer; border-radius: 25px; 
+            border: 1px solid var(--current-theme); background: #1e1e2e; 
+            color: var(--current-theme); font-weight: bold; transition: 0.3s; font-family: inherit;
         }
-        button:hover { background: #a6e3a1; color: #11111b; box-shadow: 0 0 15px rgba(166, 227, 161, 0.4); }
+        button:hover { background: var(--current-theme); color: #11111b; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
         
-        body.break-theme button {
-            border-color: #cba6f7;
-            color: #cba6f7;
+        /* أزرار الانتقال بين المودات والنشاطات */
+        .mode-btn { background: #11111b; font-size: 0.9rem; }
+        #btn-study { border-color: var(--study-color); color: var(--study-color); }
+        #btn-break { border-color: var(--break-color); color: var(--break-color); }
+        #btn-social { border-color: var(--social-color); color: var(--social-color); }
+        #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
+
+        /* اللوحة الجانبية للسجلات (Sidebar) */
+        .sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 360px;
+            height: 100%;
+            background: #11111b;
+            border-left: 2px solid var(--current-theme);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+            transition: right 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
         }
-        body.break-theme button:hover {
-            background: #cba6f7;
-            color: #11111b;
-            box-shadow: 0 0 15px rgba(203, 166, 247, 0.4);
+        .sidebar.open { right: 0; }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #313244;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-header h2 { margin: 0; font-size: 1.4rem; color: var(--current-theme); }
+        .close-sidebar-btn { background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; padding: 0;}
+        .close-sidebar-btn:hover { color: #fff; }
+
+        /* منطقة محتوى السجل المخصصة للتحريك بدون بكرة ماوس */
+        .sidebar-content {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: scroll; /* إظهار شريط التمرير دائماً ليتم سحبه بالماوس */
+        }
+        /* تعديل تصميم شريط التمرير الجانبي (Scrollbar) ليكون عريضاً وسهل السحب باليد */
+        .sidebar-content::-webkit-scrollbar {
+            width: 14px;
+        }
+        .sidebar-content::-webkit-scrollbar-track {
+            background: #181825;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: var(--current-theme);
+            border-radius: 7px;
+            border: 2px solid #11111b;
         }
 
-        #breakModeBtn { background: #110f18; color: #cba6f7; border-color: #cba6f7; }
-        #studyModeBtn { background: #0f0f16; color: #a6e3a1; border-color: #a6e3a1; }
+        /* كروت السجلات الاحترافية داخل القائمة */
+        .history-card {
+            background: #181825;
+            border: 1px solid #313244;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            color: #cdd6f4;
+            position: relative;
+        }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;}
+        .card-title { font-weight: bold; font-size: 1.1rem; color: #fff; max-width: 180px; word-wrap: break-word;}
+        .card-duration { font-weight: bold; font-size: 1.1rem; color: var(--current-theme); }
+        .card-details { font-size: 0.8rem; color: #a6adc8; line-height: 1.4; }
+        .card-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end;}
+        .card-actions button { padding: 5px 10px; font-size: 0.75rem; border-radius: 5px; border: 1px solid #313244;}
+        .btn-edit { color: #f9e2af; border-color: #f9e2af !important; }
+        .btn-delete { color: #f38ba8; border-color: #f38ba8 !important; }
+        .btn-share { color: #89b4fa; border-color: #89b4fa !important; }
+
+        /* نوافذ الإدخال المنبثقة البسيطة لحفظ وتعديل البيانات */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #1e1e2e; border: 2px solid var(--current-theme); padding: 25px;
+            border-radius: 15px; width: 320px; text-align: right; direction: rtl; color: #cdd6f4;
+        }
+        .modal-content h3 { margin-top: 0; color: var(--current-theme); text-align: center;}
+        .modal-content label { display: block; margin: 10px 0 5px; font-size: 0.9rem;}
+        .modal-content input {
+            width: 100%; padding: 8px; background: #11111b; border: 1px solid #313244;
+            border-radius: 6px; color: #fff; box-sizing: border-box; outline: none;
+        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: center;}
+        .modal-actions button { padding: 8px 20px; font-size: 0.9rem;}
     </style>
 </head>
 <body>
 
-    <div class="brand-title" id="appTitle">Study Timer</div>
+    <!-- البار العلوي لفتح السجلات المنفصلة -->
+    <div class="top-bar">
+        <button onclick="openHistory('study')">Study History 📚</button>
+        <button onclick="openHistory('break')">Break History ☕</button>
+        <button onclick="openHistory('social')">Social History 📱</button>
+        <button onclick="openHistory('afk')">AFK History ⏳</button>
+    </div>
 
-    <div id="mainApp">
-        <!-- مؤقت الدراسة (تصاعدي ديناميكي) -->
-        <div id="studyContainer" class="timer-box active">
-            <div id="studyDisplay" class="timer-display">00:00</div>
-            <div class="controls">
-                <button onclick="startStudy()">Start</button>
-                <button onclick="pauseStudy()">Pause</button>
-                <button onclick="endStudy()">End</button>
-                <button onclick="requestMini('studyDisplay')">Mini</button>
-                <button id="breakModeBtn" onclick="switchMode('break')">Break Mode ☕</button>
+    <div id="mainContainer">
+        <div id="appTitle" class="brand-title">Study Timer</div>
+
+        <div id="mainApp">
+            <!-- 1. واجهة مؤقت الدراسة -->
+            <div id="container-study" class="timer-box active">
+                <div id="display-study" class="timer-display">00:00</div>
+                <div class="controls">
+                    <button onclick="startTimer()">Start</button>
+                    <button onclick="pauseTimer()">Pause</button>
+                    <button onclick="saveSessionPrompt()">Save</button>
+                    <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini('display-study')">Mini</button>
+                </div>
+            </div>
+
+            <!-- 2. واجهة مؤقت الاستراحة -->
+            <div id="container-break" class="timer-box">
+                <div id="display-break" class="timer-display">05:00</div>
+                <div class="break-input-group">
+                    <div class="input-field"><label>Hours</label><input type="number" id="breakHoursInput" value="0" min="0" max="24" onchange="setBreakDuration()"></div>
+                    <div class="input-field"><label>Minutes</label><input type="number" id="breakMinutesInput" value="5" min="0" max="59" onchange="setBreakDuration()"></div>
+                </div>
+                <div class="controls">
+                    <button onclick="startTimer()">Start</button>
+                    <button onclick="pauseTimer()">Pause</button>
+                    <button onclick="saveSessionPrompt()">Save</button>
+                    <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini('display-break')">Mini</button>
+                </div>
+            </div>
+
+            <!-- 3. واجهة مؤقت السوشيال ميديا -->
+            <div id="container-social" class="timer-box">
+                <div id="display-social" class="timer-display">00:00</div>
+                <div class="controls">
+                    <button onclick="startTimer()">Start</button>
+                    <button onclick="pauseTimer()">Pause</button>
+                    <button onclick="saveSessionPrompt()">Save</button>
+                    <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini('display-social')">Mini</button>
+                </div>
+            </div>
+
+            <!-- 4. واجهة مؤقت AFK خارج الجهاز -->
+            <div id="container-afk" class="timer-box">
+                <div id="display-afk" class="timer-display">00:00</div>
+                <div class="controls">
+                    <button onclick="startTimer()">Start</button>
+                    <button onclick="pauseTimer()">Pause</button>
+                    <button onclick="saveSessionPrompt()">Save</button>
+                    <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini('display-afk')">Mini</button>
+                </div>
+            </div>
+
+            <!-- صف الأزرار السفلية للتحويل السلس والكامل بين المودات -->
+            <div class="controls" style="margin-top: 35px; border-top: 1px solid #181825; padding-top: 20px;">
+                <button id="btn-study" class="mode-btn" onclick="switchMode('study')">Study Mode 📚</button>
+                <button id="btn-break" class="mode-btn" onclick="switchMode('break')">Break Mode ☕</button>
+                <button id="btn-social" class="mode-btn" onclick="switchMode('social')">Social Timer 📱</button>
+                <button id="btn-afk" class="mode-btn" onclick="switchMode('afk')">AFK Timer ⏳</button>
             </div>
         </div>
+    </div>
 
-        <!-- مؤقت الاستراحة (تنازلي ديناميكي) -->
-        <div id="breakContainer" class="timer-box">
-            <div id="breakDisplay" class="timer-display">05:00</div>
-            <div class="break-input-group">
-                <div class="input-field">
-                    <label>Hours</label>
-                    <input type="number" id="breakHoursInput" value="0" min="0" max="24" onchange="setBreakDuration()">
-                </div>
-                <div class="input-field">
-                    <label>Minutes</label>
-                    <input type="number" id="breakMinutesInput" value="5" min="0" max="59" onchange="setBreakDuration()">
-                </div>
+    <!-- لوحة السجلات الجانبية الاحترافية ذات السحب اليدوي المريح بالماوس -->
+    <div id="sidebarHistory" class="sidebar">
+        <div class="sidebar-header">
+            <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
+            <h2 id="sidebarTitle">Study History</h2>
+        </div>
+        <div id="sidebarContent" class="sidebar-content">
+            <!-- كروت السجلات ستظهر برمجياً هنا -->
+        </div>
+    </div>
+
+    <!-- نافذة منبثقة لحفظ السجل وإدخال اسم المادة -->
+    <div id="saveModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalHeaderTitle">حفظ السجل الجديد</h3>
+            <label id="modalInputLabel">اسم المادة المذاكرة:</label>
+            <input type="text" id="modalSubjectInput" placeholder="اكتب الاسم هنا...">
+            <div class="modal-actions">
+                <button onclick="confirmSaveSession()">حفظ السجل</button>
+                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button>
             </div>
-            <div class="controls">
-                <button onclick="startBreak()">Start</button>
-                <button onclick="pauseBreak()">Pause</button>
-                <button onclick="endBreak()">Reset</button>
-                <button onclick="requestMini('breakDisplay')">Mini</button>
-                <button id="studyModeBtn" onclick="switchMode('study')">Study Mode 📚</button>
+        </div>
+    </div>
+
+    <!-- نافذة منبثقة لتعديل السجل (الاسم واليوم والتاريخ فقط دون المساس بالأوقات) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>تعديل بيانات السجل</h3>
+            <label>اسم المادة / النشاط:</label>
+            <input type="text" id="editSubjectInput">
+            <label>اليوم:</label>
+            <input type="text" id="editDayInput">
+            <label>التاريخ:</label>
+            <input type="text" id="editDateInput">
+            <div class="modal-actions">
+                <button onclick="confirmEditSession()">تحديث</button>
+                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('editModal')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -168,12 +320,21 @@
     <video id="pipVideo" width="360" height="150" autoplay muted loop style="display:none;"></video>
 
     <script>
-        let studySeconds = parseInt(localStorage.getItem('savedStudySeconds')) || 0;
-        let studyTimerId = null;
+        // داتا المؤقتات الأربعة المستقلة
+        let timers = {
+            study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up', id: null },
+            break: { seconds: 300, type: 'down', id: null },
+            social: { seconds: 0, type: 'up', id: null },
+            afk: { seconds: 0, type: 'up', id: null }
+        };
 
-        let breakSeconds = 300; 
-        let breakTimerId = null;
-        let currentActiveMode = 'study'; 
+        let currentActiveMode = 'study';
+        let sessionStartTime = null; 
+
+        // نظام قواعد تخزين السجلات الدائمة
+        let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [] };
+        let activeHistoryView = 'study'; 
+        let currentEditingIndex = null;
 
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
@@ -181,9 +342,10 @@
 
         window.onload = function() {
             document.title = "Study Timer";
-            updateStudyDisplay();
+            updateDisplay('study');
             setBreakDuration();
             setupPipStream();
+            updateThemeColors();
         }
 
         function setupPipStream() {
@@ -193,122 +355,296 @@
             video.srcObject = stream;
         }
 
+        // تحديث الألوان المخصصة حسب النشاط الحالي المفتوح
+        function updateThemeColors() {
+            const root = document.documentElement;
+            if(currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
+            if(currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            if(currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
+            if(currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+        }
+
         function switchMode(mode) {
-            currentActiveMode = mode;
-            const body = document.body;
+            pauseTimer();
+            // إخفاء الواجهة القديمة
+            document.getElementById(`container-${currentActiveMode}`).classList.remove('active');
             
-            if(mode === 'break') {
-                body.classList.add('break-theme');
-                document.getElementById('studyContainer').classList.remove('active');
-                document.getElementById('breakContainer').classList.add('active');
-            } else {
-                body.classList.remove('break-theme');
-                document.getElementById('breakContainer').classList.remove('active');
-                document.getElementById('studyContainer').classList.add('active');
-                stopAlarm(); 
-            }
+            currentActiveMode = mode;
+            // إظهار الواجهة الجديدة وتحديث الألوان
+            document.getElementById(`container-${currentActiveMode}`).classList.add('active');
+            updateThemeColors();
+            updateDisplay(currentActiveMode);
+            stopAlarm();
+
             if(document.pictureInPictureElement) {
-                updatePipCanvas(mode === 'break' ? 'breakDisplay' : 'studyDisplay');
+                updatePipCanvas(`display-${currentActiveMode}`);
             }
         }
 
-        // دالة ذكية لتنسيق الوقت وإظهار خانة الساعات فقط عند الحاجة إليها
         function formatDynamicTime(totalSeconds) {
             let hours = Math.floor(totalSeconds / 3600);
             let mins = Math.floor((totalSeconds % 3600) / 60);
             let secs = totalSeconds % 60;
-
             let minsStr = mins.toString().padStart(2, '0');
             let secsStr = secs.toString().padStart(2, '0');
+            return hours > 0 ? `${hours}:${minsStr}:${secsStr}` : `${minsStr}:${secsStr}`;
+        }
 
-            // إذا مرّت ساعة أو أكثر، افتح خانة الساعات تلقائياً
-            if (hours > 0) {
-                return `${hours}:${minsStr}:${secsStr}`;
-            } else {
-                // الوضع الافتراضي البسيط
-                return `${minsStr}:${secsStr}`;
+        function updateDisplay(mode) {
+            let timeStr = formatDynamicTime(timers[mode].seconds);
+            document.getElementById(`display-${mode}`).innerText = timeStr;
+            if(mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
+        }
+
+        // تحسين التقاط ساعة البدء والانتهاء بصيغة 12 ساعة احترافية
+        function getFormattedTimeOnly() {
+            let date = new Date();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        function getEgyptianDateInfo() {
+            let date = new Date();
+            let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            let dayName = days[date.getDay()];
+            let dateStr = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+            return { day: dayName, date: dateStr };
+        }
+
+        // --- التحكم الموحد للمؤقتات الأربعة الفعالة ---
+        function startTimer() {
+            let t = timers[currentActiveMode];
+            if(!sessionStartTime) {
+                sessionStartTime = getFormattedTimeOnly(); // تسجيل توقيت البداية الفعلي لحظة الضغط على أول ستارت
             }
-        }
-
-        // --- منطق مؤقت الدراسة ---
-        function updateStudyDisplay() {
-            let timeStr = formatDynamicTime(studySeconds);
-            document.getElementById('studyDisplay').innerText = timeStr;
-            localStorage.setItem('savedStudySeconds', studySeconds);
-        }
-
-        function startStudy() { 
-            if(!studyTimerId) {
-                studyTimerId = setInterval(()=>{ 
-                    studySeconds++; 
-                    updateStudyDisplay(); 
-
-                    if (studySeconds > 0 && studySeconds % 3600 === 0) {
-                        playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
-                    }
-
-                    if(document.pictureInPictureElement && currentActiveMode === 'study') {
-                        updatePipCanvas('studyDisplay');
-                    }
-                }, 1000); 
-            } 
-        }
-        function pauseStudy() { clearInterval(studyTimerId); studyTimerId = null; }
-        function endStudy() { pauseStudy(); studySeconds = 0; updateStudyDisplay(); if(document.pictureInPictureElement && currentActiveMode === 'study') updatePipCanvas('studyDisplay'); }
-
-        // --- منطق مؤقت الاستراحة ---
-        function setBreakDuration() {
-            const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0;
-            const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-            
-            breakSeconds = (hoursInput * 3600) + (minsInput * 60);
-            updateBreakDisplay();
-        }
-
-        function updateBreakDisplay() {
-            let timeStr = formatDynamicTime(breakSeconds);
-            document.getElementById('breakDisplay').innerText = timeStr;
-        }
-
-        function startBreak() {
-            stopAlarm();
-            if(!breakTimerId) {
-                breakTimerId = setInterval(()=>{
-                    if(breakSeconds > 0) {
-                        breakSeconds--;
-                        updateBreakDisplay();
-                        if(document.pictureInPictureElement && currentActiveMode === 'break') {
-                            updatePipCanvas('breakDisplay');
+            if(!t.id) {
+                t.id = setInterval(() => {
+                    if(t.type === 'up') {
+                        t.seconds++;
+                        updateDisplay(currentActiveMode);
+                        if(currentActiveMode === 'study' && t.seconds > 0 && t.seconds % 3600 === 0) {
+                            playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
                         }
                     } else {
-                        pauseBreak();
-                        playAlarm("وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚");
+                        if(t.seconds > 0) {
+                            t.seconds--;
+                            updateDisplay(currentActiveMode);
+                        } else {
+                            pauseTimer();
+                            playAlarm(currentActiveMode === 'break' ? "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" : "انتهى الوقت!");
+                        }
+                    }
+                    if(document.pictureInPictureElement) {
+                        updatePipCanvas(`display-${currentActiveMode}`);
                     }
                 }, 1000);
             }
         }
-        function pauseBreak() { clearInterval(breakTimerId); breakTimerId = null; }
-        function endBreak() { pauseBreak(); setBreakDuration(); stopAlarm(); if(document.pictureInPictureElement && currentActiveMode === 'break') updatePipCanvas('breakDisplay'); }
 
-        // --- نظام تشغيل الصوت المخصص والإشعارات ---
+        function pauseTimer() {
+            let t = timers[currentActiveMode];
+            clearInterval(t.id);
+            t.id = null;
+        }
+
+        function endTimer() {
+            pauseTimer();
+            sessionStartTime = null;
+            if(timers[currentActiveMode].type === 'up') {
+                timers[currentActiveMode].seconds = 0;
+            } else {
+                setBreakDuration();
+            }
+            updateDisplay(currentActiveMode);
+            if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
+        }
+
+        function setBreakDuration() {
+            const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            timers.break.seconds = (hoursInput * 3600) + (minsInput * 60);
+            updateDisplay('break');
+        }
+
+        // --- نظام فتح وحفظ وإدارة السجلات المنبثقة والجانبية ---
+        function saveSessionPrompt() {
+            pauseTimer();
+            if(timers[currentActiveMode].seconds === 0) {
+                alert("المؤقت فارغ! لا يمكن حفظ سجل بدون وقت.");
+                return;
+            }
+            
+            // تخصيص عناوين المدخلات حسب التايمر الحالي
+            const inputLabel = document.getElementById('modalInputLabel');
+            const headerTitle = document.getElementById('modalHeaderTitle');
+            const inputField = document.getElementById('modalSubjectInput');
+            
+            inputField.value = "";
+            
+            if(currentActiveMode === 'study') { headerTitle.innerText = "حفظ سجل المذاكرة 📚"; inputLabel.innerText = "اسم المادة الدراسية:"; inputField.placeholder = "مثال: لغة عربية (بلاغة)..."; }
+            if(currentActiveMode === 'break') { headerTitle.innerText = "حفظ سجل الاستراحة ☕"; inputLabel.innerText = "ماذا فعلت في الاستراحة:"; inputField.placeholder = "مثال: شرب قهوة، مكالمة سريعة..."; }
+            if(currentActiveMode === 'social') { headerTitle.innerText = "حفظ سجل السوشيال ميديا 📱"; inputLabel.innerText = "التطبيق المستهلك:"; inputField.placeholder = "مثال: فيسبوك، يوتيوب..."; }
+            if(currentActiveMode === 'afk') { headerTitle.innerText = "حفظ سجل الوقت الضائع ⏳"; inputLabel.innerText = "سبب الابتعاد عن الجهاز:"; inputField.placeholder = "مثال: تناول الغداء، شراء طلبات..."; }
+
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            let subjectInput = document.getElementById('modalSubjectInput').value.trim();
+            if(!subjectInput) subjectInput = "نشاط غير مسمى";
+
+            let endTime = getFormattedTimeOnly();
+            let dateInfo = getEgyptianDateInfo();
+            
+            // حساب المدة المستغرقة الفعالة للنشاط وتثبيتها
+            let durationStr = formatDynamicTime(timers[currentActiveMode].seconds);
+
+            let newRecord = {
+                id: Date.now(),
+                subject: subjectInput,
+                duration: durationStr,
+                date: dateInfo.date,
+                day: dateInfo.day,
+                startTime: sessionStartTime || getFormattedTimeOnly(),
+                endTime: endTime
+            };
+
+            historyData[currentActiveMode].unshift(newRecord);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+
+            document.getElementById('saveModal').style.display = 'none';
+            alert("تم حفظ السجل بنجاح في ذاكرة النظام! 🎉");
+            
+            // تصفير وتهيئة المؤقت المكتمل تلقائياً
+            endTimer();
+        }
+
+        function openHistory(type) {
+            activeHistoryView = type;
+            const sidebar = document.getElementById('sidebarHistory');
+            const title = document.getElementById('sidebarTitle');
+            const mainCont = document.getElementById('mainContainer');
+
+            let typeNames = { study: 'Study History 📚', break: 'Break History ☕', social: 'Social History 📱', afk: 'AFK History ⏳' };
+            title.innerText = typeNames[type];
+
+            renderHistoryCards();
+            sidebar.classList.add('open');
+            mainCont.classList.add('sidebar-open');
+        }
+
+        function closeHistory() {
+            document.getElementById('sidebarHistory').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('sidebar-open');
+        }
+
+        function renderHistoryCards() {
+            const container = document.getElementById('sidebarContent');
+            container.innerHTML = "";
+            let list = historyData[activeHistoryView];
+
+            if(list.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#585b70; margin-top:40px;">لا توجد سجلات محفوظة هنا حتى الآن.</p>`;
+                return;
+            }
+
+            list.forEach((item, index) => {
+                let card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="card-top">
+                        <div class="card-title">${item.subject}</div>
+                        <div class="card-duration">${item.duration}</div>
+                    </div>
+                    <div class="card-details">
+                        <div>التاريخ واليوم: ${item.day} - ${item.date}</div>
+                        <div>وقت البدء والانتهاء: من ${item.startTime} إلى ${item.endTime}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-share" onclick="shareRecord(${index})">Share 🔗</button>
+                        <button class="btn-edit" onclick="openEditModal(${index})">Edit ✏️</button>
+                        <button class="btn-delete" onclick="deleteRecord(${index})">Delete 🗑️</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteRecord(index) {
+            if(confirm("هل أنت متأكد تماماً من رغبتك في حذف هذا السجل نهائياً؟")) {
+                historyData[activeHistoryView].splice(index, 1);
+                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+                renderHistoryCards();
+            }
+        }
+
+        function openEditModal(index) {
+            currentEditingIndex = index;
+            let record = historyData[activeHistoryView][index];
+            
+            document.getElementById('editSubjectInput').value = record.subject;
+            document.getElementById('editDayInput').value = record.day;
+            document.getElementById('editDateInput').value = record.date;
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function confirmEditSession() {
+            let record = historyData[activeHistoryView][currentEditingIndex];
+            
+            record.subject = document.getElementById('editSubjectInput').value.trim() || record.subject;
+            record.day = document.getElementById('editDayInput').value.trim() || record.day;
+            record.date = document.getElementById('editDateInput').value.trim() || record.date;
+
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            document.getElementById('editModal').style.display = 'none';
+            renderHistoryCards();
+            alert("تم تحديث البيانات المسموح بها بنجاح!");
+        }
+
+        // إتاحة مشاركة احترافية منسقة بصيغة نصية لنسخها فوراً
+        function shareRecord(index) {
+            let record = historyData[activeHistoryView][index];
+            let typeTitle = { study: 'تقرير جلسة المذاكرة 📚', break: 'سجل فترة الاستراحة ☕', social: 'سجل وقت السوشيال ميديا 📱', afk: 'سجل الوقت خارج الجهاز ⏳' }[activeHistoryView];
+
+            let shareText = `📊 *${typeTitle}*\n` +
+                            `━━━━━━━━━━━━━━━━━━━\n` +
+                            `🏷️ *النشاط / المادة:* ${record.subject}\n` +
+                            `⏱️ *المدة المستغرقة:* ${record.duration}\n` +
+                            `📅 *اليوم والتاريخ:* ${record.day} (${record.date})\n` +
+                            `⏰ *توقيت الجلسة:* من [ ${record.startTime} ] إلى [ ${record.endTime} ]\n\n` +
+                            `💪 تم الإرسال والمشاركة عبر منصة تطبيق Study Timer الاحترافي الخارق!`;
+
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert("تم نسخ تقرير النشاط الكامل بالتفاصيل إلى الحافظة بنجاح! يمكنك الآن لصقه وإرساله مباشرة لأخيك. 🔗🚀");
+            }).catch(err => {
+                alert("تعذر النسخ التلقائي، يمكنك التقاط صورة للشاشة كبديل.");
+            });
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // --- تشغيل التنبيهات والصوت المخصص ---
         function playAlarm(notificationText) {
             if(audioStopTimeout) clearTimeout(audioStopTimeout);
             customAudio.pause();
             customAudio.currentTime = 0;
             
-            customAudio.play().catch(e => console.log("خطأ تشغيل الصوت: ", e));
+            customAudio.play().catch(e => console.log("المتصفح حظر الصوت التلقائي: ", e));
 
-            audioStopTimeout = setTimeout(() => {
-                stopAlarm();
-            }, 12000);
+            audioStopTimeout = setTimeout(() => { stopAlarm(); }, 12000);
 
             if (Notification.permission === "granted") {
                 new Notification("Study Timer", { body: notificationText });
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        new Notification("Study Timer", { body: notificationText });
-                    }
+                    if (permission === "granted") new Notification("Study Timer", { body: notificationText });
                 });
             }
         }
@@ -319,18 +655,22 @@
             customAudio.currentTime = 0;
         }
 
-        // --- نظام الـ Mini Player الذكي الديناميكي ---
+        // --- نظام الـ Mini Player الصغير العائم ---
         function updatePipCanvas(targetDisplayId) {
             const canvas = document.getElementById('videoCanvas');
             const ctx = canvas.getContext('2d');
-            const textColor = (targetDisplayId === 'breakDisplay') ? "#cba6f7" : "#a6e3a1";
+            
+            let textColor = "#a6e3a1";
+            if(currentActiveMode === 'break') textColor = "#cba6f7";
+            if(currentActiveMode === 'social') textColor = "#89b4fa";
+            if(currentActiveMode === 'afk') textColor = "#f9e2af";
+
             const textText = document.getElementById(targetDisplayId).innerText;
             
             ctx.fillStyle = "#0f0f16"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = textColor; 
             
-            // تصغير الخط نسبياً لو عدد الخانات كبر للساعات
             ctx.font = textText.length > 5 ? "bold 42px Courier New" : "bold 55px Courier New";
             ctx.textAlign = "center"; 
             ctx.fillText(textText, canvas.width/2, 90);
@@ -347,12 +687,12 @@
                     await video.requestPictureInPicture();
                     setInterval(() => {
                         if(document.pictureInPictureElement) {
-                            updatePipCanvas(currentActiveMode === 'break' ? 'breakDisplay' : 'studyDisplay');
+                            updatePipCanvas(`display-${currentActiveMode}`);
                         }
                     }, 500);
                 }
             } catch (error) {
-                console.error("فشل وضع التايمر المصغر: ", error);
+                console.error("فشل التايمر المصغر: ", error);
                 alert("تأكد من الضغط على زر Start أولاً لتفعيل الواجهة قبل تشغيل الـ Mini!");
             }
         }
