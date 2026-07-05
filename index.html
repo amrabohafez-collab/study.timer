@@ -137,8 +137,8 @@
 <body>
 
     <div class="cairo-live-widget">
-        <div id="cairoClock" class="widget-clock">جاري تحميل التوقيت...</div>
-        <div id="cairoDate">جاري تحميل التاريخ...</div>
+        <div id="cairoClock" class="widget-clock">جاري حساب التوقيت...</div>
+        <div id="cairoDate">جاري حساب التاريخ...</div>
     </div>
 
     <div class="top-bar">
@@ -269,7 +269,8 @@
         let currentActiveMode = 'study';
         let sessionStartTime = null; 
         
-        let currentCairoGlobalDateObject = null; 
+        // كائن الوقت الداخلي
+        let currentCairoGlobalDateObject = new Date(); 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
         if(!historyData.trash) historyData.trash = []; 
@@ -286,42 +287,41 @@
             setBreakDuration();
             setupPipStream();
             updateThemeColors();
-            fetchCairoGlobalTime(); 
-        }
-
-        async function fetchCairoGlobalTime() {
-            try {
-                let response = await fetch('https://worldtimeapi.org/api/timezone/Africa/Cairo');
-                if (response.ok) {
-                    let data = await response.json();
-                    currentCairoGlobalDateObject = new Date(data.datetime);
-                } else {
-                    currentCairoGlobalDateObject = new Date();
-                }
-            } catch (error) {
-                currentCairoGlobalDateObject = new Date();
-            }
             startCairoLiveClockAndEngine(); 
         }
 
+        // الفانكشن دي تم تعديلها جذرياً لتقرأ مباشرة بتوقيت مصر الجغرافي الفعلي من نظام تشغيلك
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return { textTime: "--:--", periodName: "" };
 
-            // إجبار النظام على جلب الساعة والدقيقة طبقاً للتوقيت الإقليمي الفعلي للقاهرة
-            let cairoTimeStr = dateObj.toLocaleTimeString('en-US', { timeZone: 'Africa/Cairo', hour12: false });
-            let [hours, minutes] = cairoTimeStr.split(':').map(Number);
+            // تحويل واستخراج الساعة والدقيقة بنظام 24 ساعة لجمهورية مصر العربية فوراً
+            let formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Africa/Cairo',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: false
+            });
+            
+            let parts = formatter.formatToParts(dateObj);
+            let hours = 0;
+            let minutes = 0;
+            
+            parts.forEach(p => {
+                if (p.type === 'hour') hours = parseInt(p.value, 10);
+                if (p.type === 'minute') minutes = parseInt(p.value, 10);
+            });
 
             let totalMinutes = (hours * 60) + minutes;
             let periodName = "";
 
-            // التقسيم الدقيق لفترات اليوم بناء على رغبتك بالدقائق المتتالية
-            let m430_am = (4 * 60) + 30;  // 4:30 ص (فجراً)
-            let m600_am = (6 * 60);       // 6:00 ص (الشروق)
-            let m800_am = (8 * 60);       // 8:00 ص (صباحاً)
-            let m1200_pm = (12 * 60);     // 12:00 م (ظهراً)
-            let m430_pm = (16 * 60) + 30; // 4:30 م (عصراً)
-            let m800_pm = (20 * 60);      // 8:00 م (المغرب)
-            let m930_pm = (21 * 60) + 30; // 9:30 م (العشاء)
+            // مواقيت اليوم بالدقائق
+            let m430_am = (4 * 60) + 30;  // 4:30 ص
+            let m600_am = (6 * 60);       // 6:00 ص
+            let m800_am = (8 * 60);       // 8:00 ص
+            let m1200_pm = (12 * 60);     // 12:00 م
+            let m430_pm = (16 * 60) + 30; // 4:30 م
+            let m800_pm = (20 * 60);      // 8:00 م
+            let m930_pm = (21 * 60) + 30; // 9:30 م
 
             if (totalMinutes >= m430_am && totalMinutes < m600_am) {
                 periodName = "فجراً";
@@ -338,7 +338,7 @@
             } else if (totalMinutes >= m930_pm && totalMinutes < 1440) { 
                 periodName = "العشاء";
             } else { 
-                periodName = "الليل"; // الفاصل بين منتصف الليل وحتى الرابعة والنصف فجراً
+                periodName = "الليل"; 
             }
 
             let displayHours = hours;
@@ -353,21 +353,44 @@
             const daysArr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             
             setInterval(() => {
-                if (currentCairoGlobalDateObject) {
-                    currentCairoGlobalDateObject.setSeconds(currentCairoGlobalDateObject.getSeconds() + 1);
-                    
-                    let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
-                    
-                    // تحديث قراءة التاريخ لتنسيقها بتوقيت القاهرة الفعلي أيضاً
-                    let cairoDateStr = currentCairoGlobalDateObject.toLocaleDateString('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' });
-                    let dateParts = cairoDateStr.split('/');
-                    
-                    let tempCairoDate = new Date(currentCairoGlobalDateObject.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));
-                    let cairoDayName = daysArr[tempCairoDate.getDay()];
-                    
-                    document.getElementById('cairoClock').innerText = prayerFormattedTime;
-                    document.getElementById('cairoDate').innerText = `${cairoDayName}، ${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`;
-                }
+                currentCairoGlobalDateObject = new Date(); // تحديث مستمر بناء على اللحظة الحالية للكمبيوتر وتحويلها لمصر
+                
+                let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
+                
+                // حساب واستخراج التاريخ واليوم الجغرافي الحقيقي لمصر أيضاً
+                let dateFormatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'Africa/Cairo',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    weekday: 'long'
+                });
+                
+                let dateParts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
+                let dayNameStr = "";
+                let dayNum = "";
+                let monthNum = "";
+                let yearNum = "";
+                
+                dateParts.forEach(p => {
+                    if (p.type === 'weekday') dayNameStr = p.value;
+                    if (p.type === 'day') dayNum = p.value;
+                    if (p.type === 'month') monthNum = p.value;
+                    if (p.type === 'year') yearNum = p.value;
+                });
+                
+                // ترجمة أيام الإنجليزي الحرفية إذا ظهرت من التنسيق الدولي
+                let arabicDay = dayNameStr;
+                if(dayNameStr.includes("Sunday") || dayNameStr.includes("الأحد")) arabicDay = "الأحد";
+                if(dayNameStr.includes("Monday") || dayNameStr.includes("الإثنين")) arabicDay = "الإثنين";
+                if(dayNameStr.includes("Tuesday") || dayNameStr.includes("الثلاثاء")) arabicDay = "الثلاثاء";
+                if(dayNameStr.includes("Wednesday") || dayNameStr.includes("الأربعاء")) arabicDay = "الأربعاء";
+                if(dayNameStr.includes("Thursday") || dayNameStr.includes("الخميس")) arabicDay = "الخميس";
+                if(dayNameStr.includes("Friday") || dayNameStr.includes("الجمعة")) arabicDay = "الجمعة";
+                if(dayNameStr.includes("Saturday") || dayNameStr.includes("السبت")) arabicDay = "السبت";
+
+                document.getElementById('cairoClock').innerText = prayerFormattedTime;
+                document.getElementById('cairoDate').innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
             }, 1000);
         }
 
@@ -377,15 +400,33 @@
 
         function getCairoDateSnapshotInfo() {
             let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            if (!currentCairoGlobalDateObject) {
-                let d = new Date();
-                return { day: days[d.getDay()], date: d.toLocaleDateString('en-US') };
-            }
-            let dateStr = currentCairoGlobalDateObject.toLocaleDateString('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' });
-            let dateParts = dateStr.split('/');
-            let tempCairoDate = new Date(currentCairoGlobalDateObject.toLocaleString('en-US', { timeZone: 'Africa/Cairo' }));
-            let dayName = days[tempCairoDate.getDay()];
-            return { day: dayName, date: `${dateParts[1]}/${dateParts[0]}/${dateParts[2]}` };
+            
+            let dateFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Africa/Cairo',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            let parts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
+            let d = "", m = "", y = "";
+            parts.forEach(p => {
+                if(p.type === 'day') d = p.value;
+                if(p.type === 'month') m = p.value;
+                if(p.type === 'year') y = p.value;
+            });
+            
+            // معرفة اليوم بالرقم
+            let formatterText = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', weekday: 'short' }).format(currentCairoGlobalDateObject);
+            let dayName = days[new Date().getDay()]; 
+            if(formatterText.includes("Sun")) dayName = "الأحد";
+            if(formatterText.includes("Mon")) dayName = "الإثنين";
+            if(formatterText.includes("Tue")) dayName = "الثلاثاء";
+            if(formatterText.includes("Wed")) dayName = "الأربعاء";
+            if(formatterText.includes("Thu")) dayName = "الخميس";
+            if(formatterText.includes("Fri")) dayName = "الجمعة";
+            if(formatterText.includes("Sat")) dayName = "السبت";
+
+            return { day: dayName, date: `${d}/${m}/${y}` };
         }
 
         function setupPipStream() {
@@ -486,7 +527,7 @@
             historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ الجلسة بنظام التوقيت الإقليمي لجمهورية مصر العربية الحقيقي! 🌍");
+            alert("تم حفظ الجلسة بنظام التوقيت الفعلي لجمهورية مصر العربية! 🌍");
             endTimer();
         }
 
