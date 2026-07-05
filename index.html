@@ -377,7 +377,6 @@
 
         function startTimer() {
             let t = timers[currentActiveMode];
-            // التقاط وقت البداية الحقيقي من السيرفر فوراً عند الضغط على Start لأول مرة
             if(!sessionStartTime || timers[currentActiveMode].seconds === 0) {
                 sessionStartTime = getFormattedTimeOnly();
             }
@@ -417,7 +416,6 @@
             let subjectInput = document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى";
             let descInput = document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل وصفية لهذه الجلسة.";
             
-            // جلب وقت الانتهاء والتاريخ الفعلي للسيرفر في لحظة الحفظ
             let endTime = getFormattedTimeOnly();
             let dateInfo = getEgyptianDateInfo();
 
@@ -429,7 +427,7 @@
                 duration: formatDynamicTime(timers[currentActiveMode].seconds),
                 date: dateInfo.date,
                 day: dateInfo.day,
-                startTime: sessionStartTime || getFormattedTimeOnly(), // الاعتماد الكامل على توقيت البداية المحفوظ
+                startTime: sessionStartTime || getFormattedTimeOnly(), 
                 endTime: endTime
             };
 
@@ -564,7 +562,7 @@
             }
         }
 
-        fnction stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
+        function stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
 
         function updatePipCanvas(targetDisplayId) {
             const canvas = document.getElementById('videoCanvas'); const ctx = canvas.getContext('2d');
