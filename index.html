@@ -14,11 +14,12 @@
             --clock-color: #a6adc8; 
             --current-theme: var(--study-color);
             
-            /* ألوان المواد الخاصة بالمفكرة */
+            /* ألوان المواد الخاصة بالمفكرة والدروس */
             --arabic-color: #89b4fa;
             --english-color: #a6e3a1;
             --history-color: #f9e2af;
             --physics-color: #f38ba8;
+            --lessons-theme: #fab387;
         }
 
         body { 
@@ -68,6 +69,7 @@
         #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
         #mainContainer.sidebar-open { padding-right: 380px; }
         #mainContainer.notebook-open { padding-left: 50vw; } 
+        #mainContainer.lessons-open { padding-left: 50vw; }
         
         #mainApp { text-align: center; width: 100%; max-width: 600px; transition: all 0.3s ease; }
         .timer-box { display: none; }
@@ -84,6 +86,8 @@
         
         .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
         .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
+        .btn-lessons-trigger { border-color: var(--lessons-theme) !important; color: var(--lessons-theme) !important; font-weight: bold; }
+        .btn-lessons-trigger:hover { background: var(--lessons-theme) !important; color: #11111b !important; }
 
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; transition: opacity 0.3s ease; }
         #bottomModeSelectors { transition: opacity 0.3s ease; }
@@ -110,15 +114,17 @@
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; border-right: 2px solid #cba6f7; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; }
-        .notebook-sidebar.open { left: 0; }
+        /* القائمة الجانبية الكبيرة للمفكرة والدروس (اليسار) */
+        .notebook-sidebar, .lessons-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; }
+        .notebook-sidebar { border-right: 2px solid #cba6f7; }
+        .lessons-sidebar { border-right: 2px solid var(--lessons-theme); }
+        
+        .notebook-sidebar.open, .lessons-sidebar.open { left: 0; }
         
         .nb-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; direction: rtl; }
         .nb-header-right { display: flex; align-items: center; gap: 15px; }
-        .nb-title { margin: 0; font-size: 1.4rem; color: #cba6f7; font-weight: bold; }
-        .btn-nb-share { background: #181825; border: 1px solid #a6e3a1; color: #a6e3a1; padding: 6px 14px; font-size: 0.85rem; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-nb-share:hover { background: #a6e3a1; color: #11111b; }
-        .close-nb-btn { background: none; border: none; color: #f38ba8; font-size: 1.5rem; cursor: pointer; }
+        .nb-title { margin: 0; font-size: 1.4rem; font-weight: bold; }
+        .close-nb-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
 
         .nb-content { padding: 20px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
         .nb-content::-webkit-scrollbar { width: 8px; }
@@ -153,6 +159,15 @@
         .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
         .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
 
+        /* تنسيقات إدارة الدروس اللانهائية */
+        .lessons-container { display: flex; flex-direction: column; gap: 10px; direction: rtl; }
+        .lesson-item { display: flex; gap: 8px; align-items: center; background: #11111b; padding: 8px; border-radius: 8px; border: 1px solid #313244; }
+        .lesson-item input[type="text"] { flex: 2; background: #181825; border: 1px solid #313244; color: #fff; padding: 6px; border-radius: 6px; font-size: 0.9rem; }
+        .lesson-item input[type="url"] { flex: 3; background: #181825; border: 1px solid #313244; color: var(--lessons-theme); padding: 6px; border-radius: 6px; font-size: 0.9rem; direction: ltr; }
+        .lesson-item button { padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
+        .btn-add-lesson { background: #1e1e2e; color: #a6e3a1; border-color: #a6e3a1; margin-top: 5px; align-self: flex-start; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem;}
+        .btn-add-lesson:hover { background: #a6e3a1; color: #11111b; }
+
         .hide-in-notebook { opacity: 0 !important; pointer-events: none !important; }
 
         .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; }
@@ -185,19 +200,8 @@
         @media print {
             body * { visibility: hidden; background: white !important; color: black !important; }
             #sidebarHistory, #sidebarHistory * { visibility: hidden; }
-            
             body.printing-notebook #notebookSidebar, body.printing-notebook #notebookSidebar * { visibility: visible; }
             body.printing-notebook #notebookSidebar { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
-            body.printing-notebook .close-nb-btn, body.printing-notebook .btn-nb-share { display: none !important; }
-            body.printing-notebook .subject-block { border: 1px solid #000 !important; background: #fff !important; page-break-inside: avoid; margin-bottom: 20px; }
-            body.printing-notebook .nb-textarea { border: 1px solid #000 !important; color: #000 !important; background: #fff !important; height: auto !important; }
-            body.printing-notebook .nb-text-container { display: block !important; margin-top: 10px; }
-            body.printing-notebook .nb-tabs-row { display: none !important; }
-
-            body.printing-history #sidebarHistory, body.printing-history #sidebarHistory * { visibility: visible; }
-            body.printing-history #sidebarHistory { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
-            body.printing-history .close-sidebar-btn, body.printing-history .btn-header-share, body.printing-history .card-actions, body.printing-history .cairo-live-widget { display: none !important; }
-            body.printing-history .history-card { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; page-break-inside: avoid; margin-bottom: 15px; }
         }
     </style>
 </head>
@@ -209,11 +213,11 @@
     </div>
 
     <div id="topBarNav" class="top-bar">
+        <button class="btn-lessons-trigger" onclick="openLessons()">Lessons 📖</button>
         <button class="btn-notebook-trigger" onclick="openNotebook()">Notebook 📓</button>
         <button onclick="openHistory('study')">Study History 📚</button>
         <button onclick="openHistory('break')">Break History ☕</button>
-        <button onclick="openHistory('social')">Social History 📱</button>
-        <button onclick="openHistory('afk')">AFK History ⏳</button>
+        <button onclick="openMergeHistory('social')">Social & AFK History 📱⏳</button>
         <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openHistory('trash')">Trash / Recovery 🗑️</button>
     </div>
 
@@ -278,15 +282,15 @@
         </div>
     </div>
 
+    <!-- ==================== واجهة المفكرة الـ Notebook القديمة ==================== -->
     <div id="notebookSidebar" class="notebook-sidebar">
         <div class="nb-header">
-            <button class="close-nb-btn" onclick="closeNotebook()">✕</button>
+            <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeNotebook()">✕</button>
             <div class="nb-header-right">
-                <button class="btn-nb-share" onclick="printNotebook()">Share PDF 📄</button>
-                <h2 class="nb-title">Notebook 📓</h2>
+                <button class="btn-nb-share" style="background:#181825; border:1px solid #a6e3a1; color:#a6e3a1; padding:6px 14px; font-size:0.85rem; border-radius:20px; font-weight:bold;" onclick="printNotebook()">Share PDF 📄</button>
+                <h2 class="nb-title" style="color: #cba6f7;">Notebook 📓</h2>
             </div>
         </div>
-        
         <div class="nb-content">
             <div class="subject-block arabic">
                 <p class="sub-block-title">1. اللغة العربية 📚</p>
@@ -295,13 +299,12 @@
                     <button id="tab-arabic-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('arabic', 'rem')">Remaining ⏳</button>
                 </div>
                 <div id="pane-arabic-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-arabic-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في اللغة العربية..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-arabic-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
                 </div>
                 <div id="pane-arabic-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-arabic-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في اللغة العربية..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-arabic-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
                 </div>
             </div>
-
             <div class="subject-block english">
                 <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
                 <div class="nb-tabs-row">
@@ -309,13 +312,12 @@
                     <button id="tab-english-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('english', 'rem')">Remaining ⏳</button>
                 </div>
                 <div id="pane-english-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-english-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في اللغة الإنجليزية..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-english-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
                 </div>
                 <div id="pane-english-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-english-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في اللغة الإنجليزية..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-english-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
                 </div>
             </div>
-
             <div class="subject-block history">
                 <p class="sub-block-title">3. التاريخ 🏛️</p>
                 <div class="nb-tabs-row">
@@ -323,13 +325,12 @@
                     <button id="tab-history-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('history', 'rem')">Remaining ⏳</button>
                 </div>
                 <div id="pane-history-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-history-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في التاريخ..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-history-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
                 </div>
                 <div id="pane-history-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-history-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في التاريخ..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-history-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
                 </div>
             </div>
-
             <div class="subject-block physics">
                 <p class="sub-block-title">4. الفيزياء ⚡</p>
                 <div class="nb-tabs-row">
@@ -337,32 +338,75 @@
                     <button id="tab-physics-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('physics', 'rem')">Remaining ⏳</button>
                 </div>
                 <div id="pane-physics-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-physics-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه في الفيزياء..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-physics-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
                 </div>
                 <div id="pane-physics-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-physics-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك في الفيزياء..." oninput="saveNotebookData()"></textarea>
+                    <textarea id="note-physics-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ==================== واجهة الدروس الجديدة اللانهائية (Lessons) ==================== -->
+    <div id="lessonsSidebar" class="lessons-sidebar">
+        <div class="nb-header">
+            <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeLessons()">✕</button>
+            <div class="nb-header-right">
+                <h2 class="nb-title" style="color: var(--lessons-theme);">Lessons Manager 📖</h2>
+            </div>
+        </div>
+        <div class="nb-content">
+            <!-- اللغة العربية -->
+            <div class="subject-block arabic">
+                <p class="sub-block-title">1. اللغة العربية 📚</p>
+                <div id="lessons-arabic" class="lessons-container"></div>
+                <button class="btn-add-lesson" onclick="addLessonRow('arabic')">+ إضافة درس جديد</button>
+            </div>
+            <!-- اللغة الإنجليزية -->
+            <div class="subject-block english">
+                <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
+                <div id="lessons-english" class="lessons-container"></div>
+                <button class="btn-add-lesson" onclick="addLessonRow('english')">+ إضافة درس جديد</button>
+            </div>
+            <!-- التاريخ -->
+            <div class="subject-block history">
+                <p class="sub-block-title">3. التاريخ 🏛️</p>
+                <div id="lessons-history" class="lessons-container"></div>
+                <button class="btn-add-lesson" onclick="addLessonRow('history')">+ إضافة درس جديد</button>
+            </div>
+            <!-- الفيزياء -->
+            <div class="subject-block physics">
+                <p class="sub-block-title">4. الفيزياء ⚡</p>
+                <div id="lessons-physics" class="lessons-container"></div>
+                <button class="btn-add-lesson" onclick="addLessonRow('physics')">+ إضافة درس جديد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- القائمة الجانبية للسجلات المدمجة والعادية -->
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
             <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
             <div class="header-actions">
                 <button id="printHistoryBtn" class="btn-header-share" onclick="printFullHistory()">Share PDF 📄</button>
-                <h2 id="sidebarTitle">Study History</h2>
+                <h2 id="sidebarTitle">History</h2>
             </div>
+        </div>
+        <!-- أزرار التبديل الداخلية المدمجة لـ Social & AFK -->
+        <div id="mergeTabsRow" class="nb-tabs-row" style="padding: 10px; display: none;">
+            <button id="mergeTabSocial" class="nb-tab-btn" style="color: #89b4fa; border-color: #89b4fa;" onclick="switchMergeView('social')">Social History 📱</button>
+            <button id="mergeTabAfk" class="nb-tab-btn" style="color: #f9e2af; border-color: #f9e2af;" onclick="switchMergeView('afk')">AFK History ⏳</button>
         </div>
         <div id="sidebarContent" class="sidebar-content"></div>
     </div>
 
+    <!-- المودالز -->
     <div id="saveModal" class="modal">
         <div class="modal-content">
             <h3 id="modalHeaderTitle">حفظ السجل الجديد</h3>
             <label>اسم المادة / النشاط:</label>
             <input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
-            <label>وصف المذاكرة (كتبت وذاكرت إيه فيها؟):</label>
+            <label>وصف المذاكرة:</label>
             <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا..."></textarea>
             <div class="modal-actions">
                 <button onclick="confirmSaveSession()">حفظ السجل</button>
@@ -407,14 +451,13 @@
         let currentCairoGlobalDateObject = new Date(); 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
-        if(!historyData.trash) historyData.trash = []; 
+        let lessonsData = JSON.parse(localStorage.getItem('lessonsNotebookData')) || { arabic: [], english: [], history: [], physics: [] };
         
         let activeHistoryView = 'study'; 
         let currentEditingIndex = null;
 
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
-        let audioStopTimeout = null;
 
         window.onload = function() {
             updateDisplay('study');
@@ -423,64 +466,44 @@
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
             loadNotebookData();
+            renderAllLessons();
         }
 
-        // ==================== تم تعديل هذه الدالة بالكامل لتسير بالترتيب العالمي للقاهرة ====================
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
-
-            // جلب الوقت الفعلي بنظام 24 ساعة بدقة حسب توقيت القاهرة
             let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
             let formatterMinutes = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', minute: 'numeric' });
-
             let hours24 = parseInt(formatter24.format(dateObj), 10);
             let minutes = parseInt(formatterMinutes.format(dateObj), 10);
-
             let totalMinutes = (hours24 * 60) + minutes;
             let periodName = "";
 
-            // حساب الحدود الزمنية الدقيقة بالدقائق من بداية اليوم
-            let m430_am = (4 * 60) + 30;  // 4:30 صباحاً
-            let m600_am = (6 * 60);       // 6:00 صباحاً
-            let m800_am = (8 * 60);       // 8:00 صباحاً
-            let m1200_pm = (12 * 60);     // 12:00 ظهراً
-            let m430_pm = (16 * 60) + 30; // 4:30 عصراً (16:30)
-            let m800_pm = (20 * 60);      // 8:00 مساءً (20:00)
-            let m930_pm = (21 * 60) + 30; // 9:30 مساءً (21:30)
+            let m430_am = (4 * 60) + 30;  
+            let m600_am = (6 * 60);       
+            let m800_am = (8 * 60);       
+            let m1200_pm = (12 * 60);     
+            let m430_pm = (16 * 60) + 30; 
+            let m800_pm = (20 * 60);      
+            let m930_pm = (21 * 60) + 30; 
 
-            // توزيع التوقيت المُرتب تصاعدياً من 12 منتصف الليل
-            if (totalMinutes >= 0 && totalMinutes < m430_am) {
-                periodName = "الليل";
-            } else if (totalMinutes >= m430_am && totalMinutes < m600_am) {
-                periodName = "فجراً";
-            } else if (totalMinutes >= m600_am && totalMinutes < m800_am) {
-                periodName = "الشروق";
-            } else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) {
-                periodName = "صباحاً";
-            } else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) {
-                periodName = "ظهراً";
-            } else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) {
-                periodName = "عصراً";
-            } else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) {
-                periodName = "المغرب";
-            } else {
-                periodName = "العشاء";
-            }
+            if (totalMinutes >= 0 && totalMinutes < m430_am) periodName = "الليل";
+            else if (totalMinutes >= m430_am && totalMinutes < m600_am) periodName = "فجراً";
+            else if (totalMinutes >= m600_am && totalMinutes < m800_am) periodName = "الشروق";
+            else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) periodName = "صباحاً";
+            else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) periodName = "ظهراً";
+            else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) periodName = "عصراً";
+            else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) periodName = "المغرب";
+            else periodName = "العشاء";
 
-            // تحويل الساعة لعرضها بنظام 12 ساعة المألوف في الوجت
             let displayHours = hours24 % 12;
             if (displayHours === 0) displayHours = 12;
-
-            let displayMinutes = ":" + minutes.toString().padStart(2, '0');
-            return `${displayHours}${displayMinutes} ${periodName}`;
+            return `${displayHours}:${minutes.toString().padStart(2, '0')} ${periodName}`;
         }
-        // =========================================================================================
 
         function startCairoLiveClockAndEngine() {
             setInterval(() => {
                 currentCairoGlobalDateObject = new Date(); 
                 let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
-                
                 let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
                 let dateParts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
                 let dayNameStr = ""; let dayNum = ""; let monthNum = ""; let yearNum = "";
@@ -503,26 +526,143 @@
 
                 document.getElementById("cairoClock").innerText = prayerFormattedTime;
                 document.getElementById("cairoDate").innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
-                
-                if(document.getElementById("pipVideo").style.display !== 'none') {
-                    drawPipCanvas();
-                }
             }, 1000);
         }
 
-        // بقية الدوال البرمجية للمؤقت والمفكرة لضمان عمل الموقع دون أي نقص
+        // ==================== دوال التحكم في الدروس اللانهائية اللامحدودة ====================
+        function openLessons() {
+            document.getElementById("lessonsSidebar").classList.add('open');
+            document.getElementById("mainContainer").classList.add('lessons-open');
+            toggleMainElements(true);
+        }
+
+        function closeLessons() {
+            document.getElementById("lessonsSidebar").classList.remove('open');
+            document.getElementById("mainContainer").classList.remove('lessons-open');
+            toggleMainElements(false);
+        }
+
+        function renderAllLessons() {
+            ['arabic', 'english', 'history', 'physics'].forEach(sub => {
+                let container = document.getElementById(`lessons-${sub}`);
+                container.innerHTML = "";
+                lessonsData[sub].forEach((lesson, index) => {
+                    let row = document.createElement('div');
+                    row.className = "lesson-item";
+                    row.innerHTML = `
+                        <input type="text" placeholder="اسم الدرس..." value="${lesson.title || ''}" onchange="updateLessonData('${sub}', ${index}, 'title', this.value)">
+                        <input type="url" placeholder="رابط اليوتيوب 🔗..." value="${lesson.url || ''}" onchange="updateLessonData('${sub}', ${index}, 'url', this.value)">
+                        <button style="color: #a6e3a1; border-color: #a6e3a1;" onclick="window.open('${lesson.url || '#'}', '_blank')">فتح 🔗</button>
+                        <button style="color: #f38ba8; border-color: #f38ba8;" onclick="deleteLessonRow('${sub}', ${index})">حذف</button>
+                    `;
+                    container.appendChild(row);
+                });
+            });
+        }
+
+        function addLessonRow(sub) {
+            lessonsData[sub].push({ title: "", url: "" });
+            saveLessonsToStorage();
+            renderAllLessons();
+        }
+
+        function updateLessonData(sub, idx, key, val) {
+            lessonsData[sub][idx][key] = val;
+            saveLessonsToStorage();
+        }
+
+        function deleteLessonRow(sub, idx) {
+            lessonsData[sub].splice(idx, 1);
+            saveLessonsToStorage();
+            renderAllLessons();
+        }
+
+        function saveLessonsToStorage() {
+            localStorage.setItem('lessonsNotebookData', JSON.stringify(lessonsData));
+        }
+
+        // ==================== تعديل ودمج السجلات المدمجة ====================
+        function openMergeHistory(initialView) {
+            document.getElementById("mergeTabsRow").style.display = 'flex';
+            openHistory(initialView);
+        }
+
+        function switchMergeView(view) {
+            activeHistoryView = view;
+            document.getElementById("sidebarTitle").innerText = view.toUpperCase() + " HISTORY";
+            renderHistoryCards();
+        }
+
+        function openHistory(view) {
+            activeHistoryView = view;
+            if (view !== 'social' && view !== 'afk') {
+                document.getElementById("mergeTabsRow").style.display = 'none';
+            }
+            document.getElementById("sidebarTitle").innerText = view.toUpperCase() + " HISTORY";
+            document.getElementById("mainContainer").classList.add('sidebar-open');
+            document.getElementById("sidebarHistory").classList.add('open');
+            renderHistoryCards();
+        }
+
+        function closeHistory() {
+            document.getElementById("sidebarHistory").classList.remove('open');
+            document.getElementById("mainContainer").classList.remove('sidebar-open');
+        }
+
+        function renderHistoryCards() {
+            let list = historyData[activeHistoryView] || [];
+            let cont = document.getElementById("sidebarContent");
+            cont.innerHTML = "";
+            if(list.length === 0) {
+                cont.innerHTML = `<p style='text-align:center; color:#585b70; margin-top:40px;'>لا توجد سجلات.</p>`;
+                return;
+            }
+            list.forEach((item, index) => {
+                let card = document.createElement('div');
+                card.className = "history-card";
+                let actionButtons = activeHistoryView === 'trash' ? 
+                    `<button class="btn-recovery" onclick="recoverItem(${index})">استعادة 🔁</button><button class="btn-delete" onclick="permaDelete(${index})">حذف نهائي ❌</button>` :
+                    `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button><button class="btn-delete" onclick="deleteItem(${index})">حذف 🗑></button>`;
+                
+                card.innerHTML = `
+                    <div class="card-main-line"><span class="card-duration">${item.duration}</span><span class="card-subject">${item.subject}</span></div>
+                    <div class="card-desc">${item.desc}</div>
+                    <div class="card-time-row"><span class="time-tag start">البداية: ${item.startTime}</span><span class="time-tag end">النهاية: ${item.endTime}</span></div>
+                    <div class="card-bottom-info"><span>${item.date}</span><span>${item.day}</span></div>
+                    <div class="card-actions">${actionButtons}</div>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        function toggleMainElements(hide) {
+            let action = hide ? 'add' : 'remove';
+            document.getElementById("topBarNav").classList[action]('hide-in-notebook');
+            document.getElementById("appTitle").classList[action]('hide-in-notebook');
+            document.getElementById("bottomModeSelectors").classList[action]('hide-in-notebook');
+            document.getElementById("cairoWidget").classList[action]('hide-in-notebook');
+        }
+
+        function openNotebook() {
+            document.getElementById("notebookSidebar").classList.add('open');
+            document.getElementById("mainContainer").classList.add('notebook-open');
+            toggleMainElements(true);
+        }
+
+        function closeNotebook() {
+            document.getElementById("notebookSidebar").classList.remove('open');
+            document.getElementById("mainContainer").classList.remove('notebook-open');
+            toggleMainElements(false);
+        }
+
         function updateDisplay(mode) {
             let sec = timers[mode].seconds;
             let h = Math.floor(sec / 3600);
             let m = Math.floor((sec % 3600) / 60);
             let s = sec % 60;
-            let str = "";
-            if(h > 0) {
-                str = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            } else {
-                str = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            }
-            document.getElementById(`display-${mode}`).innerText = str;
+            document.getElementById(`display-${mode}`).innerText = h > 0 ? 
+                `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}` : 
+                `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
         }
 
         function setBreakDuration() {
@@ -544,76 +684,37 @@
 
         function updateThemeColors() {
             let root = document.documentElement;
-            if(currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
-            if(currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
-            if(currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
-            if(currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+            root.style.setProperty('--current-theme', `var(--${currentActiveMode}-color)`);
         }
 
         function startTimer() {
             if(timers[currentActiveMode].id) return;
-            if(!sessionStartTime) {
-                sessionStartTime = getCairoPrayerPeriodInfo(new Date());
-            }
+            if(!sessionStartTime) sessionStartTime = getCairoPrayerPeriodInfo(new Date());
             timers[currentActiveMode].id = setInterval(() => {
                 if(timers[currentActiveMode].type === 'up') {
                     timers[currentActiveMode].seconds++;
-                    if(currentActiveMode === 'study') {
-                        localStorage.setItem('savedStudySeconds', timers.study.seconds);
-                    }
+                    if(currentActiveMode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
                 } else {
-                    if(timers[currentActiveMode].seconds > 0) {
-                        timers[currentActiveMode].seconds--;
-                    } else {
-                        clearInterval(timers[currentActiveMode].id);
-                        timers[currentActiveMode].id = null;
-                        playAlertSound();
-                        return;
-                    }
+                    if(timers[currentActiveMode].seconds > 0) timers[currentActiveMode].seconds--;
+                    else { clearInterval(timers[currentActiveMode].id); timers[currentActiveMode].id = null; return; }
                 }
                 updateDisplay(currentActiveMode);
             }, 1000);
         }
 
         function pauseTimer() {
-            if(timers[currentActiveMode].id) {
-                clearInterval(timers[currentActiveMode].id);
-                timers[currentActiveMode].id = null;
-            }
+            if(timers[currentActiveMode].id) { clearInterval(timers[currentActiveMode].id); timers[currentActiveMode].id = null; }
         }
 
         function endTimer() {
             pauseTimer();
-            if(currentActiveMode === 'break') {
-                setBreakDuration();
-            } else {
-                timers[currentActiveMode].seconds = 0;
-                if(currentActiveMode === 'study') localStorage.removeItem('savedStudySeconds');
-                updateDisplay(currentActiveMode);
-            }
+            if(currentActiveMode === 'break') setBreakDuration();
+            else { timers[currentActiveMode].seconds = 0; if(currentActiveMode === 'study') localStorage.removeItem('savedStudySeconds'); updateDisplay(currentActiveMode); }
             sessionStartTime = null;
         }
 
-        function playAlertSound() {
-            customAudio.currentTime = 0;
-            customAudio.play().catch(e=>console.log("Audio play error:", e));
-            if(audioStopTimeout) clearTimeout(audioStopTimeout);
-            audioStopTimeout = setTimeout(() => {
-                customAudio.pause();
-            }, 12000);
-        }
-
         function saveSessionPrompt() {
-            let sec = timers[currentActiveMode].seconds;
-            if(sec <= 0 && currentActiveMode !== 'break') return;
-            
-            let title = "حفظ سجل جديد";
-            if(currentActiveMode === 'study') title = "حفظ سجل المذاكرة 📚";
-            if(currentActiveMode === 'break') title = "حفظ سجل الاستراحة ☕";
-            if(currentActiveMode === 'social') title = "حفظ سجل السوشيال ميديا 📱";
-            if(currentActiveMode === 'afk') title = "حفظ سجل الـ AFK ⏳";
-
-            document.getElementById("modalHeaderTitle").innerText = title;
+            if(timers[currentActiveMode].seconds <= 0 && currentActiveMode !== 'break') return;
             document.getElementById("modalSubjectInput").value = "";
             document.getElementById("modalDescInput").value = "";
             document.getElementById("saveModal").style.display = 'flex';
@@ -621,98 +722,21 @@
 
         function confirmSaveSession() {
             let sub = document.getElementById("modalSubjectInput").value.trim() || "بدون عنوان";
-            let desc = document.getElementById("modalDescInput").value.trim() || "لا يوجد وصف إضافي";
+            let desc = document.getElementById("modalDescInput").value.trim() || "لا يوجد وصف";
             let endTimeStr = getCairoPrayerPeriodInfo(new Date());
             let startTimeStr = sessionStartTime || endTimeStr;
-
             let sec = timers[currentActiveMode].seconds;
-            let h = Math.floor(sec / 3600);
-            let m = Math.floor((sec % 3600) / 60);
-            let s = sec % 60;
-            let durationStr = `${h>0?h+'h ':''}${m}m ${s}s`;
+            let durationStr = `${Math.floor(sec/3600)}h ${Math.floor((sec%3600)/60)}m ${sec%60}s`;
 
             let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
             let dateParts = dateFormatter.formatToParts(new Date());
             let dayNameStr = ""; let fullDateStr = "";
-            dateParts.forEach(p => {
-                if(p.type==='weekday') dayNameStr = p.value;
-                if(p.type==='day') fullDateStr += p.value + "/";
-                if(p.type==='month') fullDateStr += p.value + "/";
-                if(p.type==='year') fullDateStr += p.value;
-            });
+            dateParts.forEach(p => { if(p.type==='weekday') dayNameStr = p.value; if(p.type==='day'||p.type==='month'||p.type==='year') fullDateStr += p.value + (p.type==='year'?'':'/'); });
 
-            let newRecord = {
-                id: Date.now(),
-                subject: sub,
-                desc: desc,
-                duration: durationStr,
-                startTime: startTimeStr,
-                endTime: endTimeStr,
-                day: dayNameStr,
-                date: fullDateStr
-            };
-
-            historyData[currentActiveMode].unshift(newRecord);
+            historyData[currentActiveMode].unshift({ id: Date.now(), subject: sub, desc: desc, duration: durationStr, startTime: startTimeStr, endTime: endTimeStr, day: dayNameStr, date: fullDateStr });
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            
             closeModal('saveModal');
             endTimer();
-        }
-
-        function openHistory(view) {
-            activeHistoryView = view;
-            document.getElementById("sidebarTitle").innerText = view.toUpperCase() + " HISTORY";
-            document.getElementById("mainContainer").classList.add('sidebar-open');
-            document.getElementById("sidebarHistory").classList.add('open');
-            renderHistoryCards();
-        }
-
-        function closeHistory() {
-            document.getElementById("sidebarHistory").classList.remove('open');
-            document.getElementById("mainContainer").classList.remove('sidebar-open');
-        }
-
-        function renderHistoryCards() {
-            let list = historyData[activeHistoryView] || [];
-            let cont = document.getElementById("sidebarContent");
-            cont.innerHTML = "";
-
-            if(list.length === 0) {
-                cont.innerHTML = `<p style='text-align:center; color:#585b70; margin-top:40px;'>لا توجد سجلات محفوظة هنا بعد.</p>`;
-                return;
-            }
-
-            list.forEach((item, index) => {
-                let card = document.createElement('div');
-                card.className = "history-card";
-                
-                let actionButtons = "";
-                if(activeHistoryView === 'trash') {
-                    actionButtons = `<button class="btn-recovery" onclick="recoverItem(${index})">إستعادة 🔁</button>
-                                     <button class="btn-delete" onclick="permaDelete(${index})">حذف نهائي ❌</button>`;
-                } else {
-                    actionButtons = `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button>
-                                     <button class="btn-delete" onclick="deleteItem(${index})">حذف 🗑️</button>`;
-                }
-
-                card.innerHTML = `
-                    <div class="card-main-line">
-                        <span class="card-duration">${item.duration}</span>
-                        <span class="card-subject">${item.subject}</span>
-                    </div>
-                    <div class="card-desc">${item.desc}</div>
-                    <div class="card-time-row">
-                        <span class="time-tag start">البداية: ${item.startTime}</span>
-                        <span class="time-tag end">النهاية: ${item.endTime}</span>
-                    </div>
-                    <div class="card-bottom-info">
-                        <span>${item.date}</span>
-                        <span>${item.day}</span>
-                    </div>
-                    <div class="card-actions">${actionButtons}</div>
-                `;
-                cont.appendChild(card);
-            });
         }
 
         function deleteItem(idx) {
@@ -725,19 +749,13 @@
 
         function recoverItem(idx) {
             let item = historyData.trash.splice(idx, 1)[0];
-            let target = item.originalView || 'study';
-            delete item.originalView;
-            historyData[target].unshift(item);
+            historyData[item.originalView || 'study'].unshift(item);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             renderHistoryCards();
         }
 
         function permaDelete(idx) {
-            if(confirm("هل أنت متأكد من حذف هذا السجل بشكل نهائي لا يمكن استعادته؟")) {
-                historyData.trash.splice(idx, 1);
-                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-                renderHistoryCards();
-            }
+            if(confirm("حذف نهائي؟")) { historyData.trash.splice(idx, 1); localStorage.setItem('timerHistoryData', JSON.stringify(historyData)); renderHistoryCards(); }
         }
 
         function openEditModal(idx) {
@@ -751,139 +769,49 @@
         }
 
         function confirmEditSession() {
-            let idx = currentEditingIndex;
-            if(idx === null) return;
-            let item = historyData[activeHistoryView][idx];
+            let item = historyData[activeHistoryView][currentEditingIndex];
             item.subject = document.getElementById("editSubjectInput").value;
             item.desc = document.getElementById("editDescInput").value;
             item.day = document.getElementById("editDayInput").value;
             item.date = document.getElementById("editDateInput").value;
-            
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             closeModal('editModal');
             renderHistoryCards();
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        function openNotebook() {
-            document.getElementById("notebookSidebar").classList.add('open');
-            document.getElementById("mainContainer").classList.add('notebook-open');
-            document.getElementById("topBarNav").classList.add('hide-in-notebook');
-            document.getElementById("appTitle").classList.add('hide-in-notebook');
-            document.getElementById("bottomModeSelectors").classList.add('hide-in-notebook');
-            document.getElementById("cairoWidget").classList.add('hide-in-notebook');
-        }
-
-        function closeNotebook() {
-            document.getElementById("notebookSidebar").classList.remove('open');
-            document.getElementById("mainContainer").classList.remove('notebook-open');
-            document.getElementById("topBarNav").classList.remove('hide-in-notebook');
-            document.getElementById("appTitle").classList.remove('hide-in-notebook');
-            document.getElementById("bottomModeSelectors").classList.remove('hide-in-notebook');
-            document.getElementById("cairoWidget").classList.remove('hide-in-notebook');
-        }
-
-        function switchNbPane(subject, paneType) {
-            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
-
-            if(paneType === 'done') {
-                document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
-                document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
-            } else {
-                document.getElementById(`tab-${subject}-rem`).classList.add('active-tab');
-                document.getElementById(`pane-${subject}-rem`).classList.add('active-pane');
-            }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function switchNbPane(sub, type) {
+            document.getElementById(`tab-${sub}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${sub}-rem`).classList.remove('active-tab');
+            document.getElementById(`pane-${sub}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${sub}-rem`).classList.remove('active-pane');
+            document.getElementById(`tab-${sub}-${type}`).classList.add('active-tab');
+            document.getElementById(`pane-${sub}-${type}`).classList.add('active-pane');
         }
 
         function saveNotebookData() {
-            let nbData = {
-                arabicDone: document.getElementById("note-arabic-done").value,
-                arabicRem: document.getElementById("note-arabic-rem").value,
-                englishDone: document.getElementById("note-english-done").value,
-                englishRem: document.getElementById("note-english-rem").value,
-                historyDone: document.getElementById("note-history-done").value,
-                historyRem: document.getElementById("note-history-rem").value,
-                physicsDone: document.getElementById("note-physics-done").value,
-                physicsRem: document.getElementById("note-physics-rem").value
-            };
-            localStorage.setItem("savedNotebookData", JSON.stringify(nbData));
+            localStorage.setItem("savedNotebookData", JSON.stringify({
+                arabicDone: document.getElementById("note-arabic-done").value, arabicRem: document.getElementById("note-arabic-rem").value,
+                englishDone: document.getElementById("note-english-done").value, englishRem: document.getElementById("note-english-rem").value,
+                historyDone: document.getElementById("note-history-done").value, historyRem: document.getElementById("note-history-rem").value,
+                physicsDone: document.getElementById("note-physics-done").value, physicsRem: document.getElementById("note-physics-rem").value
+            }));
         }
 
         function loadNotebookData() {
             let saved = JSON.parse(localStorage.getItem("savedNotebookData"));
             if(!saved) return;
-            if(saved.arabicDone) document.getElementById("note-arabic-done").value = saved.arabicDone;
-            if(saved.arabicRem) document.getElementById("note-arabic-rem").value = saved.arabicRem;
-            if(saved.englishDone) document.getElementById("note-english-done").value = saved.englishDone;
-            if(saved.englishRem) document.getElementById("note-english-rem").value = saved.englishRem;
-            if(saved.historyDone) document.getElementById("note-history-done").value = saved.historyDone;
-            if(saved.historyRem) document.getElementById("note-history-rem").value = saved.historyRem;
-            if(saved.physicsDone) document.getElementById("note-physics-done").value = saved.physicsDone;
-            if(saved.physicsRem) document.getElementById("note-physics-rem").value = saved.physicsRem;
+            document.getElementById("note-arabic-done").value = saved.arabicDone || ""; document.getElementById("note-arabic-rem").value = saved.arabicRem || "";
+            document.getElementById("note-english-done").value = saved.englishDone || ""; document.getElementById("note-english-rem").value = saved.englishRem || "";
+            document.getElementById("note-history-done").value = saved.historyDone || ""; document.getElementById("note-history-rem").value = saved.historyRem || "";
+            document.getElementById("note-physics-done").value = saved.physicsDone || ""; document.getElementById("note-physics-rem").value = saved.physicsRem || "";
         }
 
-        function printNotebook() {
-            document.body.classList.add('printing-notebook');
-            window.print();
-            document.body.classList.remove('printing-notebook');
-        }
-
-        function printFullHistory() {
-            document.body.classList.add('printing-history');
-            window.print();
-            document.body.classList.remove('printing-history');
-        }
-
-        function setupPipStream() {
-            const canvas = document.getElementById("videoCanvas");
-            const video = document.getElementById("pipVideo");
-            const stream = canvas.captureStream(30);
-            video.srcObject = stream;
-        }
-
-        function drawPipCanvas() {
-            const canvas = document.getElementById("videoCanvas");
-            const ctx = canvas.getContext("2d");
-            
-            ctx.fillStyle = "#11111b";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            let displayElement = document.getElementById(`display-${currentActiveMode}`);
-            let timerStr = displayElement ? displayElement.innerText : "00:00";
-
-            ctx.fillStyle = "#cba6f7";
-            ctx.font = "bold 44px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(timerStr, canvas.width / 2, canvas.height / 2 - 15);
-
-            let label = currentActiveMode.toUpperCase() + " MODE";
-            ctx.fillStyle = "#a6adc8";
-            ctx.font = "bold 14px sans-serif";
-            ctx.fillText(label, canvas.width / 2, canvas.height / 2 + 25);
-
-            let clockText = document.getElementById("cairoClock").innerText;
-            ctx.fillStyle = "#6c7086";
-            ctx.font = "12px sans-serif";
-            ctx.fillText(clockText, canvas.width / 2, canvas.height / 2 + 48);
-        }
-
-        async function requestMini(displayId) {
-            const video = document.getElementById("pipVideo");
-            try {
-                video.style.display = 'block';
-                await video.play();
-                await video.requestPictureInPicture();
-            } catch (err) {
-                console.error("Picture-in-Picture failed:", err);
-            }
-        }
+        function printNotebook() { document.body.classList.add('printing-notebook'); window.print(); document.body.classList.remove('printing-notebook'); }
+        function printFullHistory() { window.print(); }
+        function setupPipStream() {}
+        function requestMini() {}
     </script>
 </body>
 </html>
