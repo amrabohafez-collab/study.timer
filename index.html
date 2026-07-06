@@ -14,12 +14,11 @@
             --clock-color: #a6adc8; 
             --current-theme: var(--study-color);
             
-            /* ألوان المواد الخاصة بالمفكرة والدروس */
+            /* ألوان المواد الخاصة بالمفكرة */
             --arabic-color: #89b4fa;
             --english-color: #a6e3a1;
             --history-color: #f9e2af;
             --physics-color: #f38ba8;
-            --lessons-theme: #fab387;
         }
 
         body { 
@@ -69,7 +68,6 @@
         #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
         #mainContainer.sidebar-open { padding-right: 380px; }
         #mainContainer.notebook-open { padding-left: 50vw; } 
-        #mainContainer.lessons-open { padding-left: 50vw; }
         
         #mainApp { text-align: center; width: 100%; max-width: 600px; transition: all 0.3s ease; }
         .timer-box { display: none; }
@@ -86,8 +84,6 @@
         
         .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
         .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
-        .btn-lessons-trigger { border-color: var(--lessons-theme) !important; color: var(--lessons-theme) !important; font-weight: bold; }
-        .btn-lessons-trigger:hover { background: var(--lessons-theme) !important; color: #11111b !important; }
 
         .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; transition: opacity 0.3s ease; }
         #bottomModeSelectors { transition: opacity 0.3s ease; }
@@ -114,12 +110,9 @@
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* القائمة الجانبية الكبيرة للمفكرة والدروس (اليسار) */
-        .notebook-sidebar, .lessons-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; }
-        .notebook-sidebar { border-right: 2px solid #cba6f7; }
-        .lessons-sidebar { border-right: 2px solid var(--lessons-theme); }
-        
-        .notebook-sidebar.open, .lessons-sidebar.open { left: 0; }
+        /* القائمة الجانبية الكبيرة للمفكرة (اليسار) */
+        .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; border-right: 2px solid #cba6f7; }
+        .notebook-sidebar.open { left: 0; }
         
         .nb-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; direction: rtl; }
         .nb-header-right { display: flex; align-items: center; gap: 15px; }
@@ -158,15 +151,6 @@
         .nb-text-container.done-pane .nb-textarea:focus { border-color: #a6e3a1; }
         .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
         .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
-
-        /* تنسيقات إدارة الدروس اللانهائية */
-        .lessons-container { display: flex; flex-direction: column; gap: 10px; direction: rtl; }
-        .lesson-item { display: flex; gap: 8px; align-items: center; background: #11111b; padding: 8px; border-radius: 8px; border: 1px solid #313244; }
-        .lesson-item input[type="text"] { flex: 2; background: #181825; border: 1px solid #313244; color: #fff; padding: 6px; border-radius: 6px; font-size: 0.9rem; }
-        .lesson-item input[type="url"] { flex: 3; background: #181825; border: 1px solid #313244; color: var(--lessons-theme); padding: 6px; border-radius: 6px; font-size: 0.9rem; direction: ltr; }
-        .lesson-item button { padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
-        .btn-add-lesson { background: #1e1e2e; color: #a6e3a1; border-color: #a6e3a1; margin-top: 5px; align-self: flex-start; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem;}
-        .btn-add-lesson:hover { background: #a6e3a1; color: #11111b; }
 
         .hide-in-notebook { opacity: 0 !important; pointer-events: none !important; }
 
@@ -213,7 +197,6 @@
     </div>
 
     <div id="topBarNav" class="top-bar">
-        <button class="btn-lessons-trigger" onclick="openLessons()">Lessons 📖</button>
         <button class="btn-notebook-trigger" onclick="openNotebook()">Notebook 📓</button>
         <button onclick="openHistory('study')">Study History 📚</button>
         <button onclick="openHistory('break')">Break History ☕</button>
@@ -282,7 +265,7 @@
         </div>
     </div>
 
-    <!-- ==================== واجهة المفكرة الـ Notebook القديمة ==================== -->
+    <!-- واجهة المفكرة الـ Notebook -->
     <div id="notebookSidebar" class="notebook-sidebar">
         <div class="nb-header">
             <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeNotebook()">✕</button>
@@ -347,43 +330,7 @@
         </div>
     </div>
 
-    <!-- ==================== واجهة الدروس الجديدة اللانهائية (Lessons) ==================== -->
-    <div id="lessonsSidebar" class="lessons-sidebar">
-        <div class="nb-header">
-            <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeLessons()">✕</button>
-            <div class="nb-header-right">
-                <h2 class="nb-title" style="color: var(--lessons-theme);">Lessons Manager 📖</h2>
-            </div>
-        </div>
-        <div class="nb-content">
-            <!-- اللغة العربية -->
-            <div class="subject-block arabic">
-                <p class="sub-block-title">1. اللغة العربية 📚</p>
-                <div id="lessons-arabic" class="lessons-container"></div>
-                <button class="btn-add-lesson" onclick="addLessonRow('arabic')">+ إضافة درس جديد</button>
-            </div>
-            <!-- اللغة الإنجليزية -->
-            <div class="subject-block english">
-                <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
-                <div id="lessons-english" class="lessons-container"></div>
-                <button class="btn-add-lesson" onclick="addLessonRow('english')">+ إضافة درس جديد</button>
-            </div>
-            <!-- التاريخ -->
-            <div class="subject-block history">
-                <p class="sub-block-title">3. التاريخ 🏛️</p>
-                <div id="lessons-history" class="lessons-container"></div>
-                <button class="btn-add-lesson" onclick="addLessonRow('history')">+ إضافة درس جديد</button>
-            </div>
-            <!-- الفيزياء -->
-            <div class="subject-block physics">
-                <p class="sub-block-title">4. الفيزياء ⚡</p>
-                <div id="lessons-physics" class="lessons-container"></div>
-                <button class="btn-add-lesson" onclick="addLessonRow('physics')">+ إضافة درس جديد</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- القائمة الجانبية للسجلات المدمجة والعادية -->
+    <!-- القائمة الجانبية للسجلات -->
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
             <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
@@ -451,7 +398,6 @@
         let currentCairoGlobalDateObject = new Date(); 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
-        let lessonsData = JSON.parse(localStorage.getItem('lessonsNotebookData')) || { arabic: [], english: [], history: [], physics: [] };
         
         let activeHistoryView = 'study'; 
         let currentEditingIndex = null;
@@ -466,7 +412,6 @@
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
             loadNotebookData();
-            renderAllLessons();
         }
 
         function getCairoPrayerPeriodInfo(dateObj) {
@@ -529,59 +474,7 @@
             }, 1000);
         }
 
-        // ==================== دوال التحكم في الدروس اللانهائية اللامحدودة ====================
-        function openLessons() {
-            document.getElementById("lessonsSidebar").classList.add('open');
-            document.getElementById("mainContainer").classList.add('lessons-open');
-            toggleMainElements(true);
-        }
-
-        function closeLessons() {
-            document.getElementById("lessonsSidebar").classList.remove('open');
-            document.getElementById("mainContainer").classList.remove('lessons-open');
-            toggleMainElements(false);
-        }
-
-        function renderAllLessons() {
-            ['arabic', 'english', 'history', 'physics'].forEach(sub => {
-                let container = document.getElementById(`lessons-${sub}`);
-                container.innerHTML = "";
-                lessonsData[sub].forEach((lesson, index) => {
-                    let row = document.createElement('div');
-                    row.className = "lesson-item";
-                    row.innerHTML = `
-                        <input type="text" placeholder="اسم الدرس..." value="${lesson.title || ''}" onchange="updateLessonData('${sub}', ${index}, 'title', this.value)">
-                        <input type="url" placeholder="رابط اليوتيوب 🔗..." value="${lesson.url || ''}" onchange="updateLessonData('${sub}', ${index}, 'url', this.value)">
-                        <button style="color: #a6e3a1; border-color: #a6e3a1;" onclick="window.open('${lesson.url || '#'}', '_blank')">فتح 🔗</button>
-                        <button style="color: #f38ba8; border-color: #f38ba8;" onclick="deleteLessonRow('${sub}', ${index})">حذف</button>
-                    `;
-                    container.appendChild(row);
-                });
-            });
-        }
-
-        function addLessonRow(sub) {
-            lessonsData[sub].push({ title: "", url: "" });
-            saveLessonsToStorage();
-            renderAllLessons();
-        }
-
-        function updateLessonData(sub, idx, key, val) {
-            lessonsData[sub][idx][key] = val;
-            saveLessonsToStorage();
-        }
-
-        function deleteLessonRow(sub, idx) {
-            lessonsData[sub].splice(idx, 1);
-            saveLessonsToStorage();
-            renderAllLessons();
-        }
-
-        function saveLessonsToStorage() {
-            localStorage.setItem('lessonsNotebookData', JSON.stringify(lessonsData));
-        }
-
-        // ==================== تعديل ودمج السجلات المدمجة ====================
+        // ==================== السجلات المدمجة وعرضها ====================
         function openMergeHistory(initialView) {
             document.getElementById("mergeTabsRow").style.display = 'flex';
             openHistory(initialView);
@@ -622,7 +515,7 @@
                 card.className = "history-card";
                 let actionButtons = activeHistoryView === 'trash' ? 
                     `<button class="btn-recovery" onclick="recoverItem(${index})">استعادة 🔁</button><button class="btn-delete" onclick="permaDelete(${index})">حذف نهائي ❌</button>` :
-                    `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button><button class="btn-delete" onclick="deleteItem(${index})">حذف 🗑></button>`;
+                    `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button><button class="btn-delete" onclick="deleteItem(${index})">حذف 🗑️</button>`;
                 
                 card.innerHTML = `
                     <div class="card-main-line"><span class="card-duration">${item.duration}</span><span class="card-subject">${item.subject}</span></div>
