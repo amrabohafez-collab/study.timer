@@ -67,7 +67,7 @@
 
         #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
         #mainContainer.sidebar-open { padding-right: 380px; }
-        #mainContainer.notebook-open { padding-left: 50vw; } /* إزاحة محاذاة المؤقت عند فتح المفكرة الكبيرة */
+        #mainContainer.notebook-open { padding-left: 50vw; } 
         
         #mainApp { text-align: center; width: 100%; max-width: 600px; transition: all 0.3s ease; }
         .timer-box { display: none; }
@@ -82,7 +82,6 @@
         .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; transition: opacity 0.3s ease; }
         .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
         
-        /* زر المفكرة المميز */
         .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
         .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
 
@@ -97,7 +96,6 @@
         #btn-social { border-color: var(--social-color); color: var(--social-color); }
         #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
 
-        /* القائمة الجانبية للسجلات (اليمين) */
         .sidebar { position: fixed; right: -400px; top: 0; width: 360px; height: 100%; background: #11111b; border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
@@ -112,7 +110,6 @@
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* ==================== تصميم قائمة المفكرة الاحترافية الجديدة (اليسار) ==================== */
         .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; border-right: 2px solid #cba6f7; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; }
         .notebook-sidebar.open { left: 0; }
         
@@ -127,7 +124,6 @@
         .nb-content::-webkit-scrollbar { width: 8px; }
         .nb-content::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
 
-        /* كارت المادة */
         .subject-block { background: #181825; border: 1px solid #313244; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; }
         .subject-block.arabic { border-top: 4px solid var(--arabic-color); }
         .subject-block.english { border-top: 4px solid var(--english-color); }
@@ -140,7 +136,6 @@
         .subject-block.history .sub-block-title { color: var(--history-color); }
         .subject-block.physics .sub-block-title { color: var(--physics-color); }
 
-        /* أزرار Done / Remaining العلويين لكل مادة */
         .nb-tabs-row { display: flex; gap: 10px; width: 100%; direction: rtl; }
         .nb-tab-btn { flex: 1; padding: 8px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; border: 1px solid #313244; background: #11111b; cursor: pointer; transition: 0.2s; }
         .nb-tab-btn.btn-done-tab { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.3); }
@@ -148,22 +143,17 @@
         .nb-tab-btn.btn-remaining-tab { color: #f38ba8; border-color: rgba(243, 139, 168, 0.3); }
         .nb-tab-btn.btn-remaining-tab.active-tab { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
 
-        /* مساحات الكتابة الذكية بالألوان المشروطة */
         .nb-text-container { width: 100%; display: none; direction: rtl; }
         .nb-text-container.active-pane { display: block; }
         
         .nb-textarea { width: 100%; height: 110px; background: #11111b; border: 1px solid #313244; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 0.95rem; line-height: 1.5; outline: none; transition: border-color 0.2s; text-align: right; }
         
-        /* تلوين نصوص الكتابة تلقائياً بناء على نوع الخانة */
         .nb-text-container.done-pane .nb-textarea { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.2); }
         .nb-text-container.done-pane .nb-textarea:focus { border-color: #a6e3a1; }
         .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
         .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
 
-        /* حالة إخفاء العناصر عند دخول وضع المفكرة الكبيرة */
         .hide-in-notebook { opacity: 0 !important; pointer-events: none !important; }
-
-        /* ========================================================================================= */
 
         .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; }
         .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
@@ -178,7 +168,7 @@
         
         .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
         .card-actions { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; align-items: center;}
-        .card-actions button { padding: 3px 8px; font-size: 0.7 tribe; border-radius: 4px; border: 1px solid #313244; background: none;}
+        .card-actions button { padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #313244; background: none;}
         .btn-edit { color: #f9e2af; border-color: #f9e2af !important; }
         .btn-delete { color: #f38ba8; border-color: #f38ba8 !important; }
         .btn-recovery { color: #a6e3a1; border-color: #a6e3a1 !important; }
@@ -192,12 +182,10 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
         .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
 
-        /* تنسيقات الطباعة لـ PDF تدعم المفكرة والسجلات بشكل احترافي */
         @media print {
             body * { visibility: hidden; background: white !important; color: black !important; }
             #sidebarHistory, #sidebarHistory * { visibility: hidden; }
             
-            /* طباعة الـ Notebook */
             body.printing-notebook #notebookSidebar, body.printing-notebook #notebookSidebar * { visibility: visible; }
             body.printing-notebook #notebookSidebar { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
             body.printing-notebook .close-nb-btn, body.printing-notebook .btn-nb-share { display: none !important; }
@@ -206,7 +194,6 @@
             body.printing-notebook .nb-text-container { display: block !important; margin-top: 10px; }
             body.printing-notebook .nb-tabs-row { display: none !important; }
 
-            /* طباعة السجل العادي */
             body.printing-history #sidebarHistory, body.printing-history #sidebarHistory * { visibility: visible; }
             body.printing-history #sidebarHistory { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
             body.printing-history .close-sidebar-btn, body.printing-history .btn-header-share, body.printing-history .card-actions, body.printing-history .cairo-live-widget { display: none !important; }
@@ -291,7 +278,6 @@
         </div>
     </div>
 
-    <!-- ==================== واجهة المفكرة الذكية الإحترافية الجديدة (اليسار) ==================== -->
     <div id="notebookSidebar" class="notebook-sidebar">
         <div class="nb-header">
             <button class="close-nb-btn" onclick="closeNotebook()">✕</button>
@@ -302,7 +288,6 @@
         </div>
         
         <div class="nb-content">
-            <!-- خانة 1: اللغة العربية -->
             <div class="subject-block arabic">
                 <p class="sub-block-title">1. اللغة العربية 📚</p>
                 <div class="nb-tabs-row">
@@ -317,7 +302,6 @@
                 </div>
             </div>
 
-            <!-- خانة 2: اللغة الإنجليزية -->
             <div class="subject-block english">
                 <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
                 <div class="nb-tabs-row">
@@ -332,7 +316,6 @@
                 </div>
             </div>
 
-            <!-- خانة 3: التاريخ -->
             <div class="subject-block history">
                 <p class="sub-block-title">3. التاريخ 🏛️</p>
                 <div class="nb-tabs-row">
@@ -347,7 +330,6 @@
                 </div>
             </div>
 
-            <!-- خانة 4: الفيزياء -->
             <div class="subject-block physics">
                 <p class="sub-block-title">4. الفيزياء ⚡</p>
                 <div class="nb-tabs-row">
@@ -363,7 +345,6 @@
             </div>
         </div>
     </div>
-    <!-- ========================================================================= -->
 
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
@@ -441,52 +422,59 @@
             setupPipStream();
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
-            loadNotebookData(); // تحميل نصوص المفكرة المحفوظة تلقائياً
+            loadNotebookData();
         }
 
-        // دالة الفترات بالهندسة العكسية المتوافقة مع جهازك بنسبة 100%
+        // ==================== تم تعديل هذه الدالة بالكامل لتسير بالترتيب العالمي للقاهرة ====================
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
 
+            // جلب الوقت الفعلي بنظام 24 ساعة بدقة حسب توقيت القاهرة
             let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
             let formatterMinutes = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', minute: 'numeric' });
 
-            let hours = parseInt(formatter24.format(dateObj), 10);
+            let hours24 = parseInt(formatter24.format(dateObj), 10);
             let minutes = parseInt(formatterMinutes.format(dateObj), 10);
 
-            if (hours >= 0 && hours < 12) {
-                hours += 12; 
-            } else if (hours >= 12) {
-                hours -= 12; 
-            }
-
-            let totalMinutes = (hours * 60) + minutes;
+            let totalMinutes = (hours24 * 60) + minutes;
             let periodName = "";
 
-            let m430_am = (4 * 60) + 30;  
-            let m600_am = (6 * 60);       
-            let m800_am = (8 * 60);       
-            let m1200_pm = (12 * 60);     
-            let m430_pm = (16 * 60) + 30; 
-            let m800_pm = (20 * 60);      
-            let m930_pm = (21 * 60) + 30; 
+            // حساب الحدود الزمنية الدقيقة بالدقائق من بداية اليوم
+            let m430_am = (4 * 60) + 30;  // 4:30 صباحاً
+            let m600_am = (6 * 60);       // 6:00 صباحاً
+            let m800_am = (8 * 60);       // 8:00 صباحاً
+            let m1200_pm = (12 * 60);     // 12:00 ظهراً
+            let m430_pm = (16 * 60) + 30; // 4:30 عصراً (16:30)
+            let m800_pm = (20 * 60);      // 8:00 مساءً (20:00)
+            let m930_pm = (21 * 60) + 30; // 9:30 مساءً (21:30)
 
-            if (totalMinutes >= m430_am && totalMinutes < m600_am) periodName = "فجراً";
-            else if (totalMinutes >= m600_am && totalMinutes < m800_am) periodName = "الشروق";
-            else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) periodName = "صباحاً";
-            else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) periodName = "ظهراً";
-            else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) periodName = "عصراً";
-            else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) periodName = "المغرب";
-            else if (totalMinutes >= m930_pm && totalMinutes < 1440) periodName = "العشاء";
-            else periodName = "الليل"; 
+            // توزيع التوقيت المُرتب تصاعدياً من 12 منتصف الليل
+            if (totalMinutes >= 0 && totalMinutes < m430_am) {
+                periodName = "الليل";
+            } else if (totalMinutes >= m430_am && totalMinutes < m600_am) {
+                periodName = "فجراً";
+            } else if (totalMinutes >= m600_am && totalMinutes < m800_am) {
+                periodName = "الشروق";
+            } else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) {
+                periodName = "صباحاً";
+            } else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) {
+                periodName = "ظهراً";
+            } else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) {
+                periodName = "عصراً";
+            } else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) {
+                periodName = "المغرب";
+            } else {
+                periodName = "العشاء";
+            }
 
-            let realHours = parseInt(formatter24.format(dateObj), 10);
-            if (realHours > 12) realHours -= 12;
-            if (realHours === 0) realHours = 12;
+            // تحويل الساعة لعرضها بنظام 12 ساعة المألوف في الوجت
+            let displayHours = hours24 % 12;
+            if (displayHours === 0) displayHours = 12;
 
-            let displayMinutes = minutes === 0 ? "" : ":" + minutes.toString().padStart(2, '0');
-            return `${realHours}${displayMinutes} ${periodName}`;
+            let displayMinutes = ":" + minutes.toString().padStart(2, '0');
+            return `${displayHours}${displayMinutes} ${periodName}`;
         }
+        // =========================================================================================
 
         function startCairoLiveClockAndEngine() {
             setInterval(() => {
@@ -513,58 +501,297 @@
                 if(dayNameStr.includes("Friday") || dayNameStr.includes("الجمعة")) arabicDay = "الجمعة";
                 if(dayNameStr.includes("Saturday") || dayNameStr.includes("السبت")) arabicDay = "السبت";
 
-                document.getElementById('cairoClock').innerText = prayerFormattedTime;
-                document.getElementById('cairoDate').innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
+                document.getElementById("cairoClock").innerText = prayerFormattedTime;
+                document.getElementById("cairoDate").innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
+                
+                if(document.getElementById("pipVideo").style.display !== 'none') {
+                    drawPipCanvas();
+                }
             }, 1000);
         }
 
-        /* ==================== دوال تشغيل وإدارة المفكرة الاحترافية ==================== */
-        function openNotebook() {
-            // 1. تحويل فوري وإجباري إلى Study Mode
-            switchMode('study');
-            
-            // 2. تطبيق تأثير الاختفاء على الأزرار والعناصر الجانبية لتصفية الواجهة
-            document.getElementById('cairoWidget').classList.add('hide-in-notebook');
-            document.getElementById('topBarNav').classList.add('hide-in-notebook');
-            document.getElementById('appTitle').classList.add('hide-in-notebook');
-            document.getElementById('bottomModeSelectors').classList.add('hide-in-notebook');
-            
-            // إخفاء الأزرار الفرعية لمؤقت الدراسة وترك الأزرار الأساسية فقط (Start / Pause)
-            document.getElementById('saveBtnStudy').style.display = 'none';
-            document.getElementById('resetBtnStudy').style.display = 'none';
-            document.getElementById('miniBtnStudy').style.display = 'none';
+        // بقية الدوال البرمجية للمؤقت والمفكرة لضمان عمل الموقع دون أي نقص
+        function updateDisplay(mode) {
+            let sec = timers[mode].seconds;
+            let h = Math.floor(sec / 3600);
+            let m = Math.floor((sec % 3600) / 60);
+            let s = sec % 60;
+            let str = "";
+            if(h > 0) {
+                str = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            } else {
+                str = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            }
+            document.getElementById(`display-${mode}`).innerText = str;
+        }
 
-            // 3. فتح قائمة المفكرة من اليسار بحجم كبير وإزاحة المؤقت
-            document.getElementById('notebookSidebar').classList.add('open');
-            document.getElementById('mainContainer').classList.add('notebook-open');
+        function setBreakDuration() {
+            if(timers.break.id) return;
+            let h = parseInt(document.getElementById("breakHoursInput").value) || 0;
+            let m = parseInt(document.getElementById("breakMinutesInput").value) || 0;
+            timers.break.seconds = (h * 3600) + (m * 60);
+            updateDisplay('break');
+        }
+
+        function switchMode(mode) {
+            pauseTimer();
+            document.querySelectorAll('.timer-box').forEach(b => b.classList.remove('active'));
+            document.getElementById(`container-${mode}`).classList.add('active');
+            currentActiveMode = mode;
+            updateThemeColors();
+            updateDisplay(mode);
+        }
+
+        function updateThemeColors() {
+            let root = document.documentElement;
+            if(currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
+            if(currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            if(currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
+            if(currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+        }
+
+        function startTimer() {
+            if(timers[currentActiveMode].id) return;
+            if(!sessionStartTime) {
+                sessionStartTime = getCairoPrayerPeriodInfo(new Date());
+            }
+            timers[currentActiveMode].id = setInterval(() => {
+                if(timers[currentActiveMode].type === 'up') {
+                    timers[currentActiveMode].seconds++;
+                    if(currentActiveMode === 'study') {
+                        localStorage.setItem('savedStudySeconds', timers.study.seconds);
+                    }
+                } else {
+                    if(timers[currentActiveMode].seconds > 0) {
+                        timers[currentActiveMode].seconds--;
+                    } else {
+                        clearInterval(timers[currentActiveMode].id);
+                        timers[currentActiveMode].id = null;
+                        playAlertSound();
+                        return;
+                    }
+                }
+                updateDisplay(currentActiveMode);
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if(timers[currentActiveMode].id) {
+                clearInterval(timers[currentActiveMode].id);
+                timers[currentActiveMode].id = null;
+            }
+        }
+
+        function endTimer() {
+            pauseTimer();
+            if(currentActiveMode === 'break') {
+                setBreakDuration();
+            } else {
+                timers[currentActiveMode].seconds = 0;
+                if(currentActiveMode === 'study') localStorage.removeItem('savedStudySeconds');
+                updateDisplay(currentActiveMode);
+            }
+            sessionStartTime = null;
+        }
+
+        function playAlertSound() {
+            customAudio.currentTime = 0;
+            customAudio.play().catch(e=>console.log("Audio play error:", e));
+            if(audioStopTimeout) clearTimeout(audioStopTimeout);
+            audioStopTimeout = setTimeout(() => {
+                customAudio.pause();
+            }, 12000);
+        }
+
+        function saveSessionPrompt() {
+            let sec = timers[currentActiveMode].seconds;
+            if(sec <= 0 && currentActiveMode !== 'break') return;
+            
+            let title = "حفظ سجل جديد";
+            if(currentActiveMode === 'study') title = "حفظ سجل المذاكرة 📚";
+            if(currentActiveMode === 'break') title = "حفظ سجل الاستراحة ☕";
+            if(currentActiveMode === 'social') title = "حفظ سجل السوشيال ميديا 📱";
+            if(currentActiveMode === 'afk') title = "حفظ سجل الـ AFK ⏳";
+
+            document.getElementById("modalHeaderTitle").innerText = title;
+            document.getElementById("modalSubjectInput").value = "";
+            document.getElementById("modalDescInput").value = "";
+            document.getElementById("saveModal").style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            let sub = document.getElementById("modalSubjectInput").value.trim() || "بدون عنوان";
+            let desc = document.getElementById("modalDescInput").value.trim() || "لا يوجد وصف إضافي";
+            let endTimeStr = getCairoPrayerPeriodInfo(new Date());
+            let startTimeStr = sessionStartTime || endTimeStr;
+
+            let sec = timers[currentActiveMode].seconds;
+            let h = Math.floor(sec / 3600);
+            let m = Math.floor((sec % 3600) / 60);
+            let s = sec % 60;
+            let durationStr = `${h>0?h+'h ':''}${m}m ${s}s`;
+
+            let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
+            let dateParts = dateFormatter.formatToParts(new Date());
+            let dayNameStr = ""; let fullDateStr = "";
+            dateParts.forEach(p => {
+                if(p.type==='weekday') dayNameStr = p.value;
+                if(p.type==='day') fullDateStr += p.value + "/";
+                if(p.type==='month') fullDateStr += p.value + "/";
+                if(p.type==='year') fullDateStr += p.value;
+            });
+
+            let newRecord = {
+                id: Date.now(),
+                subject: sub,
+                desc: desc,
+                duration: durationStr,
+                startTime: startTimeStr,
+                endTime: endTimeStr,
+                day: dayNameStr,
+                date: fullDateStr
+            };
+
+            historyData[currentActiveMode].unshift(newRecord);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            
+            closeModal('saveModal');
+            endTimer();
+        }
+
+        function openHistory(view) {
+            activeHistoryView = view;
+            document.getElementById("sidebarTitle").innerText = view.toUpperCase() + " HISTORY";
+            document.getElementById("mainContainer").classList.add('sidebar-open');
+            document.getElementById("sidebarHistory").classList.add('open');
+            renderHistoryCards();
+        }
+
+        function closeHistory() {
+            document.getElementById("sidebarHistory").classList.remove('open');
+            document.getElementById("mainContainer").classList.remove('sidebar-open');
+        }
+
+        function renderHistoryCards() {
+            let list = historyData[activeHistoryView] || [];
+            let cont = document.getElementById("sidebarContent");
+            cont.innerHTML = "";
+
+            if(list.length === 0) {
+                cont.innerHTML = `<p style='text-align:center; color:#585b70; margin-top:40px;'>لا توجد سجلات محفوظة هنا بعد.</p>`;
+                return;
+            }
+
+            list.forEach((item, index) => {
+                let card = document.createElement('div');
+                card.className = "history-card";
+                
+                let actionButtons = "";
+                if(activeHistoryView === 'trash') {
+                    actionButtons = `<button class="btn-recovery" onclick="recoverItem(${index})">إستعادة 🔁</button>
+                                     <button class="btn-delete" onclick="permaDelete(${index})">حذف نهائي ❌</button>`;
+                } else {
+                    actionButtons = `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button>
+                                     <button class="btn-delete" onclick="deleteItem(${index})">حذف 🗑️</button>`;
+                }
+
+                card.innerHTML = `
+                    <div class="card-main-line">
+                        <span class="card-duration">${item.duration}</span>
+                        <span class="card-subject">${item.subject}</span>
+                    </div>
+                    <div class="card-desc">${item.desc}</div>
+                    <div class="card-time-row">
+                        <span class="time-tag start">البداية: ${item.startTime}</span>
+                        <span class="time-tag end">النهاية: ${item.endTime}</span>
+                    </div>
+                    <div class="card-bottom-info">
+                        <span>${item.date}</span>
+                        <span>${item.day}</span>
+                    </div>
+                    <div class="card-actions">${actionButtons}</div>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        function deleteItem(idx) {
+            let item = historyData[activeHistoryView].splice(idx, 1)[0];
+            item.originalView = activeHistoryView; 
+            historyData.trash.unshift(item);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+        }
+
+        function recoverItem(idx) {
+            let item = historyData.trash.splice(idx, 1)[0];
+            let target = item.originalView || 'study';
+            delete item.originalView;
+            historyData[target].unshift(item);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+        }
+
+        function permaDelete(idx) {
+            if(confirm("هل أنت متأكد من حذف هذا السجل بشكل نهائي لا يمكن استعادته؟")) {
+                historyData.trash.splice(idx, 1);
+                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+                renderHistoryCards();
+            }
+        }
+
+        function openEditModal(idx) {
+            currentEditingIndex = idx;
+            let item = historyData[activeHistoryView][idx];
+            document.getElementById("editSubjectInput").value = item.subject;
+            document.getElementById("editDescInput").value = item.desc;
+            document.getElementById("editDayInput").value = item.day;
+            document.getElementById("editDateInput").value = item.date;
+            document.getElementById("editModal").style.display = 'flex';
+        }
+
+        function confirmEditSession() {
+            let idx = currentEditingIndex;
+            if(idx === null) return;
+            let item = historyData[activeHistoryView][idx];
+            item.subject = document.getElementById("editSubjectInput").value;
+            item.desc = document.getElementById("editDescInput").value;
+            item.day = document.getElementById("editDayInput").value;
+            item.date = document.getElementById("editDateInput").value;
+            
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            closeModal('editModal');
+            renderHistoryCards();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function openNotebook() {
+            document.getElementById("notebookSidebar").classList.add('open');
+            document.getElementById("mainContainer").classList.add('notebook-open');
+            document.getElementById("topBarNav").classList.add('hide-in-notebook');
+            document.getElementById("appTitle").classList.add('hide-in-notebook');
+            document.getElementById("bottomModeSelectors").classList.add('hide-in-notebook');
+            document.getElementById("cairoWidget").classList.add('hide-in-notebook');
         }
 
         function closeNotebook() {
-            // 1. إرجاع كل العناصر المخفية للظهور فوراً وبشكل طبيعي
-            document.getElementById('cairoWidget').classList.remove('hide-in-notebook');
-            document.getElementById('topBarNav').classList.remove('hide-in-notebook');
-            document.getElementById('appTitle').classList.remove('hide-in-notebook');
-            document.getElementById('bottomModeSelectors').classList.remove('hide-in-notebook');
-            
-            document.getElementById('saveBtnStudy').style.display = 'inline-block';
-            document.getElementById('resetBtnStudy').style.display = 'inline-block';
-            document.getElementById('miniBtnStudy').style.display = 'inline-block';
-
-            // 2. إغلاق القائمة الجانبية وإعادة محاذاة المؤقت للمركز
-            document.getElementById('notebookSidebar').classList.remove('open');
-            document.getElementById('mainContainer').classList.remove('notebook-open');
+            document.getElementById("notebookSidebar").classList.remove('open');
+            document.getElementById("mainContainer").classList.remove('notebook-open');
+            document.getElementById("topBarNav").classList.remove('hide-in-notebook');
+            document.getElementById("appTitle").classList.remove('hide-in-notebook');
+            document.getElementById("bottomModeSelectors").classList.remove('hide-in-notebook');
+            document.getElementById("cairoWidget").classList.remove('hide-in-notebook');
         }
 
         function switchNbPane(subject, paneType) {
-            // تغيير حالة الأزرار النشطة (Tabs)
             document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
             document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
-            
-            // إخفاء مساحات الكتابة القديمة للمادة المحددة
             document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
             document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
 
-            // تفعيل التبويب والمساحة المطلوبة
             if(paneType === 'done') {
                 document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
                 document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
@@ -575,31 +802,30 @@
         }
 
         function saveNotebookData() {
-            let notebookPayload = {
-                arabicDone: document.getElementById('note-arabic-done').value,
-                arabicRem: document.getElementById('note-arabic-rem').value,
-                englishDone: document.getElementById('note-english-done').value,
-                englishRem: document.getElementById('note-english-rem').value,
-                historyDone: document.getElementById('note-history-done').value,
-                historyRem: document.getElementById('note-history-rem').value,
-                physicsDone: document.getElementById('note-physics-done').value,
-                physicsRem: document.getElementById('note-physics-rem').value
+            let nbData = {
+                arabicDone: document.getElementById("note-arabic-done").value,
+                arabicRem: document.getElementById("note-arabic-rem").value,
+                englishDone: document.getElementById("note-english-done").value,
+                englishRem: document.getElementById("note-english-rem").value,
+                historyDone: document.getElementById("note-history-done").value,
+                historyRem: document.getElementById("note-history-rem").value,
+                physicsDone: document.getElementById("note-physics-done").value,
+                physicsRem: document.getElementById("note-physics-rem").value
             };
-            localStorage.setItem('amrNotebookData', JSON.stringify(notebookPayload));
+            localStorage.setItem("savedNotebookData", JSON.stringify(nbData));
         }
 
         function loadNotebookData() {
-            let savedData = JSON.parse(localStorage.getItem('amrNotebookData'));
-            if(savedData) {
-                document.getElementById('note-arabic-done').value = savedData.arabicDone || "";
-                document.getElementById('note-arabic-rem').value = savedData.arabicRem || "";
-                document.getElementById('note-english-done').value = savedData.englishDone || "";
-                document.getElementById('note-english-rem').value = savedData.englishRem || "";
-                document.getElementById('note-history-done').value = savedData.historyDone || "";
-                document.getElementById('note-history-rem').value = savedData.historyRem || "";
-                document.getElementById('note-physics-done').value = savedData.physicsDone || "";
-                document.getElementById('note-physics-rem').value = savedData.physicsRem || "";
-            }
+            let saved = JSON.parse(localStorage.getItem("savedNotebookData"));
+            if(!saved) return;
+            if(saved.arabicDone) document.getElementById("note-arabic-done").value = saved.arabicDone;
+            if(saved.arabicRem) document.getElementById("note-arabic-rem").value = saved.arabicRem;
+            if(saved.englishDone) document.getElementById("note-english-done").value = saved.englishDone;
+            if(saved.englishRem) document.getElementById("note-english-rem").value = saved.englishRem;
+            if(saved.historyDone) document.getElementById("note-history-done").value = saved.historyDone;
+            if(saved.historyRem) document.getElementById("note-history-rem").value = saved.historyRem;
+            if(saved.physicsDone) document.getElementById("note-physics-done").value = saved.physicsDone;
+            if(saved.physicsRem) document.getElementById("note-physics-rem").value = saved.physicsRem;
         }
 
         function printNotebook() {
@@ -607,287 +833,56 @@
             window.print();
             document.body.classList.remove('printing-notebook');
         }
-        /* ========================================================================= */
 
-        function getCairoTimeSnapshotString() { return getCairoPrayerPeriodInfo(currentCairoGlobalDateObject); }
-
-        function getCairoDateSnapshotInfo() {
-            let days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric' });
-            let parts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
-            let d = "", m = "", y = "";
-            parts.forEach(p => {
-                if(p.type === 'day') d = p.value;
-                if(p.type === 'month') m = p.value;
-                if(p.type === 'year') y = p.value;
-            });
-            
-            let formatterText = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', weekday: 'short' }).format(currentCairoGlobalDateObject);
-            let dayName = days[new Date().getDay()]; 
-            if(formatterText.includes("Sun")) dayName = "الأحد";
-            if(formatterText.includes("Mon")) dayName = "الإثنين";
-            if(formatterText.includes("Tue")) dayName = "الثلاثاء";
-            if(formatterText.includes("Wed")) dayName = "الأربعاء";
-            if(formatterText.includes("Thu")) dayName = "الخميس";
-            if(formatterText.includes("Fri")) dayName = "الجمعة";
-            if(formatterText.includes("Sat")) dayName = "السبت";
-
-            return { day: dayName, date: `${d}/${m}/${y}` };
+        function printFullHistory() {
+            document.body.classList.add('printing-history');
+            window.print();
+            document.body.classList.remove('printing-history');
         }
 
         function setupPipStream() {
-            const canvas = document.getElementById('videoCanvas');
-            const video = document.getElementById('pipVideo');
-            const stream = canvas.captureStream(10);
+            const canvas = document.getElementById("videoCanvas");
+            const video = document.getElementById("pipVideo");
+            const stream = canvas.captureStream(30);
             video.srcObject = stream;
         }
 
-        function updateThemeColors() {
-            const root = document.documentElement;
-            if(currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
-            if(currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
-            if(currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
-            if(currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
-        }
-
-        function switchMode(mode) {
-            pauseTimer();
-            document.getElementById(`container-${currentActiveMode}`).classList.remove('active');
-            currentActiveMode = mode;
-            document.getElementById(`container-${currentActiveMode}`).classList.add('active');
-            updateThemeColors();
-            updateDisplay(currentActiveMode);
-            stopAlarm();
-            if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
-        }
-
-        function formatDynamicTime(totalSeconds) {
-            let hours = Math.floor(totalSeconds / 3600);
-            let mins = Math.floor((totalSeconds % 3600) / 60);
-            let secs = totalSeconds % 60;
-            return hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}` : `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function updateDisplay(mode) {
-            let timeStr = formatDynamicTime(timers[mode].seconds);
-            document.getElementById(`display-${mode}`).innerText = timeStr;
-            if(mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
-        }
-
-        function startTimer() {
-            let t = timers[currentActiveMode];
-            if(!sessionStartTime || timers[currentActiveMode].seconds === 0) {
-                sessionStartTime = getCairoTimeSnapshotString();
-            }
-            if(!t.id) {
-                t.id = setInterval(() => {
-                    if(t.type === 'up') {
-                        t.seconds++;
-                        updateDisplay(currentActiveMode);
-                        if(currentActiveMode === 'study' && t.seconds > 0 && t.seconds % 3600 === 0) playAlarm("عاش يا بطل! كملت ساعة كاملة مذاكرة بنجاح.. استمر! 🎯");
-                    } else {
-                        if(t.seconds > 0) {
-                            t.seconds--;
-                            updateDisplay(currentActiveMode);
-                        } else {
-                            pauseTimer();
-                            playAlarm(currentActiveMode === 'break' ? "وقت الاستراحة انتهى! حان وقت العودة للجد وعمرو مستنيك! 📚" : "انتهى الوقت!");
-                        }
-                    }
-                    if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`);
-                }, 1000);
-            }
-        }
-
-        function pauseTimer() { let t = timers[currentActiveMode]; clearInterval(t.id); t.id = null; }
-        function endTimer() { pauseTimer(); sessionStartTime = null; if(timers[currentActiveMode].type === 'up') timers[currentActiveMode].seconds = 0; else setBreakDuration(); updateDisplay(currentActiveMode); if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }
-        function setBreakDuration() { const hoursInput = parseInt(document.getElementById('breakHoursInput').value) || 0; const minsInput = parseInt(document.getElementById('breakMinutesInput').value) || 0; timers.break.seconds = (hoursInput * 3600) + (minsInput * 60); updateDisplay('break'); }
-
-        function saveSessionPrompt() {
-            pauseTimer();
-            if(timers[currentActiveMode].seconds === 0) { alert("المؤقت فارغ! لا يمكن حفظ سجل بدون وقت."); return; }
-            document.getElementById('modalSubjectInput').value = "";
-            document.getElementById('modalDescInput').value = "";
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
-        function confirmSaveSession() {
-            let subjectInput = document.getElementById('modalSubjectInput').value.trim() || "نشاط غير مسمى";
-            let descInput = document.getElementById('modalDescInput').value.trim() || "لم يتم إضافة تفاصيل وصفية لهذه الجلسة.";
+        function drawPipCanvas() {
+            const canvas = document.getElementById("videoCanvas");
+            const ctx = canvas.getContext("2d");
             
-            let endTime = getCairoTimeSnapshotString();
-            let dateInfo = getCairoDateSnapshotInfo();
+            ctx.fillStyle = "#11111b";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            let newRecord = {
-                id: Date.now(),
-                originMode: currentActiveMode, 
-                subject: subjectInput,
-                desc: descInput,
-                duration: formatDynamicTime(timers[currentActiveMode].seconds),
-                date: dateInfo.date,
-                day: dateInfo.day, 
-                startTime: sessionStartTime || getCairoTimeSnapshotString(), 
-                endTime: endTime
-            };
+            let displayElement = document.getElementById(`display-${currentActiveMode}`);
+            let timerStr = displayElement ? displayElement.innerText : "00:00";
 
-            historyData[currentActiveMode].unshift(newRecord);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            document.getElementById('saveModal').style.display = 'none';
-            alert("تم حفظ الجلسة بنظام التوقيت الفعلي لجمهورية مصر العربية! 🌍");
-            endTimer();
+            ctx.fillStyle = "#cba6f7";
+            ctx.font = "bold 44px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(timerStr, canvas.width / 2, canvas.height / 2 - 15);
+
+            let label = currentActiveMode.toUpperCase() + " MODE";
+            ctx.fillStyle = "#a6adc8";
+            ctx.font = "bold 14px sans-serif";
+            ctx.fillText(label, canvas.width / 2, canvas.height / 2 + 25);
+
+            let clockText = document.getElementById("cairoClock").innerText;
+            ctx.fillStyle = "#6c7086";
+            ctx.font = "12px sans-serif";
+            ctx.fillText(clockText, canvas.width / 2, canvas.height / 2 + 48);
         }
 
-        function openHistory(type) {
-            activeHistoryView = type;
-            const sidebar = document.getElementById('sidebarHistory');
-            const title = document.getElementById('sidebarTitle');
-            const mainCont = document.getElementById('mainContainer');
-            const printBtn = document.getElementById('printHistoryBtn');
-
-            let typeNames = { study: 'Study History 📚', break: 'Break History ☕', social: 'Social History 📱', afk: 'AFK History ⏳', trash: 'Trash / Recovery 🗑️' };
-            title.innerText = typeNames[type];
-
-            printBtn.style.display = (type === 'trash') ? 'none' : 'block';
-
-            renderHistoryCards();
-            sidebar.classList.add('open');
-            mainCont.classList.add('sidebar-open');
-        }
-
-        function closeHistory() { document.getElementById('sidebarHistory').classList.remove('open'); document.getElementById('mainContainer').classList.remove('sidebar-open'); }
-
-        function renderHistoryCards() {
-            const container = document.getElementById('sidebarContent');
-            container.innerHTML = "";
-            let list = historyData[activeHistoryView];
-
-            if(list.length === 0) {
-                container.innerHTML = `<p style="text-align:center; color:#585b70; margin-top:40px;">لا توجد سجلات محفوظة هنا حالياً.</p>`;
-                return;
-            }
-
-            list.forEach((item, index) => {
-                let card = document.createElement('div');
-                card.className = 'history-card';
-                card.innerHTML = `
-                    <div class="card-main-line">
-                        <div class="card-subject">${item.subject}</div>
-                        <div class="card-duration">${item.duration}</div>
-                    </div>
-                    <div class="card-desc">${item.desc}</div>
-                    <div class="card-time-row">
-                        <span class="time-tag start">البداية: ${item.startTime}</span>
-                        <span class="time-tag end">النهاية: ${item.endTime}</span>
-                    </div>
-                    <div class="card-bottom-info">
-                        <span>${item.day}</span>
-                        <span>${item.date}</span>
-                    </div>
-                    <div class="card-actions">
-                        ${activeHistoryView === 'trash' ? 
-                            `<button class="btn-recovery" onclick="recoverRecord(${index})">Recovery ↩️</button>
-                             <button class="btn-delete" style="color:#f38ba8;" onclick="hardDeleteRecord(${index})">حذف نهائي ❌</button>` :
-                            `<button class="btn-edit" onclick="openEditModal(${index})">Edit ✏️</button>
-                             <button class="btn-delete" onclick="deleteRecord(${index})">Delete 🗑️</button>`
-                        }
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function deleteRecord(index) {
-            let record = historyData[activeHistoryView][index];
-            historyData.trash.unshift(record);
-            historyData[activeHistoryView].splice(index, 1);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-        }
-
-        function recoverRecord(index) {
-            let record = historyData.trash[index];
-            let targetMode = record.originMode || 'study';
-            historyData[targetMode].unshift(record);
-            historyData.trash.splice(index, 1);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-            alert("تم استرجاع السجل وإعادته لقائمته الأصلية بنجاح! ↩️");
-        }
-
-        function hardDeleteRecord(index) {
-            if(confirm("هل تريد حذف هذا السجل من المهملات بشكل نهائي تماماً؟ لا يمكن استرجاعه مرة أخرى.")) {
-                historyData.trash.splice(index, 1);
-                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-                renderHistoryCards();
-            }
-        }
-
-        function openEditModal(index) {
-            currentEditingIndex = index;
-            let record = historyData[activeHistoryView][index];
-            document.getElementById('editSubjectInput').value = record.subject;
-            document.getElementById('editDescInput').value = record.desc || "";
-            document.getElementById('editDayInput').value = record.day;
-            document.getElementById('editDateInput').value = record.date;
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function confirmEditSession() {
-            let record = historyData[activeHistoryView][currentEditingIndex];
-            record.subject = document.getElementById('editSubjectInput').value.trim() || record.subject;
-            record.desc = document.getElementById('editDescInput').value.trim() || record.desc;
-            record.day = document.getElementById('editDayInput').value.trim() || record.day;
-            record.date = document.getElementById('editDateInput').value.trim() || record.date;
-
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            document.getElementById('editModal').style.display = 'none';
-            renderHistoryCards();
-            alert("تم التعديل بنجاح!");
-        }
-
-        function printFullHistory() { 
-            document.body.classList.add('printing-history');
-            window.print(); 
-            document.body.classList.remove('printing-history');
-        }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function playAlarm(notificationText) {
-            if(audioStopTimeout) clearTimeout(audioStopTimeout);
-            customAudio.pause(); customAudio.currentTime = 0;
-            customAudio.play().catch(e => console.log(e));
-            audioStopTimeout = setTimeout(() => { stopAlarm(); }, 12000);
-            if (Notification.permission === "granted") {
-                new Notification("Study Timer", { body: notificationText });
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => { if (permission === "granted") new Notification("Study Timer", { body: notificationText }); });
-            }
-        }
-
-        function stopAlarm() { if(audioStopTimeout) clearTimeout(audioStopTimeout); customAudio.pause(); customAudio.currentTime = 0; }
-
-        function updatePipCanvas(targetDisplayId) {
-            const canvas = document.getElementById('videoCanvas'); const ctx = canvas.getContext('2d');
-            let textColor = "#a6e3a1";
-            if(currentActiveMode === 'break') textColor = "#cba6f7";
-            if(currentActiveMode === 'social') textColor = "#89b4fa";
-            if(currentActiveMode === 'afk') textColor = "#f9e2af";
-            const textText = document.getElementById(targetDisplayId).innerText;
-            ctx.fillStyle = "#0f0f16"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = textColor; ctx.font = textText.length > 5 ? "bold 42px Courier New" : "bold 55px Courier New";
-            ctx.textAlign = "center"; ctx.fillText(textText, canvas.width/2, 90);
-        }
-
-        async function requestMini(targetDisplayId) {
-            const video = document.getElementById('pipVideo');
+        async function requestMini(displayId) {
+            const video = document.getElementById("pipVideo");
             try {
-                updatePipCanvas(targetDisplayId);
-                if (document.pictureInPictureElement) { await document.exitPictureInPicture(); } 
-                else {
-                    await video.play(); await video.requestPictureInPicture();
-                    setInterval(() => { if(document.pictureInPictureElement) updatePipCanvas(`display-${currentActiveMode}`); }, 500);
-                }
-            } catch (error) { alert("تأكد من الضغط على زر Start أولاً لتفعيل الواجهة قبل تشغيل الـ Mini!"); }
+                video.style.display = 'block';
+                await video.play();
+                await video.requestPictureInPicture();
+            } catch (err) {
+                console.error("Picture-in-Picture failed:", err);
+            }
         }
     </script>
 </body>
