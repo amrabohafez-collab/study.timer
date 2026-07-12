@@ -110,7 +110,7 @@
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* القائمة الجانبية الكبيرة للمفكرة (اليسار) */
+        /* المفكرة */
         .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; border-right: 2px solid #cba6f7; }
         .notebook-sidebar.open { left: 0; }
         
@@ -215,7 +215,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button id="saveBtnStudy" onclick="saveSessionPrompt()">Save</button>
                     <button id="resetBtnStudy" onclick="endTimer()">Reset</button>
-                    <button id="miniBtnStudy" onclick="requestMini('display-study')">Mini</button>
+                    <button id="miniBtnStudy" onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -230,7 +230,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini('display-break')">Mini</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -241,7 +241,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini('display-social')">Mini</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -252,7 +252,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini('display-afk')">Mini</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -265,7 +265,7 @@
         </div>
     </div>
 
-    <!-- واجهة المفكرة الـ Notebook -->
+    <!-- واجهة المفكرة -->
     <div id="notebookSidebar" class="notebook-sidebar">
         <div class="nb-header">
             <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeNotebook()">✕</button>
@@ -339,7 +339,6 @@
                 <h2 id="sidebarTitle">History</h2>
             </div>
         </div>
-        <!-- أزرار التبديل الداخلية المدمجة لـ Social & AFK -->
         <div id="mergeTabsRow" class="nb-tabs-row" style="padding: 10px; display: none;">
             <button id="mergeTabSocial" class="nb-tab-btn" style="color: #89b4fa; border-color: #89b4fa;" onclick="switchMergeView('social')">Social History 📱</button>
             <button id="mergeTabAfk" class="nb-tab-btn" style="color: #f9e2af; border-color: #f9e2af;" onclick="switchMergeView('afk')">AFK History ⏳</button>
@@ -382,36 +381,49 @@
 
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
-    <canvas id="videoCanvas" width="360" height="150" style="display:none;"></canvas>
-    <video id="pipVideo" width="360" height="150" autoplay muted loop style="display:none;"></video>
+    <!-- عناصر الخفاء الخاصة بالـ Mini Mode -->
+    <canvas id="videoCanvas" width="400" height="160" style="display:none;"></canvas>
+    <video id="pipVideo" autoplay muted playsinline style="display:none;"></video>
 
     <script>
         let timers = {
-            study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up', id: null },
-            break: { seconds: 300, type: 'down', id: null },
-            social: { seconds: 0, type: 'up', id: null },
-            afk: { seconds: 0, type: 'up', id: null }
+            study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up' },
+            break: { seconds: 300, type: 'down', default: 300 },
+            social: { seconds: 0, type: 'up' },
+            afk: { seconds: 0, type: 'up' }
         };
 
         let currentActiveMode = 'study';
+        let isRunning = false;
+        let globalIntervalId = null;
+        let lastTimestamp = null; // لحل مشكلة توقف المؤقت في الخلفية بالاعتماد على توقيت النظام الفعلي
+
         let sessionStartTime = null; 
         let currentCairoGlobalDateObject = new Date(); 
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
-        
         let activeHistoryView = 'study'; 
         let currentEditingIndex = null;
 
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
 
+        // متغيرات نافذة المصغر Mini
+        let canvasStream = null;
+        let pipCanvas = document.getElementById('videoCanvas');
+        let pipCtx = pipCanvas.getContext('2d');
+        let pipVideo = document.getElementById('pipVideo');
+
         window.onload = function() {
             updateDisplay('study');
+            updateDisplay('break');
+            updateDisplay('social');
+            updateDisplay('afk');
             setBreakDuration();
-            setupPipStream();
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
             loadNotebookData();
+            setupPipStream();
         }
 
         function getCairoPrayerPeriodInfo(dateObj) {
@@ -474,7 +486,152 @@
             }, 1000);
         }
 
-        // ==================== السجلات المدمجة وعرضها ====================
+        // ==================== محرك العداد الذكي (يمنع التوقف في الخلفية) ====================
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            lastTimestamp = Date.now();
+            
+            if (!sessionStartTime) {
+                let now = new Date();
+                sessionStartTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+
+            globalIntervalId = setInterval(() => {
+                let currentTimestamp = Date.now();
+                let deltaSeconds = Math.floor((currentTimestamp - lastTimestamp) / 1000);
+                
+                if (deltaSeconds >= 1) {
+                    let modeData = timers[currentActiveMode];
+                    if (modeData.type === 'up') {
+                        modeData.seconds += deltaSeconds;
+                    } else {
+                        modeData.seconds -= deltaSeconds;
+                        if (modeData.seconds <= 0) {
+                            modeData.seconds = 0;
+                            pauseTimer();
+                            customAudio.play().catch(e => console.log("Audio play deferred"));
+                        }
+                    }
+                    
+                    lastTimestamp = currentTimestamp; // تحديث الطابع الزمني
+                    updateDisplay(currentActiveMode);
+                    if (currentActiveMode === 'study') {
+                        localStorage.setItem('savedStudySeconds', modeData.seconds);
+                    }
+                    drawPipCanvas(); // تحديث شاشة الـ Mini إن كانت نشطة
+                }
+            }, 200);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(globalIntervalId);
+        }
+
+        function endTimer() {
+            pauseTimer();
+            let modeData = timers[currentActiveMode];
+            if (modeData.type === 'up') {
+                modeData.seconds = 0;
+            } else {
+                modeData.seconds = modeData.default || 300;
+            }
+            if (currentActiveMode === 'study') localStorage.removeItem('savedStudySeconds');
+            sessionStartTime = null;
+            updateDisplay(currentActiveMode);
+            drawPipCanvas();
+        }
+
+        function switchMode(mode) {
+            pauseTimer();
+            document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
+            document.getElementById(`container-${mode}`).classList.add('active');
+            currentActiveMode = mode;
+            updateThemeColors();
+            updateDisplay(mode);
+            drawPipCanvas();
+        }
+
+        function formatTime(totalSeconds) {
+            let hrs = Math.floor(totalSeconds / 3600);
+            let mins = Math.floor((totalSeconds % 3600) / 60);
+            let secs = totalSeconds % 60;
+            if (hrs > 0) {
+                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateDisplay(mode) {
+            let el = document.getElementById(`display-${mode}`);
+            if (el) el.innerText = formatTime(timers[mode].seconds);
+        }
+
+        function setBreakDuration() {
+            if (isRunning && currentActiveMode === 'break') return;
+            let hrs = parseInt(document.getElementById("breakHoursInput").value) || 0;
+            let mins = parseInt(document.getElementById("breakMinutesInput").value) || 0;
+            timers.break.seconds = (hrs * 3600) + (mins * 60);
+            timers.break.default = timers.break.seconds;
+            updateDisplay('break');
+            drawPipCanvas();
+        }
+
+        function updateThemeColors() {
+            let colors = { study: '#a6e3a1', break: '#cba6f7', social: '#89b4fa', afk: '#f9e2af' };
+            document.documentElement.style.setProperty('--current-theme', colors[currentActiveMode]);
+        }
+
+        // ==================== ميزة الـ Mini (Picture in Picture) المصلحة ====================
+        function setupPipStream() {
+            canvasStream = pipCanvas.captureStream(10);
+            pipVideo.srcObject = canvasStream;
+            drawPipCanvas();
+        }
+
+        function drawPipCanvas() {
+            let themeHexColors = { study: '#a6e3a1', break: '#cba6f7', social: '#89b4fa', afk: '#f9e2af' };
+            let currentHex = themeHexColors[currentActiveMode];
+
+            pipCtx.fillStyle = '#11111b';
+            pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+            
+            // رسم خط علوي جمالي بلون الوضع الحالي
+            pipCtx.fillStyle = currentHex;
+            pipCtx.fillRect(0, 0, pipCanvas.width, 6);
+
+            // رسم الوقت
+            pipCtx.fillStyle = currentHex;
+            pipCtx.font = 'bold 55px sans-serif';
+            pipCtx.textAlign = 'center';
+            pipCtx.textBaseline = 'middle';
+            let timeStr = formatTime(timers[currentActiveMode].seconds);
+            pipCtx.fillText(timeStr, pipCanvas.width / 2, pipCanvas.height / 2 - 5);
+
+            // رسم اسم الوضع بالأسفل
+            pipCtx.fillStyle = '#a6adc8';
+            pipCtx.font = 'bold 16px sans-serif';
+            let modeLabels = { study: 'Study Mode 📚', break: 'Break Mode ☕', social: 'Social Timer 📱', afk: 'AFK Timer ⏳' };
+            pipCtx.fillText(modeLabels[currentActiveMode], pipCanvas.width / 2, pipCanvas.height - 30);
+        }
+
+        async function requestMini() {
+            try {
+                drawPipCanvas();
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else {
+                    await pipVideo.play();
+                    await pipVideo.requestPictureInPicture();
+                }
+            } catch (error) {
+                console.error("فشل وضع مصغر الشاشة Mini Mode:", error);
+                alert("متصفحك لا يدعم خاصية المصغر التلقائي للمؤقت، يرجى استخدام متصفح حديث.");
+            }
+        }
+
+        // ==================== نظام السجلات والمفكرة والمودالز ====================
         function openMergeHistory(initialView) {
             document.getElementById("mergeTabsRow").style.display = 'flex';
             openHistory(initialView);
@@ -515,196 +672,183 @@
                 card.className = "history-card";
                 let actionButtons = activeHistoryView === 'trash' ? 
                     `<button class="btn-recovery" onclick="recoverItem(${index})">استعادة 🔁</button><button class="btn-delete" onclick="permaDelete(${index})">حذف نهائي ❌</button>` :
-                    `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button><button class="btn-delete" onclick="deleteItem(${index})">حذف 🗑️</button>`;
-                
+                    `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button><button class="btn-delete" onclick="moveToTrash(${index})">حذف 🗑️</button>`;
+
                 card.innerHTML = `
-                    <div class="card-main-line"><span class="card-duration">${item.duration}</span><span class="card-subject">${item.subject}</span></div>
-                    <div class="card-desc">${item.desc}</div>
-                    <div class="card-time-row"><span class="time-tag start">البداية: ${item.startTime}</span><span class="time-tag end">النهاية: ${item.endTime}</span></div>
-                    <div class="card-bottom-info"><span>${item.date}</span><span>${item.day}</span></div>
+                    <div class="card-main-line">
+                        <span class="card-duration">${item.duration}</span>
+                        <span class="card-subject">${item.subject || 'نشاط بدون عنوان'}</span>
+                    </div>
+                    ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+                    <div class="card-time-row">
+                        <span class="time-tag start">البدء: ${item.start}</span>
+                        <span class="time-tag end">النهاية: ${item.end}</span>
+                    </div>
+                    <div class="card-bottom-info">
+                        <span>${item.date}</span>
+                        <span>${item.day}</span>
+                    </div>
                     <div class="card-actions">${actionButtons}</div>
                 `;
                 cont.appendChild(card);
             });
         }
 
-        function toggleMainElements(hide) {
-            let action = hide ? 'add' : 'remove';
-            document.getElementById("topBarNav").classList[action]('hide-in-notebook');
-            document.getElementById("appTitle").classList[action]('hide-in-notebook');
-            document.getElementById("bottomModeSelectors").classList[action]('hide-in-notebook');
-            document.getElementById("cairoWidget").classList[action]('hide-in-notebook');
-        }
-
-        function openNotebook() {
-            document.getElementById("notebookSidebar").classList.add('open');
-            document.getElementById("mainContainer").classList.add('notebook-open');
-            toggleMainElements(true);
-        }
-
-        function closeNotebook() {
-            document.getElementById("notebookSidebar").classList.remove('open');
-            document.getElementById("mainContainer").classList.remove('notebook-open');
-            toggleMainElements(false);
-        }
-
-        function updateDisplay(mode) {
-            let sec = timers[mode].seconds;
-            let h = Math.floor(sec / 3600);
-            let m = Math.floor((sec % 3600) / 60);
-            let s = sec % 60;
-            document.getElementById(`display-${mode}`).innerText = h > 0 ? 
-                `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}` : 
-                `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-        }
-
-        function setBreakDuration() {
-            if(timers.break.id) return;
-            let h = parseInt(document.getElementById("breakHoursInput").value) || 0;
-            let m = parseInt(document.getElementById("breakMinutesInput").value) || 0;
-            timers.break.seconds = (h * 3600) + (m * 60);
-            updateDisplay('break');
-        }
-
-        function switchMode(mode) {
-            pauseTimer();
-            document.querySelectorAll('.timer-box').forEach(b => b.classList.remove('active'));
-            document.getElementById(`container-${mode}`).classList.add('active');
-            currentActiveMode = mode;
-            updateThemeColors();
-            updateDisplay(mode);
-        }
-
-        function updateThemeColors() {
-            let root = document.documentElement;
-            root.style.setProperty('--current-theme', `var(--${currentActiveMode}-color)`);
-        }
-
-        function startTimer() {
-            if(timers[currentActiveMode].id) return;
-            if(!sessionStartTime) sessionStartTime = getCairoPrayerPeriodInfo(new Date());
-            timers[currentActiveMode].id = setInterval(() => {
-                if(timers[currentActiveMode].type === 'up') {
-                    timers[currentActiveMode].seconds++;
-                    if(currentActiveMode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
-                } else {
-                    if(timers[currentActiveMode].seconds > 0) timers[currentActiveMode].seconds--;
-                    else { clearInterval(timers[currentActiveMode].id); timers[currentActiveMode].id = null; return; }
-                }
-                updateDisplay(currentActiveMode);
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            if(timers[currentActiveMode].id) { clearInterval(timers[currentActiveMode].id); timers[currentActiveMode].id = null; }
-        }
-
-        function endTimer() {
-            pauseTimer();
-            if(currentActiveMode === 'break') setBreakDuration();
-            else { timers[currentActiveMode].seconds = 0; if(currentActiveMode === 'study') localStorage.removeItem('savedStudySeconds'); updateDisplay(currentActiveMode); }
-            sessionStartTime = null;
-        }
-
         function saveSessionPrompt() {
-            if(timers[currentActiveMode].seconds <= 0 && currentActiveMode !== 'break') return;
+            let durationStr = formatTime(timers[currentActiveMode].seconds);
             document.getElementById("modalSubjectInput").value = "";
             document.getElementById("modalDescInput").value = "";
-            document.getElementById("saveModal").style.display = 'flex';
+            document.getElementById("modalHeaderTitle").innerText = `حفظ سجل (${durationStr})`;
+            document.getElementById("saveModal").style.display = "flex";
         }
 
         function confirmSaveSession() {
-            let sub = document.getElementById("modalSubjectInput").value.trim() || "بدون عنوان";
-            let desc = document.getElementById("modalDescInput").value.trim() || "لا يوجد وصف";
-            let endTimeStr = getCairoPrayerPeriodInfo(new Date());
-            let startTimeStr = sessionStartTime || endTimeStr;
-            let sec = timers[currentActiveMode].seconds;
-            let durationStr = `${Math.floor(sec/3600)}h ${Math.floor((sec%3600)/60)}m ${sec%60}s`;
-
+            let now = new Date();
+            let endTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
-            let dateParts = dateFormatter.formatToParts(new Date());
-            let dayNameStr = ""; let fullDateStr = "";
-            dateParts.forEach(p => { if(p.type==='weekday') dayNameStr = p.value; if(p.type==='day'||p.type==='month'||p.type==='year') fullDateStr += p.value + (p.type==='year'?'':'/'); });
+            let dateParts = dateFormatter.formatToParts(now);
+            
+            let dayNameStr = "الأحد"; let dayNum = ""; let monthNum = ""; let yearNum = "";
+            dateParts.forEach(p => {
+                if (p.type === 'weekday') dayNameStr = p.value;
+                if (p.type === 'day') dayNum = p.value;
+                if (p.type === 'month') monthNum = p.value;
+                if (p.type === 'year') yearNum = p.value;
+            });
 
-            historyData[currentActiveMode].unshift({ id: Date.now(), subject: sub, desc: desc, duration: durationStr, startTime: startTimeStr, endTime: endTimeStr, day: dayNameStr, date: fullDateStr });
+            let newRecord = {
+                subject: document.getElementById("modalSubjectInput").value.trim(),
+                desc: document.getElementById("modalDescInput").value.trim(),
+                duration: formatTime(timers[currentActiveMode].seconds),
+                start: sessionStartTime || endTimeStr,
+                end: endTimeStr,
+                date: `${dayNum}/${monthNum}/${yearNum}`,
+                day: dayNameStr,
+                originMode: currentActiveMode
+            };
+
+            historyData[currentActiveMode].unshift(newRecord);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             closeModal('saveModal');
             endTimer();
+            if(document.getElementById("sidebarHistory").classList.contains('open') && activeHistoryView === currentActiveMode) {
+                renderHistoryCards();
+            }
         }
 
-        function deleteItem(idx) {
-            let item = historyData[activeHistoryView].splice(idx, 1)[0];
-            item.originalView = activeHistoryView; 
+        function moveToTrash(index) {
+            let item = historyData[activeHistoryView].splice(index, 1)[0];
+            item.oldMode = activeHistoryView;
             historyData.trash.unshift(item);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             renderHistoryCards();
         }
 
-        function recoverItem(idx) {
-            let item = historyData.trash.splice(idx, 1)[0];
-            historyData[item.originalView || 'study'].unshift(item);
+        function recoverItem(index) {
+            let item = historyData.trash.splice(index, 1)[0];
+            let targetMode = item.oldMode || 'study';
+            delete item.oldMode;
+            historyData[targetMode].unshift(item);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             renderHistoryCards();
         }
 
-        function permaDelete(idx) {
-            if(confirm("حذف نهائي؟")) { historyData.trash.splice(idx, 1); localStorage.setItem('timerHistoryData', JSON.stringify(historyData)); renderHistoryCards(); }
+        function permaDelete(index) {
+            if(confirm("هل أنت متأكد من الحذف النهائي؟ لا يمكن التراجع.")) {
+                historyData.trash.splice(index, 1);
+                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+                renderHistoryCards();
+            }
         }
 
-        function openEditModal(idx) {
-            currentEditingIndex = idx;
-            let item = historyData[activeHistoryView][idx];
-            document.getElementById("editSubjectInput").value = item.subject;
-            document.getElementById("editDescInput").value = item.desc;
-            document.getElementById("editDayInput").value = item.day;
-            document.getElementById("editDateInput").value = item.date;
-            document.getElementById("editModal").style.display = 'flex';
+        function openEditModal(index) {
+            currentEditingIndex = index;
+            let item = historyData[activeHistoryView][index];
+            document.getElementById("editSubjectInput").value = item.subject || "";
+            document.getElementById("editDescInput").value = item.desc || "";
+            document.getElementById("editDayInput").value = item.day || "";
+            document.getElementById("editDateInput").value = item.date || "";
+            document.getElementById("editModal").style.display = "flex";
         }
 
         function confirmEditSession() {
             let item = historyData[activeHistoryView][currentEditingIndex];
-            item.subject = document.getElementById("editSubjectInput").value;
-            item.desc = document.getElementById("editDescInput").value;
-            item.day = document.getElementById("editDayInput").value;
-            item.date = document.getElementById("editDateInput").value;
+            item.subject = document.getElementById("editSubjectInput").value.trim();
+            item.desc = document.getElementById("editDescInput").value.trim();
+            item.day = document.getElementById("editDayInput").value.trim();
+            item.date = document.getElementById("editDateInput").value.trim();
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             closeModal('editModal');
             renderHistoryCards();
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
-        function switchNbPane(sub, type) {
-            document.getElementById(`tab-${sub}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${sub}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${sub}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${sub}-rem`).classList.remove('active-pane');
-            document.getElementById(`tab-${sub}-${type}`).classList.add('active-tab');
-            document.getElementById(`pane-${sub}-${type}`).classList.add('active-pane');
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // ==================== نظام المفكرة المدعوم ====================
+        function openNotebook() {
+            document.getElementById("mainContainer").classList.add('notebook-open');
+            document.getElementById("notebookSidebar").classList.add('open');
+        }
+
+        function closeNotebook() {
+            document.getElementById("notebookSidebar").classList.remove('open');
+            document.getElementById("mainContainer").classList.remove('notebook-open');
+        }
+
+        function switchNbPane(subject, paneType) {
+            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
+            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
+
+            if(paneType === 'done') {
+                document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
+                document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
+            } else {
+                document.getElementById(`tab-${subject}-rem`).classList.add('active-tab');
+                document.getElementById(`pane-${subject}-rem`).classList.add('active-pane');
+            }
         }
 
         function saveNotebookData() {
-            localStorage.setItem("savedNotebookData", JSON.stringify({
-                arabicDone: document.getElementById("note-arabic-done").value, arabicRem: document.getElementById("note-arabic-rem").value,
-                englishDone: document.getElementById("note-english-done").value, englishRem: document.getElementById("note-english-rem").value,
-                historyDone: document.getElementById("note-history-done").value, historyRem: document.getElementById("note-history-rem").value,
-                physicsDone: document.getElementById("note-physics-done").value, physicsRem: document.getElementById("note-physics-rem").value
-            }));
+            let data = {
+                arabic_done: document.getElementById("note-arabic-done").value,
+                arabic_rem: document.getElementById("note-arabic-rem").value,
+                english_done: document.getElementById("note-english-done").value,
+                english_rem: document.getElementById("note-english-rem").value,
+                history_done: document.getElementById("note-history-done").value,
+                history_rem: document.getElementById("note-history-rem").value,
+                physics_done: document.getElementById("note-physics-done").value,
+                physics_rem: document.getElementById("note-physics-rem").value,
+            };
+            localStorage.setItem('notebookSaveData', JSON.stringify(data));
         }
 
         function loadNotebookData() {
-            let saved = JSON.parse(localStorage.getItem("savedNotebookData"));
-            if(!saved) return;
-            document.getElementById("note-arabic-done").value = saved.arabicDone || ""; document.getElementById("note-arabic-rem").value = saved.arabicRem || "";
-            document.getElementById("note-english-done").value = saved.englishDone || ""; document.getElementById("note-english-rem").value = saved.englishRem || "";
-            document.getElementById("note-history-done").value = saved.historyDone || ""; document.getElementById("note-history-rem").value = saved.historyRem || "";
-            document.getElementById("note-physics-done").value = saved.physicsDone || ""; document.getElementById("note-physics-rem").value = saved.physicsRem || "";
+            let stored = JSON.parse(localStorage.getItem('notebookSaveData'));
+            if(stored) {
+                if(stored.arabic_done) document.getElementById("note-arabic-done").value = stored.arabic_done;
+                if(stored.arabic_rem) document.getElementById("note-arabic-rem").value = stored.arabic_rem;
+                if(stored.english_done) document.getElementById("note-english-done").value = stored.english_done;
+                if(stored.english_rem) document.getElementById("note-english-rem").value = stored.english_rem;
+                if(stored.history_done) document.getElementById("note-history-done").value = stored.history_done;
+                if(stored.history_rem) document.getElementById("note-history-rem").value = stored.history_rem;
+                if(stored.physics_done) document.getElementById("note-physics-done").value = stored.physics_done;
+                if(stored.physics_rem) document.getElementById("note-physics-rem").value = stored.physics_rem;
+            }
         }
 
-        function printNotebook() { document.body.classList.add('printing-notebook'); window.print(); document.body.classList.remove('printing-notebook'); }
-        function printFullHistory() { window.print(); }
-        function setupPipStream() {}
-        function requestMini() {}
+        function printNotebook() {
+            document.body.classList.add('printing-notebook');
+            window.print();
+            document.body.classList.remove('printing-notebook');
+        }
+
+        function printFullHistory() {
+            window.print();
+        }
     </script>
 </body>
 </html>
