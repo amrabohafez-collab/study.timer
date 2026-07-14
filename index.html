@@ -165,6 +165,10 @@
         .time-tag.start { background: rgba(166, 227, 161, 0.1); color: #a6e3a1; }
         .time-tag.end { background: rgba(243, 139, 168, 0.1); color: #f38ba8; }
         
+        /* تصميم ذكي وناعم لعرض مدة التوقف */
+        .pause-tag-row { display: flex; justify-content: center; margin-top: 5px; }
+        .pause-tag { background: rgba(249, 226, 175, 0.08); color: #f9e2af; border: 1px dashed rgba(249, 226, 175, 0.25); font-size: 0.73rem; padding: 2px 10px; border-radius: 12px; font-weight: 500; text-align: center; direction: rtl; }
+
         .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
         .card-actions { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; align-items: center;}
         .card-actions button { padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #313244; background: none;}
@@ -386,20 +390,23 @@
     <video id="pipVideo" autoplay muted playsinline style="display:none;"></video>
 
     <script>
+        // استدعاء القيم المحفوظة مسبقًا لجميع الأوضاع لحماية العدادات من الضياع عند الخروج بالخطأ
         let timers = {
             study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up' },
-            break: { seconds: 300, type: 'down', default: 300 },
-            social: { seconds: 0, type: 'up' },
-            afk: { seconds: 0, type: 'up' }
+            break: { seconds: parseInt(localStorage.getItem('savedBreakSeconds')) || 300, type: 'down', default: 300 },
+            social: { seconds: parseInt(localStorage.getItem('savedSocialSeconds')) || 0, type: 'up' },
+            afk: { seconds: parseInt(localStorage.getItem('savedAfkSeconds')) || 0, type: 'up' }
         };
 
         let currentActiveMode = 'study';
         let isRunning = false;
         let globalIntervalId = null;
-        let lastTimestamp = null; // لحل مشكلة توقف المؤقت في الخلفية بالاعتماد على توقيت النظام الفعلي
+        let lastTimestamp = null; 
 
+        // متغيرات تتبع جلسة الوقت الحالي والتوقفات
         let sessionStartTime = null; 
         let currentCairoGlobalDateObject = new Date(); 
+        let pauseTrackingArray = []; // لتسجيل لحظات التوقف والاستئناف بدقة
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
         let activeHistoryView = 'study'; 
@@ -415,17 +422,24 @@
         let pipVideo = document.getElementById('pipVideo');
 
         window.onload = function() {
+            // تحديث العرض لكافة المؤقتات بناءً على القيمة المخزنة
             updateDisplay('study');
             updateDisplay('break');
             updateDisplay('social');
             updateDisplay('afk');
-            setBreakDuration();
+            
+            // قراءة وتعيين إعدادات وقت الاستراحة المخصص إن وجد
+            if (localStorage.getItem('savedBreakDefault')) {
+                timers.break.default = parseInt(localStorage.getItem('savedBreakDefault'));
+            }
+            
             updateThemeColors();
             startCairoLiveClockAndEngine(); 
             loadNotebookData();
             setupPipStream();
         }
 
+        // دالة تحويل التوقيت إلى الصياغة العربية (ظهراً، عصراً، عشاءً.. إلخ) بدلاً من AM/PM
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
             let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
@@ -486,15 +500,23 @@
             }, 1000);
         }
 
-        // ==================== محرك العداد الذكي (يمنع التوقف في الخلفية) ====================
+        // ==================== محرك العداد الذكي وحساب فترات التوقف ====================
         function startTimer() {
             if (isRunning) return;
             isRunning = true;
             lastTimestamp = Date.now();
             
+            // في حال تم الاستئناف من التوقف، سجل نهاية التوقف
+            if (sessionStartTime && pauseTrackingArray.length > 0) {
+                let lastPause = pauseTrackingArray[pauseTrackingArray.length - 1];
+                if (lastPause.end === null) {
+                    lastPause.end = Date.now();
+                }
+            }
+
             if (!sessionStartTime) {
-                let now = new Date();
-                sessionStartTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                sessionStartTime = getCairoPrayerPeriodInfo(new Date());
+                pauseTrackingArray = []; // تصفير قائمة التوقفات للجلسة الجديدة
             }
 
             globalIntervalId = setInterval(() => {
@@ -514,19 +536,42 @@
                         }
                     }
                     
-                    lastTimestamp = currentTimestamp; // تحديث الطابع الزمني
+                    lastTimestamp += deltaSeconds * 1000; 
+                    
                     updateDisplay(currentActiveMode);
-                    if (currentActiveMode === 'study') {
-                        localStorage.setItem('savedStudySeconds', modeData.seconds);
-                    }
-                    drawPipCanvas(); // تحديث شاشة الـ Mini إن كانت نشطة
+                    
+                    // حفظ لحظي وتلقائي لحالة العداد بالمتصفح لمنع ضياع الوقت عند الخروج الخاطئ
+                    saveCurrentTimerToLocalStorage(currentActiveMode);
+                    
+                    drawPipCanvas(); 
                 }
             }, 200);
         }
 
         function pauseTimer() {
+            if (!isRunning) return;
             isRunning = false;
             clearInterval(globalIntervalId);
+            
+            // إضافة وقت التوقف الحالي للمصفوفة
+            pauseTrackingArray.push({
+                start: Date.now(),
+                end: null
+            });
+        }
+
+        function saveCurrentTimerToLocalStorage(mode) {
+            if (mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
+            if (mode === 'break') localStorage.setItem('savedBreakSeconds', timers.break.seconds);
+            if (mode === 'social') localStorage.setItem('savedSocialSeconds', timers.social.seconds);
+            if (mode === 'afk') localStorage.setItem('savedAfkSeconds', timers.afk.seconds);
+        }
+
+        function clearTimerLocalStorage(mode) {
+            if (mode === 'study') localStorage.removeItem('savedStudySeconds');
+            if (mode === 'break') localStorage.removeItem('savedBreakSeconds');
+            if (mode === 'social') localStorage.removeItem('savedSocialSeconds');
+            if (mode === 'afk') localStorage.removeItem('savedAfkSeconds');
         }
 
         function endTimer() {
@@ -537,12 +582,15 @@
             } else {
                 modeData.seconds = modeData.default || 300;
             }
-            if (currentActiveMode === 'study') localStorage.removeItem('savedStudySeconds');
+            
+            clearTimerLocalStorage(currentActiveMode);
             sessionStartTime = null;
+            pauseTrackingArray = [];
             updateDisplay(currentActiveMode);
             drawPipCanvas();
         }
 
+        // ==================== دوال التحكم والواجهة الأساسية ====================
         function switchMode(mode) {
             pauseTimer();
             document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
@@ -550,7 +598,14 @@
             currentActiveMode = mode;
             updateThemeColors();
             updateDisplay(mode);
-            drawPipCanvas();
+        }
+
+        function updateThemeColors() {
+            let root = document.documentElement;
+            if (currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
+            if (currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            if (currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
+            if (currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
         }
 
         function formatTime(totalSeconds) {
@@ -564,282 +619,229 @@
         }
 
         function updateDisplay(mode) {
-            let el = document.getElementById(`display-${mode}`);
-            if (el) el.innerText = formatTime(timers[mode].seconds);
+            let displayElement = document.getElementById(`display-${mode}`);
+            if (displayElement) {
+                displayElement.innerText = formatTime(timers[mode].seconds);
+            }
         }
 
         function setBreakDuration() {
-            if (isRunning && currentActiveMode === 'break') return;
-            let hrs = parseInt(document.getElementById("breakHoursInput").value) || 0;
-            let mins = parseInt(document.getElementById("breakMinutesInput").value) || 0;
-            timers.break.seconds = (hrs * 3600) + (mins * 60);
-            timers.break.default = timers.break.seconds;
+            let hrs = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            let mins = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            let total = (hrs * 3600) + (mins * 60);
+            timers.break.seconds = total;
+            timers.break.default = total;
+            localStorage.setItem('savedBreakDefault', total);
+            localStorage.setItem('savedBreakSeconds', total);
             updateDisplay('break');
-            drawPipCanvas();
         }
 
-        function updateThemeColors() {
-            let colors = { study: '#a6e3a1', break: '#cba6f7', social: '#89b4fa', afk: '#f9e2af' };
-            document.documentElement.style.setProperty('--current-theme', colors[currentActiveMode]);
+        // ==================== المفكرة وسجل الحفظ ====================
+        function openNotebook() {
+            document.getElementById('notebookSidebar').classList.add('open');
+            document.getElementById('mainContainer').classList.add('notebook-open');
         }
 
-        // ==================== ميزة الـ Mini (Picture in Picture) المصلحة ====================
-        function setupPipStream() {
-            canvasStream = pipCanvas.captureStream(10);
-            pipVideo.srcObject = canvasStream;
-            drawPipCanvas();
+        function closeNotebook() {
+            document.getElementById('notebookSidebar').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('notebook-open');
         }
 
-        function drawPipCanvas() {
-            let themeHexColors = { study: '#a6e3a1', break: '#cba6f7', social: '#89b4fa', afk: '#f9e2af' };
-            let currentHex = themeHexColors[currentActiveMode];
-
-            pipCtx.fillStyle = '#11111b';
-            pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+        function switchNbPane(subject, type) {
+            document.querySelectorAll(`.subject-block.${subject} .nb-tab-btn`).forEach(b => b.classList.remove('active-tab'));
+            document.querySelectorAll(`.subject-block.${subject} .nb-text-container`).forEach(p => p.classList.remove('active-pane'));
             
-            // رسم خط علوي جمالي بلون الوضع الحالي
-            pipCtx.fillStyle = currentHex;
-            pipCtx.fillRect(0, 0, pipCanvas.width, 6);
-
-            // رسم الوقت
-            pipCtx.fillStyle = currentHex;
-            pipCtx.font = 'bold 55px sans-serif';
-            pipCtx.textAlign = 'center';
-            pipCtx.textBaseline = 'middle';
-            let timeStr = formatTime(timers[currentActiveMode].seconds);
-            pipCtx.fillText(timeStr, pipCanvas.width / 2, pipCanvas.height / 2 - 5);
-
-            // رسم اسم الوضع بالأسفل
-            pipCtx.fillStyle = '#a6adc8';
-            pipCtx.font = 'bold 16px sans-serif';
-            let modeLabels = { study: 'Study Mode 📚', break: 'Break Mode ☕', social: 'Social Timer 📱', afk: 'AFK Timer ⏳' };
-            pipCtx.fillText(modeLabels[currentActiveMode], pipCanvas.width / 2, pipCanvas.height - 30);
+            document.getElementById(`tab-${subject}-${type}`).classList.add('active-tab');
+            document.getElementById(`pane-${subject}-${type}`).classList.add('active-pane');
         }
 
-        async function requestMini() {
-            try {
-                drawPipCanvas();
-                if (document.pictureInPictureElement) {
-                    await document.exitPictureInPicture();
-                } else {
-                    await pipVideo.play();
-                    await pipVideo.requestPictureInPicture();
-                }
-            } catch (error) {
-                console.error("فشل وضع مصغر الشاشة Mini Mode:", error);
-                alert("متصفحك لا يدعم خاصية المصغر التلقائي للمؤقت، يرجى استخدام متصفح حديث.");
-            }
+        function saveNotebookData() {
+            let data = {};
+            document.querySelectorAll('.nb-textarea').forEach(area => {
+                data[area.id] = area.value;
+            });
+            localStorage.setItem('notebookData', JSON.stringify(data));
         }
 
-        // ==================== نظام السجلات والمفكرة والمودالز ====================
-        function openMergeHistory(initialView) {
-            document.getElementById("mergeTabsRow").style.display = 'flex';
-            openHistory(initialView);
+        function loadNotebookData() {
+            let data = JSON.parse(localStorage.getItem('notebookData')) || {};
+            Object.keys(data).forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.value = data[id];
+            });
         }
 
-        function switchMergeView(view) {
-            activeHistoryView = view;
-            document.getElementById("sidebarTitle").innerText = view.toUpperCase() + " HISTORY";
-            renderHistoryCards();
+        function openHistory(type) {
+            activeHistoryView = type;
+            document.getElementById('sidebarTitle').innerText = `${type.toUpperCase()} History`;
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('mergeTabsRow').style.display = 'none';
+            renderHistoryContent();
         }
 
-        function openHistory(view) {
-            activeHistoryView = view;
-            if (view !== 'social' && view !== 'afk') {
-                document.getElementById("mergeTabsRow").style.display = 'none';
-            }
-            document.getElementById("sidebarTitle").innerText = view.toUpperCase() + " HISTORY";
-            document.getElementById("mainContainer").classList.add('sidebar-open');
-            document.getElementById("sidebarHistory").classList.add('open');
-            renderHistoryCards();
+        function openMergeHistory(primaryType) {
+            activeHistoryView = primaryType;
+            document.getElementById('sidebarTitle').innerText = `Merged History`;
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('mergeTabsRow').style.display = 'flex';
+            switchMergeView(primaryType);
+        }
+
+        function switchMergeView(type) {
+            activeHistoryView = type;
+            document.querySelectorAll('#mergeTabsRow button').forEach(b => b.style.opacity = '0.5');
+            if (type === 'social') document.getElementById('mergeTabSocial').style.opacity = '1';
+            if (type === 'afk') document.getElementById('mergeTabAfk').style.opacity = '1';
+            renderHistoryContent();
         }
 
         function closeHistory() {
-            document.getElementById("sidebarHistory").classList.remove('open');
-            document.getElementById("mainContainer").classList.remove('sidebar-open');
+            document.getElementById('sidebarHistory').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('sidebar-open');
         }
 
-        function renderHistoryCards() {
+        function renderHistoryContent() {
+            let container = document.getElementById('sidebarContent');
+            container.innerHTML = '';
             let list = historyData[activeHistoryView] || [];
-            let cont = document.getElementById("sidebarContent");
-            cont.innerHTML = "";
-            if(list.length === 0) {
-                cont.innerHTML = `<p style='text-align:center; color:#585b70; margin-top:40px;'>لا توجد سجلات.</p>`;
+            if (list.length === 0) {
+                container.innerHTML = `<p style="color:#6c7086; text-align:center; padding: 20px;">لا يوجد سجلات حالياً.</p>`;
                 return;
             }
             list.forEach((item, index) => {
                 let card = document.createElement('div');
-                card.className = "history-card";
-                let actionButtons = activeHistoryView === 'trash' ? 
-                    `<button class="btn-recovery" onclick="recoverItem(${index})">استعادة 🔁</button><button class="btn-delete" onclick="permaDelete(${index})">حذف نهائي ❌</button>` :
-                    `<button class="btn-edit" onclick="openEditModal(${index})">تعديل 📝</button><button class="btn-delete" onclick="moveToTrash(${index})">حذف 🗑️</button>`;
+                card.className = 'history-card';
+                
+                // تحديد ما إذا كان هناك فترات توقف لعرضها
+                let pauseHtml = "";
+                if (item.totalPausedSeconds && item.totalPausedSeconds > 0) {
+                    let pMin = Math.round(item.totalPausedSeconds / 60);
+                    if (pMin === 0) pMin = 1; // دقيقة على الأقل
+                    let pauseFormatted = pMin >= 60 ? `${Math.floor(pMin/60)} ساعة و ${pMin%60} دقيقة` : `${pMin} دقيقة`;
+                    pauseHtml = `
+                        <div class="pause-tag-row">
+                            <span class="pause-tag">⏱️ إجمالي فترات التوقف: ${pauseFormatted}</span>
+                        </div>
+                    `;
+                }
 
                 card.innerHTML = `
                     <div class="card-main-line">
                         <span class="card-duration">${item.duration}</span>
-                        <span class="card-subject">${item.subject || 'نشاط بدون عنوان'}</span>
+                        <span class="card-subject">${item.subject || 'بدون اسم'}</span>
                     </div>
                     ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
                     <div class="card-time-row">
-                        <span class="time-tag start">البدء: ${item.start}</span>
-                        <span class="time-tag end">النهاية: ${item.end}</span>
+                        <span class="time-tag start">بدأ: ${item.start || '--:--'}</span>
+                        <span class="time-tag end">انتهى: ${item.end || '--:--'}</span>
                     </div>
+                    ${pauseHtml}
                     <div class="card-bottom-info">
-                        <span>${item.date}</span>
-                        <span>${item.day}</span>
+                        <span>${item.day || ''} - ${item.date || ''}</span>
                     </div>
-                    <div class="card-actions">${actionButtons}</div>
+                    <div class="card-actions">
+                        ${activeHistoryView === 'trash' ? 
+                            `<button class="btn-recovery" onclick="recoverSession(${index})">استرجاع</button>` : 
+                            `<button class="btn-edit" onclick="openEditModal(${index})">تعديل</button>
+                             <button class="btn-delete" onclick="deleteSession(${index})">حذف</button>`
+                        }
+                    </div>
                 `;
-                cont.appendChild(card);
+                container.appendChild(card);
             });
         }
 
         function saveSessionPrompt() {
-            let durationStr = formatTime(timers[currentActiveMode].seconds);
-            document.getElementById("modalSubjectInput").value = "";
-            document.getElementById("modalDescInput").value = "";
-            document.getElementById("modalHeaderTitle").innerText = `حفظ سجل (${durationStr})`;
-            document.getElementById("saveModal").style.display = "flex";
+            if (timers[currentActiveMode].seconds === 0) {
+                alert("لا توجد ثوانٍ لحفظها!");
+                return;
+            }
+            document.getElementById('modalSubjectInput').value = '';
+            document.getElementById('modalDescInput').value = '';
+            document.getElementById('saveModal').style.display = 'flex';
         }
 
         function confirmSaveSession() {
-            let now = new Date();
-            let endTimeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-            let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
-            let dateParts = dateFormatter.formatToParts(now);
-            
-            let dayNameStr = "الأحد"; let dayNum = ""; let monthNum = ""; let yearNum = "";
-            dateParts.forEach(p => {
-                if (p.type === 'weekday') dayNameStr = p.value;
-                if (p.type === 'day') dayNum = p.value;
-                if (p.type === 'month') monthNum = p.value;
-                if (p.type === 'year') yearNum = p.value;
-            });
+            let sub = document.getElementById('modalSubjectInput').value.trim();
+            let dsc = document.getElementById('modalDescInput').value.trim();
+            let totalSec = timers[currentActiveMode].seconds;
+            let endStr = getCairoPrayerPeriodInfo(new Date());
 
-            let newRecord = {
-                subject: document.getElementById("modalSubjectInput").value.trim(),
-                desc: document.getElementById("modalDescInput").value.trim(),
-                duration: formatTime(timers[currentActiveMode].seconds),
-                start: sessionStartTime || endTimeStr,
-                end: endTimeStr,
-                date: `${dayNum}/${monthNum}/${yearNum}`,
-                day: dayNameStr,
-                originMode: currentActiveMode
+            // حساب وقت الإيقاف المؤقت بدقة
+            let totalPausedMs = 0;
+            pauseTrackingArray.forEach(p => {
+                let stopTime = p.end ? p.end : Date.now(); // إذا كانت لا تزال متوقفة عند الحفظ
+                totalPausedMs += (stopTime - p.start);
+            });
+            let totalPausedSeconds = Math.floor(totalPausedMs / 1000);
+
+            let record = {
+                subject: sub || (currentActiveMode === 'study' ? "مذاكرة عامة" : currentActiveMode),
+                desc: dsc,
+                duration: formatTime(totalSec),
+                start: sessionStartTime || endStr,
+                end: endStr,
+                totalPausedSeconds: totalPausedSeconds, // تخزين ثواني التوقف المؤقت
+                day: document.getElementById('cairoDate').innerText.split('،')[0],
+                date: document.getElementById('cairoDate').innerText.split('،')[1] || new Date().toLocaleDateString()
             };
 
-            historyData[currentActiveMode].unshift(newRecord);
+            historyData[currentActiveMode].unshift(record);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            closeModal('saveModal');
+            
+            document.getElementById('saveModal').style.display = 'none';
             endTimer();
-            if(document.getElementById("sidebarHistory").classList.contains('open') && activeHistoryView === currentActiveMode) {
-                renderHistoryCards();
-            }
-        }
-
-        function moveToTrash(index) {
-            let item = historyData[activeHistoryView].splice(index, 1)[0];
-            item.oldMode = activeHistoryView;
-            historyData.trash.unshift(item);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-        }
-
-        function recoverItem(index) {
-            let item = historyData.trash.splice(index, 1)[0];
-            let targetMode = item.oldMode || 'study';
-            delete item.oldMode;
-            historyData[targetMode].unshift(item);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-        }
-
-        function permaDelete(index) {
-            if(confirm("هل أنت متأكد من الحذف النهائي؟ لا يمكن التراجع.")) {
-                historyData.trash.splice(index, 1);
-                localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-                renderHistoryCards();
-            }
+            alert("تم حفظ الجلسة بنجاح!");
         }
 
         function openEditModal(index) {
             currentEditingIndex = index;
-            let item = historyData[activeHistoryView][index];
-            document.getElementById("editSubjectInput").value = item.subject || "";
-            document.getElementById("editDescInput").value = item.desc || "";
-            document.getElementById("editDayInput").value = item.day || "";
-            document.getElementById("editDateInput").value = item.date || "";
-            document.getElementById("editModal").style.display = "flex";
+            let record = historyData[activeHistoryView][index];
+            document.getElementById('editSubjectInput').value = record.subject;
+            document.getElementById('editDescInput').value = record.desc || '';
+            document.getElementById('editDayInput').value = record.day || '';
+            document.getElementById('editDateInput').value = record.date || '';
+            document.getElementById('editModal').style.display = 'flex';
         }
 
         function confirmEditSession() {
-            let item = historyData[activeHistoryView][currentEditingIndex];
-            item.subject = document.getElementById("editSubjectInput").value.trim();
-            item.desc = document.getElementById("editDescInput").value.trim();
-            item.day = document.getElementById("editDayInput").value.trim();
-            item.date = document.getElementById("editDateInput").value.trim();
+            if (currentEditingIndex === null) return;
+            let record = historyData[activeHistoryView][currentEditingIndex];
+            record.subject = document.getElementById('editSubjectInput').value.trim();
+            record.desc = document.getElementById('editDescInput').value.trim();
+            record.day = document.getElementById('editDayInput').value.trim();
+            record.date = document.getElementById('editDateInput').value.trim();
+            
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            closeModal('editModal');
-            renderHistoryCards();
+            document.getElementById('editModal').style.display = 'none';
+            renderHistoryContent();
+        }
+
+        function deleteSession(index) {
+            if(!confirm("هل أنت متأكد من نقل هذا السجل للمهملات؟")) return;
+            let item = historyData[activeHistoryView].splice(index, 1)[0];
+            item.originalType = activeHistoryView; 
+            historyData.trash.unshift(item);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryContent();
+        }
+
+        function recoverSession(index) {
+            let item = historyData.trash.splice(index, 1)[0];
+            let targetType = item.originalType || 'study';
+            delete item.originalType;
+            historyData[targetType].unshift(item);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryContent();
         }
 
         function closeModal(id) {
-            document.getElementById(id).style.display = "none";
+            document.getElementById(id).style.display = 'none';
         }
 
-        // ==================== نظام المفكرة المدعوم ====================
-        function openNotebook() {
-            document.getElementById("mainContainer").classList.add('notebook-open');
-            document.getElementById("notebookSidebar").classList.add('open');
-        }
-
-        function closeNotebook() {
-            document.getElementById("notebookSidebar").classList.remove('open');
-            document.getElementById("mainContainer").classList.remove('notebook-open');
-        }
-
-        function switchNbPane(subject, paneType) {
-            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
-
-            if(paneType === 'done') {
-                document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
-                document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
-            } else {
-                document.getElementById(`tab-${subject}-rem`).classList.add('active-tab');
-                document.getElementById(`pane-${subject}-rem`).classList.add('active-pane');
-            }
-        }
-
-        function saveNotebookData() {
-            let data = {
-                arabic_done: document.getElementById("note-arabic-done").value,
-                arabic_rem: document.getElementById("note-arabic-rem").value,
-                english_done: document.getElementById("note-english-done").value,
-                english_rem: document.getElementById("note-english-rem").value,
-                history_done: document.getElementById("note-history-done").value,
-                history_rem: document.getElementById("note-history-rem").value,
-                physics_done: document.getElementById("note-physics-done").value,
-                physics_rem: document.getElementById("note-physics-rem").value,
-            };
-            localStorage.setItem('notebookSaveData', JSON.stringify(data));
-        }
-
-        function loadNotebookData() {
-            let stored = JSON.parse(localStorage.getItem('notebookSaveData'));
-            if(stored) {
-                if(stored.arabic_done) document.getElementById("note-arabic-done").value = stored.arabic_done;
-                if(stored.arabic_rem) document.getElementById("note-arabic-rem").value = stored.arabic_rem;
-                if(stored.english_done) document.getElementById("note-english-done").value = stored.english_done;
-                if(stored.english_rem) document.getElementById("note-english-rem").value = stored.english_rem;
-                if(stored.history_done) document.getElementById("note-history-done").value = stored.history_done;
-                if(stored.history_rem) document.getElementById("note-history-rem").value = stored.history_rem;
-                if(stored.physics_done) document.getElementById("note-physics-done").value = stored.physics_done;
-                if(stored.physics_rem) document.getElementById("note-physics-rem").value = stored.physics_rem;
-            }
-        }
-
+        // ==================== ميزات إضافية (PDF و Mini) ====================
         function printNotebook() {
             document.body.classList.add('printing-notebook');
             window.print();
@@ -848,6 +850,42 @@
 
         function printFullHistory() {
             window.print();
+        }
+
+        function setupPipStream() {
+            try {
+                canvasStream = pipCanvas.captureStream(10);
+                pipVideo.srcObject = canvasStream;
+            } catch (e) {
+                console.log("Mini Canvas capture not fully supported here.");
+            }
+        }
+
+        function drawPipCanvas() {
+            pipCtx.fillStyle = "#11111b";
+            pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+            
+            pipCtx.fillStyle = "#cba6f7";
+            pipCtx.font = "bold 24px Arial";
+            pipCtx.textAlign = "center";
+            pipCtx.fillText(currentActiveMode.toUpperCase() + " TIMER", 200, 50);
+            
+            pipCtx.fillStyle = "#ffffff";
+            pipCtx.font = "bold 55px Courier New";
+            pipCtx.fillText(formatTime(timers[currentActiveMode].seconds), 200, 120);
+        }
+
+        async function requestMini() {
+            drawPipCanvas();
+            try {
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else {
+                    await pipVideo.requestPictureInPicture();
+                }
+            } catch (err) {
+                alert("واجهة الـ PiP (Mini) مدعومة في المتصفحات الحديثة فقط بعد تشغيل العداد مرة واحدة.");
+            }
         }
     </script>
 </body>
