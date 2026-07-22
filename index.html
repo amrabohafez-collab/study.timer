@@ -12,6 +12,7 @@
             --social-color: #89b4fa;
             --afk-color: #f9e2af;
             --clock-color: #a6adc8; 
+            --exam-color: #f38ba8; /* لون مميز ومضيء لعداد الامتحانات */
             --current-theme: var(--study-color);
             
             /* ألوان المواد الخاصة بالمفكرة */
@@ -63,7 +64,38 @@
         }
 
         .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
-        .footer-credits { position: absolute; bottom: 25px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
+        
+        /* 🎯 عنصر عداد المتبقي للامتحانات أعلى الحقوق مباشرة */
+        .exam-countdown-container {
+            position: absolute;
+            bottom: 60px;
+            text-align: center;
+            background: rgba(243, 139, 168, 0.08);
+            border: 1px dashed var(--exam-color);
+            padding: 8px 22px;
+            border-radius: 20px;
+            color: var(--exam-color);
+            font-size: 0.95rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 15px rgba(243, 139, 168, 0.15);
+            direction: rtl;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+        .exam-countdown-container span {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            background: var(--exam-color);
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin: 0 6px;
+            display: inline-block;
+            box-shadow: 0 0 10px var(--exam-color);
+        }
+
+        .footer-credits { position: absolute; bottom: 20px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
 
         #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
         #mainContainer.sidebar-open { padding-right: 380px; }
@@ -383,6 +415,11 @@
         </div>
     </div>
 
+    <!-- 🎯 عنصر عداد الأيام المتبقية فوق حقوق النشر -->
+    <div class="exam-countdown-container">
+        متبقي على الامتحانات: <span id="daysRemainingNumber">313</span> يوم ⏳
+    </div>
+
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
     <!-- عناصر الخفاء الخاصة بالـ Mini Mode -->
@@ -437,6 +474,23 @@
             startCairoLiveClockAndEngine(); 
             loadNotebookData();
             setupPipStream();
+            updateExamCountdown(); // تشغيل العداد عند التحميل
+        }
+
+        // 🎯 دالة حساب وتحديث الأيام المتبقية للامتحانات بدقة متناهية تلقائياً
+        function updateExamCountdown() {
+            const examTargetDate = new Date('2027-06-01T00:00:00');
+            const now = new Date();
+            const timeDiff = examTargetDate - now;
+            
+            // تحويل الفارق لميلي ثانية إلى أيام دقيقة
+            let daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            if (daysLeft < 0) daysLeft = 0;
+
+            const daysElem = document.getElementById('daysRemainingNumber');
+            if (daysElem) {
+                daysElem.innerText = daysLeft;
+            }
         }
 
         // دالة تحويل التوقيت إلى الصياغة العربية (ظهراً، عصراً، عشاءً.. إلخ) بدلاً من AM/PM
@@ -497,6 +551,8 @@
 
                 document.getElementById("cairoClock").innerText = prayerFormattedTime;
                 document.getElementById("cairoDate").innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
+                
+                updateExamCountdown(); // تحديث العداد دورياً للتأكد من المزامنة
             }, 1000);
         }
 
@@ -506,137 +562,261 @@
             isRunning = true;
             lastTimestamp = Date.now();
             
-            // في حال تم الاستئناف من التوقف، سجل نهاية التوقف
-            if (sessionStartTime && pauseTrackingArray.length > 0) {
-                let lastPause = pauseTrackingArray[pauseTrackingArray.length - 1];
-                if (lastPause.end === null) {
-                    lastPause.end = Date.now();
-                }
-            }
-
             if (!sessionStartTime) {
-                sessionStartTime = getCairoPrayerPeriodInfo(new Date());
-                pauseTrackingArray = []; // تصفير قائمة التوقفات للجلسة الجديدة
+                sessionStartTime = new Date();
             }
 
             globalIntervalId = setInterval(() => {
-                let currentTimestamp = Date.now();
-                let deltaSeconds = Math.floor((currentTimestamp - lastTimestamp) / 1000);
+                let now = Date.now();
+                let delta = Math.floor((now - lastTimestamp) / 1000);
                 
-                if (deltaSeconds >= 1) {
-                    let modeData = timers[currentActiveMode];
-                    if (modeData.type === 'up') {
-                        modeData.seconds += deltaSeconds;
+                if (delta >= 1) {
+                    lastTimestamp = now;
+                    let currentObj = timers[currentActiveMode];
+                    
+                    if (currentObj.type === 'up') {
+                        currentObj.seconds += delta;
                     } else {
-                        modeData.seconds -= deltaSeconds;
-                        if (modeData.seconds <= 0) {
-                            modeData.seconds = 0;
+                        currentObj.seconds -= delta;
+                        if (currentObj.seconds <= 0) {
+                            currentObj.seconds = 0;
                             pauseTimer();
-                            customAudio.play().catch(e => console.log("Audio play deferred"));
+                            try { customAudio.play(); } catch(e){}
+                            alert("انتهى وقت الاستراحة!");
                         }
                     }
                     
-                    lastTimestamp += deltaSeconds * 1000; 
-                    
+                    saveCurrentState();
                     updateDisplay(currentActiveMode);
-                    
-                    // حفظ لحظي وتلقائي لحالة العداد بالمتصفح لمنع ضياع الوقت عند الخروج الخاطئ
-                    saveCurrentTimerToLocalStorage(currentActiveMode);
-                    
-                    drawPipCanvas(); 
+                    updatePipCanvas();
                 }
-            }, 200);
+            }, 500);
         }
 
         function pauseTimer() {
             if (!isRunning) return;
             isRunning = false;
             clearInterval(globalIntervalId);
-            
-            // إضافة وقت التوقف الحالي للمصفوفة
-            pauseTrackingArray.push({
-                start: Date.now(),
-                end: null
-            });
-        }
-
-        function saveCurrentTimerToLocalStorage(mode) {
-            if (mode === 'study') localStorage.setItem('savedStudySeconds', timers.study.seconds);
-            if (mode === 'break') localStorage.setItem('savedBreakSeconds', timers.break.seconds);
-            if (mode === 'social') localStorage.setItem('savedSocialSeconds', timers.social.seconds);
-            if (mode === 'afk') localStorage.setItem('savedAfkSeconds', timers.afk.seconds);
-        }
-
-        function clearTimerLocalStorage(mode) {
-            if (mode === 'study') localStorage.removeItem('savedStudySeconds');
-            if (mode === 'break') localStorage.removeItem('savedBreakSeconds');
-            if (mode === 'social') localStorage.removeItem('savedSocialSeconds');
-            if (mode === 'afk') localStorage.removeItem('savedAfkSeconds');
+            saveCurrentState();
         }
 
         function endTimer() {
             pauseTimer();
-            let modeData = timers[currentActiveMode];
-            if (modeData.type === 'up') {
-                modeData.seconds = 0;
+            let currentObj = timers[currentActiveMode];
+            if (currentObj.type === 'up') {
+                currentObj.seconds = 0;
             } else {
-                modeData.seconds = modeData.default || 300;
+                currentObj.seconds = currentObj.default;
             }
-            
-            clearTimerLocalStorage(currentActiveMode);
             sessionStartTime = null;
-            pauseTrackingArray = [];
+            saveCurrentState();
             updateDisplay(currentActiveMode);
-            drawPipCanvas();
+            updatePipCanvas();
         }
 
-        // ==================== دوال التحكم والواجهة الأساسية ====================
+        function saveCurrentState() {
+            localStorage.setItem('savedStudySeconds', timers.study.seconds);
+            localStorage.setItem('savedBreakSeconds', timers.break.seconds);
+            localStorage.setItem('savedSocialSeconds', timers.social.seconds);
+            localStorage.setItem('savedAfkSeconds', timers.afk.seconds);
+        }
+
         function switchMode(mode) {
             pauseTimer();
-            document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
-            document.getElementById(`container-${mode}`).classList.add('active');
             currentActiveMode = mode;
+            document.querySelectorAll('.timer-box').forEach(b => b.classList.remove('active'));
+            document.getElementById(`container-${mode}`).classList.add('active');
             updateThemeColors();
-            updateDisplay(mode);
+            updatePipCanvas();
         }
 
         function updateThemeColors() {
             let root = document.documentElement;
             if (currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
-            if (currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
-            if (currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
-            if (currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+            else if (currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            else if (currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
+            else if (currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
         }
 
-        function formatTime(totalSeconds) {
-            let hrs = Math.floor(totalSeconds / 3600);
-            let mins = Math.floor((totalSeconds % 3600) / 60);
-            let secs = totalSeconds % 60;
-            if (hrs > 0) {
-                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        function formatTime(sec) {
+            let h = Math.floor(sec / 3600);
+            let m = Math.floor((sec % 3600) / 60);
+            let s = sec % 60;
+            if (h > 0) {
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
             }
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
         function updateDisplay(mode) {
-            let displayElement = document.getElementById(`display-${mode}`);
-            if (displayElement) {
-                displayElement.innerText = formatTime(timers[mode].seconds);
+            let displayElem = document.getElementById(`display-${mode}`);
+            if (displayElem) {
+                displayElem.innerText = formatTime(timers[mode].seconds);
             }
         }
 
         function setBreakDuration() {
-            let hrs = parseInt(document.getElementById('breakHoursInput').value) || 0;
-            let mins = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-            let total = (hrs * 3600) + (mins * 60);
-            timers.break.seconds = total;
+            let h = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            let m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            let total = (h * 3600) + (m * 60);
+            if (total <= 0) total = 300;
             timers.break.default = total;
+            timers.break.seconds = total;
             localStorage.setItem('savedBreakDefault', total);
-            localStorage.setItem('savedBreakSeconds', total);
+            saveCurrentState();
             updateDisplay('break');
         }
 
-        // ==================== المفكرة وسجل الحفظ ====================
+        /* ==================== إدارة السجلات والـ Mini Mode والمفكرة ==================== */
+        function saveSessionPrompt() {
+            if (timers[currentActiveMode].seconds <= 0) {
+                alert("لا يوجد وقت مسجل للحفظ!");
+                return;
+            }
+            document.getElementById('modalSubjectInput').value = "";
+            document.getElementById('modalDescInput').value = "";
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            let subject = document.getElementById('modalSubjectInput').value.trim() || "بدون عنوان";
+            let desc = document.getElementById('modalDescInput').value.trim() || "لا يوجد وصف";
+            
+            let now = new Date();
+            let startFormatted = getCairoPrayerPeriodInfo(sessionStartTime || now);
+            let endFormatted = getCairoPrayerPeriodInfo(now);
+
+            let dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+            let dayStr = dayNames[now.getDay()];
+            let dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+
+            let sessionRecord = {
+                id: Date.now(),
+                subject: subject,
+                desc: desc,
+                duration: formatTime(timers[currentActiveMode].seconds),
+                startTime: startFormatted,
+                endTime: endFormatted,
+                day: dayStr,
+                date: dateStr
+            };
+
+            historyData[currentActiveMode].unshift(sessionRecord);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            closeModal('saveModal');
+            endTimer();
+            alert("تم حفظ السجل بنجاح!");
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openHistory(type) {
+            activeHistoryView = type;
+            document.getElementById('mergeTabsRow').style.display = 'none';
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            
+            let titles = { study: "Study History 📚", break: "Break History ☕", trash: "Trash / Recovery 🗑️" };
+            document.getElementById('sidebarTitle').innerText = titles[type] || "History";
+            renderHistoryCards();
+        }
+
+        function openMergeHistory() {
+            activeHistoryView = 'social';
+            document.getElementById('mergeTabsRow').style.display = 'flex';
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('sidebarTitle').innerText = "Social & AFK History";
+            switchMergeView('social');
+        }
+
+        function switchMergeView(type) {
+            activeHistoryView = type;
+            document.getElementById('mergeTabSocial').style.opacity = type === 'social' ? '1' : '0.5';
+            document.getElementById('mergeTabAfk').style.opacity = type === 'afk' ? '1' : '0.5';
+            renderHistoryCards();
+        }
+
+        function closeHistory() {
+            document.getElementById('sidebarHistory').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('sidebar-open');
+        }
+
+        function renderHistoryCards() {
+            let container = document.getElementById('sidebarContent');
+            container.innerHTML = "";
+            let list = historyData[activeHistoryView] || [];
+
+            if (list.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">لا توجد سجلات محفوظة.</div>`;
+                return;
+            }
+
+            list.forEach((item, idx) => {
+                let isTrash = activeHistoryView === 'trash';
+                let card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.subject}</span>
+                        <span class="card-duration">${item.duration}</span>
+                    </div>
+                    <div class="card-desc">${item.desc}</div>
+                    <div class="card-time-row">
+                        <span class="time-tag start">البداية: ${item.startTime}</span>
+                        <span class="time-tag end">النهاية: ${item.endTime}</span>
+                    </div>
+                    <div class="card-bottom-info">
+                        <span>${item.day} - ${item.date}</span>
+                        <div class="card-actions">
+                            ${!isTrash ? `<button class="btn-edit" onclick="editHistoryItem(${idx})">تعديل</button>` : ''}
+                            ${!isTrash ? `<button class="btn-delete" onclick="deleteHistoryItem(${idx})">حذف</button>` : `<button class="btn-recovery" onclick="recoverHistoryItem(${idx})">استرجاع</button>`}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteHistoryItem(idx) {
+            let item = historyData[activeHistoryView].splice(idx, 1)[0];
+            historyData.trash.unshift(item);
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+        }
+
+        function recoverHistoryItem(idx) {
+            let item = historyData.trash.splice(idx, 1)[0];
+            historyData.study.unshift(item); // استرجاع إلى سجل الدراسة كوضع افتراضي
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            renderHistoryCards();
+        }
+
+        function editHistoryItem(idx) {
+            currentEditingIndex = idx;
+            let item = historyData[activeHistoryView][idx];
+            document.getElementById('editSubjectInput').value = item.subject;
+            document.getElementById('editDescInput').value = item.desc;
+            document.getElementById('editDayInput').value = item.day;
+            document.getElementById('editDateInput').value = item.date;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function confirmEditSession() {
+            if (currentEditingIndex === null) return;
+            let item = historyData[activeHistoryView][currentEditingIndex];
+            item.subject = document.getElementById('editSubjectInput').value;
+            item.desc = document.getElementById('editDescInput').value;
+            item.day = document.getElementById('editDayInput').value;
+            item.date = document.getElementById('editDateInput').value;
+
+            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
+            closeModal('editModal');
+            renderHistoryCards();
+        }
+
         function openNotebook() {
             document.getElementById('notebookSidebar').classList.add('open');
             document.getElementById('mainContainer').classList.add('notebook-open');
@@ -647,201 +827,48 @@
             document.getElementById('mainContainer').classList.remove('notebook-open');
         }
 
-        function switchNbPane(subject, type) {
-            document.querySelectorAll(`.subject-block.${subject} .nb-tab-btn`).forEach(b => b.classList.remove('active-tab'));
-            document.querySelectorAll(`.subject-block.${subject} .nb-text-container`).forEach(p => p.classList.remove('active-pane'));
-            
-            document.getElementById(`tab-${subject}-${type}`).classList.add('active-tab');
-            document.getElementById(`pane-${subject}-${type}`).classList.add('active-pane');
+        function switchNbPane(sub, paneType) {
+            document.getElementById(`tab-${sub}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${sub}-rem`).classList.remove('active-tab');
+            document.getElementById(`pane-${sub}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${sub}-rem`).classList.remove('active-pane');
+
+            if (paneType === 'done') {
+                document.getElementById(`tab-${sub}-done`).classList.add('active-tab');
+                document.getElementById(`pane-${sub}-done`).classList.add('active-pane');
+            } else {
+                document.getElementById(`tab-${sub}-rem`).classList.add('active-tab');
+                document.getElementById(`pane-${sub}-rem`).classList.add('active-pane');
+            }
         }
 
         function saveNotebookData() {
-            let data = {};
-            document.querySelectorAll('.nb-textarea').forEach(area => {
-                data[area.id] = area.value;
-            });
-            localStorage.setItem('notebookData', JSON.stringify(data));
+            let data = {
+                arabicDone: document.getElementById('note-arabic-done').value,
+                arabicRem: document.getElementById('note-arabic-rem').value,
+                englishDone: document.getElementById('note-english-done').value,
+                englishRem: document.getElementById('note-english-rem').value,
+                historyDone: document.getElementById('note-history-done').value,
+                historyRem: document.getElementById('note-history-rem').value,
+                physicsDone: document.getElementById('note-physics-done').value,
+                physicsRem: document.getElementById('note-physics-rem').value,
+            };
+            localStorage.setItem('notebookSavedData', JSON.stringify(data));
         }
 
         function loadNotebookData() {
-            let data = JSON.parse(localStorage.getItem('notebookData')) || {};
-            Object.keys(data).forEach(id => {
-                let el = document.getElementById(id);
-                if (el) el.value = data[id];
-            });
+            let data = JSON.parse(localStorage.getItem('notebookSavedData'));
+            if (!data) return;
+            document.getElementById('note-arabic-done').value = data.arabicDone || "";
+            document.getElementById('note-arabic-rem').value = data.arabicRem || "";
+            document.getElementById('note-english-done').value = data.englishDone || "";
+            document.getElementById('note-english-rem').value = data.englishRem || "";
+            document.getElementById('note-history-done').value = data.historyDone || "";
+            document.getElementById('note-history-rem').value = data.historyRem || "";
+            document.getElementById('note-physics-done').value = data.physicsDone || "";
+            document.getElementById('note-physics-rem').value = data.physicsRem || "";
         }
 
-        function openHistory(type) {
-            activeHistoryView = type;
-            document.getElementById('sidebarTitle').innerText = `${type.toUpperCase()} History`;
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('mergeTabsRow').style.display = 'none';
-            renderHistoryContent();
-        }
-
-        function openMergeHistory(primaryType) {
-            activeHistoryView = primaryType;
-            document.getElementById('sidebarTitle').innerText = `Merged History`;
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('mergeTabsRow').style.display = 'flex';
-            switchMergeView(primaryType);
-        }
-
-        function switchMergeView(type) {
-            activeHistoryView = type;
-            document.querySelectorAll('#mergeTabsRow button').forEach(b => b.style.opacity = '0.5');
-            if (type === 'social') document.getElementById('mergeTabSocial').style.opacity = '1';
-            if (type === 'afk') document.getElementById('mergeTabAfk').style.opacity = '1';
-            renderHistoryContent();
-        }
-
-        function closeHistory() {
-            document.getElementById('sidebarHistory').classList.remove('open');
-            document.getElementById('mainContainer').classList.remove('sidebar-open');
-        }
-
-        function renderHistoryContent() {
-            let container = document.getElementById('sidebarContent');
-            container.innerHTML = '';
-            let list = historyData[activeHistoryView] || [];
-            if (list.length === 0) {
-                container.innerHTML = `<p style="color:#6c7086; text-align:center; padding: 20px;">لا يوجد سجلات حالياً.</p>`;
-                return;
-            }
-            list.forEach((item, index) => {
-                let card = document.createElement('div');
-                card.className = 'history-card';
-                
-                // تحديد ما إذا كان هناك فترات توقف لعرضها
-                let pauseHtml = "";
-                if (item.totalPausedSeconds && item.totalPausedSeconds > 0) {
-                    let pMin = Math.round(item.totalPausedSeconds / 60);
-                    if (pMin === 0) pMin = 1; // دقيقة على الأقل
-                    let pauseFormatted = pMin >= 60 ? `${Math.floor(pMin/60)} ساعة و ${pMin%60} دقيقة` : `${pMin} دقيقة`;
-                    pauseHtml = `
-                        <div class="pause-tag-row">
-                            <span class="pause-tag">⏱️ إجمالي فترات التوقف: ${pauseFormatted}</span>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="card-main-line">
-                        <span class="card-duration">${item.duration}</span>
-                        <span class="card-subject">${item.subject || 'بدون اسم'}</span>
-                    </div>
-                    ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
-                    <div class="card-time-row">
-                        <span class="time-tag start">بدأ: ${item.start || '--:--'}</span>
-                        <span class="time-tag end">انتهى: ${item.end || '--:--'}</span>
-                    </div>
-                    ${pauseHtml}
-                    <div class="card-bottom-info">
-                        <span>${item.day || ''} - ${item.date || ''}</span>
-                    </div>
-                    <div class="card-actions">
-                        ${activeHistoryView === 'trash' ? 
-                            `<button class="btn-recovery" onclick="recoverSession(${index})">استرجاع</button>` : 
-                            `<button class="btn-edit" onclick="openEditModal(${index})">تعديل</button>
-                             <button class="btn-delete" onclick="deleteSession(${index})">حذف</button>`
-                        }
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function saveSessionPrompt() {
-            if (timers[currentActiveMode].seconds === 0) {
-                alert("لا توجد ثوانٍ لحفظها!");
-                return;
-            }
-            document.getElementById('modalSubjectInput').value = '';
-            document.getElementById('modalDescInput').value = '';
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
-        function confirmSaveSession() {
-            let sub = document.getElementById('modalSubjectInput').value.trim();
-            let dsc = document.getElementById('modalDescInput').value.trim();
-            let totalSec = timers[currentActiveMode].seconds;
-            let endStr = getCairoPrayerPeriodInfo(new Date());
-
-            // حساب وقت الإيقاف المؤقت بدقة
-            let totalPausedMs = 0;
-            pauseTrackingArray.forEach(p => {
-                let stopTime = p.end ? p.end : Date.now(); // إذا كانت لا تزال متوقفة عند الحفظ
-                totalPausedMs += (stopTime - p.start);
-            });
-            let totalPausedSeconds = Math.floor(totalPausedMs / 1000);
-
-            let record = {
-                subject: sub || (currentActiveMode === 'study' ? "مذاكرة عامة" : currentActiveMode),
-                desc: dsc,
-                duration: formatTime(totalSec),
-                start: sessionStartTime || endStr,
-                end: endStr,
-                totalPausedSeconds: totalPausedSeconds, // تخزين ثواني التوقف المؤقت
-                day: document.getElementById('cairoDate').innerText.split('،')[0],
-                date: document.getElementById('cairoDate').innerText.split('،')[1] || new Date().toLocaleDateString()
-            };
-
-            historyData[currentActiveMode].unshift(record);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            
-            document.getElementById('saveModal').style.display = 'none';
-            endTimer();
-            alert("تم حفظ الجلسة بنجاح!");
-        }
-
-        function openEditModal(index) {
-            currentEditingIndex = index;
-            let record = historyData[activeHistoryView][index];
-            document.getElementById('editSubjectInput').value = record.subject;
-            document.getElementById('editDescInput').value = record.desc || '';
-            document.getElementById('editDayInput').value = record.day || '';
-            document.getElementById('editDateInput').value = record.date || '';
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function confirmEditSession() {
-            if (currentEditingIndex === null) return;
-            let record = historyData[activeHistoryView][currentEditingIndex];
-            record.subject = document.getElementById('editSubjectInput').value.trim();
-            record.desc = document.getElementById('editDescInput').value.trim();
-            record.day = document.getElementById('editDayInput').value.trim();
-            record.date = document.getElementById('editDateInput').value.trim();
-            
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            document.getElementById('editModal').style.display = 'none';
-            renderHistoryContent();
-        }
-
-        function deleteSession(index) {
-            if(!confirm("هل أنت متأكد من نقل هذا السجل للمهملات؟")) return;
-            let item = historyData[activeHistoryView].splice(index, 1)[0];
-            item.originalType = activeHistoryView; 
-            historyData.trash.unshift(item);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryContent();
-        }
-
-        function recoverSession(index) {
-            let item = historyData.trash.splice(index, 1)[0];
-            let targetType = item.originalType || 'study';
-            delete item.originalType;
-            historyData[targetType].unshift(item);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryContent();
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        // ==================== ميزات إضافية (PDF و Mini) ====================
         function printNotebook() {
             document.body.classList.add('printing-notebook');
             window.print();
@@ -852,39 +879,38 @@
             window.print();
         }
 
+        /* ================= Mini Mode (Picture-in-Picture) ================= */
         function setupPipStream() {
-            try {
-                canvasStream = pipCanvas.captureStream(10);
-                pipVideo.srcObject = canvasStream;
-            } catch (e) {
-                console.log("Mini Canvas capture not fully supported here.");
-            }
+            canvasStream = pipCanvas.captureStream(10);
+            pipVideo.srcObject = canvasStream;
         }
 
-        function drawPipCanvas() {
-            pipCtx.fillStyle = "#11111b";
+        function updatePipCanvas() {
+            pipCtx.fillStyle = "#0f0f16";
             pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
-            
-            pipCtx.fillStyle = "#cba6f7";
-            pipCtx.font = "bold 24px Arial";
+
+            let themeColor = getComputedStyle(document.documentElement).getPropertyValue('--current-theme').trim();
+            pipCtx.fillStyle = themeColor || "#a6e3a1";
+            pipCtx.font = "bold 45px sans-serif";
             pipCtx.textAlign = "center";
-            pipCtx.fillText(currentActiveMode.toUpperCase() + " TIMER", 200, 50);
-            
-            pipCtx.fillStyle = "#ffffff";
-            pipCtx.font = "bold 55px Courier New";
-            pipCtx.fillText(formatTime(timers[currentActiveMode].seconds), 200, 120);
+            pipCtx.fillText(formatTime(timers[currentActiveMode].seconds), pipCanvas.width / 2, 90);
+
+            pipCtx.font = "16px sans-serif";
+            pipCtx.fillStyle = "#cdd6f4";
+            pipCtx.fillText(`Mode: ${currentActiveMode.toUpperCase()}`, pipCanvas.width / 2, 130);
         }
 
         async function requestMini() {
-            drawPipCanvas();
             try {
+                updatePipCanvas();
+                await pipVideo.play();
                 if (document.pictureInPictureElement) {
                     await document.exitPictureInPicture();
                 } else {
                     await pipVideo.requestPictureInPicture();
                 }
             } catch (err) {
-                alert("واجهة الـ PiP (Mini) مدعومة في المتصفحات الحديثة فقط بعد تشغيل العداد مرة واحدة.");
+                alert("خاصية العرض المصغر غير مدعومة أو تم رفضها من المتصفح.");
             }
         }
     </script>
