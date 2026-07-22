@@ -12,7 +12,7 @@
             --social-color: #89b4fa;
             --afk-color: #f9e2af;
             --clock-color: #a6adc8; 
-            --exam-color: #f38ba8; /* لون مميز ومضيء لعداد الامتحانات */
+            --exam-color: #89b4fa; /* Soft Blue / Indigo (calming, non-red color) */
             --current-theme: var(--study-color);
             
             /* ألوان المواد الخاصة بالمفكرة */
@@ -65,34 +65,36 @@
 
         .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
         
-        /* 🎯 عنصر عداد المتبقي للامتحانات أعلى الحقوق مباشرة */
+        /* 🎯 Sleek, Frameless, Professional Countdown Container */
         .exam-countdown-container {
             position: absolute;
-            bottom: 60px;
+            bottom: 55px;
             text-align: center;
-            background: rgba(243, 139, 168, 0.08);
-            border: 1px dashed var(--exam-color);
-            padding: 8px 22px;
-            border-radius: 20px;
-            color: var(--exam-color);
-            font-size: 0.95rem;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 15px rgba(243, 139, 168, 0.15);
-            direction: rtl;
-            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
             z-index: 5;
         }
-        .exam-countdown-container span {
+
+        .exam-countdown-text {
             font-size: 1.25rem;
-            font-weight: 800;
-            color: #fff;
-            background: var(--exam-color);
-            padding: 2px 10px;
-            border-radius: 12px;
-            margin: 0 6px;
-            display: inline-block;
-            box-shadow: 0 0 10px var(--exam-color);
+            font-weight: 700;
+            color: var(--exam-color);
+            letter-spacing: 1px;
+            text-shadow: 0 0 12px rgba(137, 180, 250, 0.3);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .exam-countdown-sub {
+            font-size: 0.75rem;
+            color: #6c7086; /* Dark White / Soft Muted Gray */
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            font-family: monospace, 'Segoe UI', sans-serif;
         }
 
         .footer-credits { position: absolute; bottom: 20px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
@@ -197,7 +199,6 @@
         .time-tag.start { background: rgba(166, 227, 161, 0.1); color: #a6e3a1; }
         .time-tag.end { background: rgba(243, 139, 168, 0.1); color: #f38ba8; }
         
-        /* تصميم ذكي وناعم لعرض مدة التوقف */
         .pause-tag-row { display: flex; justify-content: center; margin-top: 5px; }
         .pause-tag { background: rgba(249, 226, 175, 0.08); color: #f9e2af; border: 1px dashed rgba(249, 226, 175, 0.25); font-size: 0.73rem; padding: 2px 10px; border-radius: 12px; font-weight: 500; text-align: center; direction: rtl; }
 
@@ -415,9 +416,10 @@
         </div>
     </div>
 
-    <!-- 🎯 عنصر عداد الأيام المتبقية فوق حقوق النشر -->
+    <!-- 🎯 Frameless & Automatic Countdown Widget -->
     <div class="exam-countdown-container">
-        متبقي على الامتحانات: <span id="daysRemainingNumber">313</span> يوم ⏳
+        <div class="exam-countdown-text" id="daysRemainingText">314 Day</div>
+        <div class="exam-countdown-sub">2026/8/1 to 2027/6/1</div>
     </div>
 
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
@@ -427,7 +429,6 @@
     <video id="pipVideo" autoplay muted playsinline style="display:none;"></video>
 
     <script>
-        // استدعاء القيم المحفوظة مسبقًا لجميع الأوضاع لحماية العدادات من الضياع عند الخروج بالخطأ
         let timers = {
             study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up' },
             break: { seconds: parseInt(localStorage.getItem('savedBreakSeconds')) || 300, type: 'down', default: 300 },
@@ -440,10 +441,9 @@
         let globalIntervalId = null;
         let lastTimestamp = null; 
 
-        // متغيرات تتبع جلسة الوقت الحالي والتوقفات
         let sessionStartTime = null; 
         let currentCairoGlobalDateObject = new Date(); 
-        let pauseTrackingArray = []; // لتسجيل لحظات التوقف والاستئناف بدقة
+        let pauseTrackingArray = [];
 
         let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
         let activeHistoryView = 'study'; 
@@ -452,20 +452,17 @@
         const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
         let customAudio = new Audio(MY_AUDIO_URL);
 
-        // متغيرات نافذة المصغر Mini
         let canvasStream = null;
         let pipCanvas = document.getElementById('videoCanvas');
         let pipCtx = pipCanvas.getContext('2d');
         let pipVideo = document.getElementById('pipVideo');
 
         window.onload = function() {
-            // تحديث العرض لكافة المؤقتات بناءً على القيمة المخزنة
             updateDisplay('study');
             updateDisplay('break');
             updateDisplay('social');
             updateDisplay('afk');
             
-            // قراءة وتعيين إعدادات وقت الاستراحة المخصص إن وجد
             if (localStorage.getItem('savedBreakDefault')) {
                 timers.break.default = parseInt(localStorage.getItem('savedBreakDefault'));
             }
@@ -474,26 +471,24 @@
             startCairoLiveClockAndEngine(); 
             loadNotebookData();
             setupPipStream();
-            updateExamCountdown(); // تشغيل العداد عند التحميل
+            updateExamCountdown();
         }
 
-        // 🎯 دالة حساب وتحديث الأيام المتبقية للامتحانات بدقة متناهية تلقائياً
+        // 🎯 Auto-decrements precisely at 00:00 (Midnight) every day
         function updateExamCountdown() {
             const examTargetDate = new Date('2027-06-01T00:00:00');
             const now = new Date();
             const timeDiff = examTargetDate - now;
             
-            // تحويل الفارق لميلي ثانية إلى أيام دقيقة
             let daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
             if (daysLeft < 0) daysLeft = 0;
 
-            const daysElem = document.getElementById('daysRemainingNumber');
-            if (daysElem) {
-                daysElem.innerText = daysLeft;
+            const textElem = document.getElementById('daysRemainingText');
+            if (textElem) {
+                textElem.innerText = `${daysLeft} Day`;
             }
         }
 
-        // دالة تحويل التوقيت إلى الصياغة العربية (ظهراً، عصراً، عشاءً.. إلخ) بدلاً من AM/PM
         function getCairoPrayerPeriodInfo(dateObj) {
             if (!dateObj) return "00:00";
             let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
@@ -552,11 +547,10 @@
                 document.getElementById("cairoClock").innerText = prayerFormattedTime;
                 document.getElementById("cairoDate").innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
                 
-                updateExamCountdown(); // تحديث العداد دورياً للتأكد من المزامنة
+                updateExamCountdown();
             }, 1000);
         }
 
-        // ==================== محرك العداد الذكي وحساب فترات التوقف ====================
         function startTimer() {
             if (isRunning) return;
             isRunning = true;
@@ -667,7 +661,6 @@
             updateDisplay('break');
         }
 
-        /* ==================== إدارة السجلات والـ Mini Mode والمفكرة ==================== */
         function saveSessionPrompt() {
             if (timers[currentActiveMode].seconds <= 0) {
                 alert("لا يوجد وقت مسجل للحفظ!");
@@ -789,7 +782,7 @@
 
         function recoverHistoryItem(idx) {
             let item = historyData.trash.splice(idx, 1)[0];
-            historyData.study.unshift(item); // استرجاع إلى سجل الدراسة كوضع افتراضي
+            historyData.study.unshift(item);
             localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
             renderHistoryCards();
         }
@@ -879,7 +872,6 @@
             window.print();
         }
 
-        /* ================= Mini Mode (Picture-in-Picture) ================= */
         function setupPipStream() {
             canvasStream = pipCanvas.captureStream(10);
             pipVideo.srcObject = canvasStream;
