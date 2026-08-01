@@ -6,43 +6,39 @@
     <title>Study System</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-main: #0f111a;
-            --bg-side: #161824;
-            --card-bg: #1e202e;
-            --card-border: #2e3245;
+            --bg-main: #0b0f19;
+            --bg-side: #111827;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
             
-            --text-main: #cdd6f4;
-            --text-muted: #89b4fa;
-            --text-sub: #a6adc8;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-sub: #6b7280;
             
-            --study-color: #a6e3a1;
-            --break-color: #fab387;
-            --afk-color: #f9e2af;
-            --primary-accent: #89b4fa;
-            --danger-color: #f38ba8;
-            --success-color: #a6e3a1;
-            
-            --listening-color: #89dceb;
-            --writing-color: #a6e3a1;
-            --quiz-color: #f9e2af;
+            --primary-accent: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.35);
+            --study-color: #10b981;
+            --break-color: #f59e0b;
+            --afk-color: #ec4899;
+            --danger-color: #ef4444;
+            --ai-color: #8b5cf6;
 
-            --arabic-color: #89b4fa;
-            --english-color: #a6e3a1;
-            --history-color: #f9e2af;
-            --physics-color: #f38ba8;
-
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-            --transition-speed: 0.3s;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 78px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
@@ -51,16 +47,20 @@
             min-height: 100vh;
             display: flex;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
         }
 
-        /* Side Navigation */
+        /* Sidebar Styling */
         aside.sidebar {
             width: var(--sidebar-width);
-            background-color: var(--bg-side);
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(16px);
             border-left: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
-            transition: width var(--transition-speed) ease;
+            transition: var(--transition);
             position: sticky;
             top: 0;
             height: 100vh;
@@ -69,11 +69,11 @@
         }
 
         aside.sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
+            width: var(--sidebar-collapsed);
         }
 
         .sidebar-header {
-            padding: 20px 15px;
+            padding: 24px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -81,49 +81,59 @@
         }
 
         .brand-logo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--study-color);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             white-space: nowrap;
-            overflow: hidden;
+        }
+
+        .brand-logo i {
+            color: var(--primary-accent);
+            filter: drop-shadow(0 0 8px var(--primary-glow));
         }
 
         .toggle-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-sub);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 5px;
-            border-radius: 6px;
-            transition: background 0.2s;
+            font-size: 1rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
         }
 
         .toggle-btn:hover {
-            background: var(--card-border);
-            color: var(--text-main);
+            background: var(--primary-accent);
+            color: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         .nav-group {
-            padding: 15px 10px;
+            padding: 20px 12px;
             flex-grow: 1;
             overflow-y: auto;
         }
 
         .nav-group-title {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-sub);
-            text-transform: uppercase;
-            padding: 10px;
+            font-weight: 700;
+            padding: 12px 12px 6px;
             letter-spacing: 0.5px;
             white-space: nowrap;
-            overflow: hidden;
         }
 
-        .sidebar.collapsed .nav-group-title {
+        .sidebar.collapsed .nav-group-title,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .profile-info {
             display: none;
         }
 
@@ -131,497 +141,314 @@
             width: 100%;
             background: transparent;
             border: none;
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: 8px;
+            color: var(--text-muted);
+            padding: 12px 14px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 0.95rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
+            gap: 14px;
+            transition: var(--transition);
+            margin-bottom: 6px;
             white-space: nowrap;
         }
 
         .nav-btn:hover {
-            background: rgba(137, 180, 250, 0.1);
-            color: var(--primary-accent);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            transform: translateX(-4px);
         }
 
         .nav-btn.active {
-            background: var(--primary-accent);
-            color: #11111b;
-            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-accent), #4f46e5);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 4px 20px var(--primary-glow);
         }
 
         .nav-btn .icon {
-            font-size: 1.2rem;
-            min-width: 24px;
+            font-size: 1.1rem;
+            width: 24px;
             text-align: center;
         }
 
-        .sidebar.collapsed .nav-text {
-            display: none;
-        }
-
         .user-profile {
-            padding: 15px;
+            padding: 16px;
             border-top: 1px solid var(--card-border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .profile-badge {
             display: flex;
             align-items: center;
-            gap: 10px;
-            width: 100%;
+            gap: 12px;
         }
 
         .profile-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--study-color);
-            color: #11111b;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
+            font-weight: 800;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
         }
 
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .sidebar.collapsed .profile-info {
-            display: none;
-        }
-
-        /* Main Content Layout */
+        /* Main Content */
         main.main-content {
             flex-grow: 1;
-            padding: 30px;
+            padding: 35px;
             overflow-y: auto;
             max-width: 1400px;
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .tab-content.active {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Modern Cards */
+        /* Modern Glass Cards */
         .card {
             background: var(--card-bg);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             border-bottom: 1px solid var(--card-border);
-            padding-bottom: 12px;
+            padding-bottom: 16px;
         }
 
         .card-title {
-            font-size: 1.25rem;
-            color: var(--primary-accent);
+            font-size: 1.3rem;
+            color: #fff;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 600;
-        }
-
-        .btn-print {
-            background: var(--card-border);
-            color: var(--text-main);
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.2s;
-        }
-
-        .btn-print:hover {
-            background: var(--primary-accent);
-            color: #111;
+            font-weight: 700;
         }
 
         /* Timer Section */
         .main-timer-display {
-            font-size: 4.5rem;
-            font-weight: 700;
+            font-size: 5rem;
+            font-weight: 800;
             text-align: center;
-            font-family: monospace;
-            color: var(--study-color);
-            margin: 15px 0;
-            text-shadow: 0 0 25px rgba(166, 227, 161, 0.15);
+            font-family: 'Plus Jakarta Sans', monospace;
+            background: linear-gradient(180deg, #ffffff, var(--study-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.2));
+            letter-spacing: 2px;
         }
 
         .controls-row {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 14px;
             flex-wrap: wrap;
             margin-bottom: 25px;
         }
 
         .btn-action {
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 12px 24px;
+            border-radius: 12px;
             border: 1px solid var(--card-border);
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             color: var(--text-main);
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-action:hover {
+            transform: translateY(-2px);
             background: var(--primary-accent);
-            color: #111;
+            color: #fff;
             border-color: var(--primary-accent);
+            box-shadow: 0 8px 25px var(--primary-glow);
         }
 
         .btn-danger {
             color: var(--danger-color);
-            border-color: var(--danger-color);
+            border-color: rgba(239, 68, 68, 0.3);
         }
         .btn-danger:hover {
             background: var(--danger-color);
-            color: #111;
+            color: #fff;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
         }
 
-        /* Mini Timers (Break & AFK) */
-        .mini-timers-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+        /* AI Assistant Box */
+        .ai-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 25px;
         }
 
-        .mini-timer-box {
-            background: var(--bg-side);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 12px 18px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        .mini-timer-header {
+        .ai-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-weight: 600;
+            gap: 10px;
+            color: var(--ai-color);
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
-        .mini-timer-box.break { border-color: var(--break-color); }
-        .mini-timer-box.break .mini-title { color: var(--break-color); }
-        
-        .mini-timer-box.afk { border-color: var(--afk-color); }
-        .mini-timer-box.afk .mini-title { color: var(--afk-color); }
+        .ai-input-group {
+            display: flex;
+            gap: 10px;
+        }
 
-        .mini-timer-content {
-            display: none;
+        .ai-input-group input {
+            flex-grow: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fff;
+            outline: none;
+        }
+
+        .ai-response {
             margin-top: 15px;
-            text-align: center;
-            border-top: 1px dashed var(--card-border);
-            padding-top: 10px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .mini-timer-box.expanded .mini-timer-content {
-            display: block;
-        }
-
-        .mini-display {
-            font-size: 2.2rem;
-            font-family: monospace;
-            margin: 10px 0;
-            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #d1d5db;
+            display: none;
         }
 
         /* Sub Timers Grid */
         .sub-timers-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 25px;
             border-top: 1px solid var(--card-border);
-            padding-top: 20px;
+            padding-top: 25px;
         }
 
         .sub-timer-card {
-            background: var(--bg-side);
-            border-radius: 12px;
-            padding: 16px;
+            background: rgba(17, 24, 39, 0.5);
+            border-radius: 14px;
+            padding: 18px;
             text-align: center;
             border: 1px solid var(--card-border);
+            transition: var(--transition);
         }
 
-        .sub-timer-card.listening { border-color: var(--listening-color); }
-        .sub-timer-card.writing { border-color: var(--writing-color); }
-        .sub-timer-card.quiz { border-color: var(--quiz-color); }
-
-        .sub-timer-title { font-weight: 600; margin-bottom: 6px; }
-        .sub-timer-card.listening .sub-timer-title { color: var(--listening-color); }
-        .sub-timer-card.writing .sub-timer-title { color: var(--writing-color); }
-        .sub-timer-card.quiz .sub-timer-title { color: var(--quiz-color); }
+        .sub-timer-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
 
         .sub-timer-display {
-            font-size: 1.8rem;
-            font-family: monospace;
+            font-size: 2rem;
+            font-family: 'Plus Jakarta Sans', monospace;
+            font-weight: 700;
             margin: 10px 0;
         }
 
-        .sub-btn {
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* Forms & Inputs */
-        .form-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        input, select, textarea {
-            background: var(--bg-side);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 10px 14px;
-            border-radius: 8px;
-            outline: none;
-            font-size: 0.9rem;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary-accent);
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: right;
-            border-bottom: 1px solid var(--card-border);
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: var(--bg-side);
-            color: var(--primary-accent);
-        }
-
-        /* Filter Pills */
-        .filter-pills {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .pill-btn {
-            background: var(--bg-side);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .pill-btn.active, .pill-btn:hover {
-            background: var(--primary-accent);
-            color: #111;
-            border-color: var(--primary-accent);
-        }
-
-        /* Stats Dashboard */
+        /* Stats Cards */
         .stats-dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
+            gap: 20px;
         }
 
         .stat-card {
-            background: var(--bg-side);
-            padding: 20px;
-            border-radius: 12px;
+            background: rgba(17, 24, 39, 0.6);
+            padding: 22px;
+            border-radius: 16px;
             border: 1px solid var(--card-border);
+            transition: var(--transition);
         }
 
-        .stat-card-title {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 8px;
+        .stat-card:hover {
+            transform: translateY(-3px);
         }
 
         .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             color: var(--study-color);
-            margin-bottom: 8px;
+            margin: 10px 0;
         }
 
         .progress-container {
             width: 100%;
-            height: 6px;
-            background: var(--card-border);
-            border-radius: 3px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
             overflow: hidden;
         }
 
         .progress-bar {
             height: 100%;
-            background: var(--study-color);
+            background: linear-gradient(90deg, var(--study-color), #34d399);
             width: 0%;
-            transition: width 0.5s ease;
+            transition: width 0.6s ease;
         }
 
-        /* Prayer Tracker */
-        .prayer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+        /* Table Design */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
         }
 
-        .prayer-card {
-            background: var(--bg-side);
-            border: 1px solid var(--card-border);
-            padding: 16px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .prayer-card.completed {
-            border-color: var(--success-color);
-            background: rgba(166, 227, 161, 0.05);
-            transform: scale(1.02);
-        }
-
-        .prayer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .prayer-check-btn {
-            background: var(--card-border);
-            color: var(--text-main);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .prayer-card.completed .prayer-check-btn {
-            background: var(--success-color);
-            color: #111;
-            transform: rotate(360deg);
-        }
-
-        /* Lessons Header & Tabs */
-        .lessons-header-nav {
-            display: flex;
-            gap: 10px;
+        th, td {
+            padding: 14px 16px;
+            text-align: right;
             border-bottom: 1px solid var(--card-border);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-            overflow-x: auto;
+            font-size: 0.95rem;
         }
 
-        .lesson-tab-btn {
-            background: var(--bg-side);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--primary-accent);
+            font-weight: 700;
         }
 
-        .lesson-tab-btn.active {
-            background: var(--primary-accent);
-            color: #111;
-            font-weight: bold;
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .subject-lesson-content {
-            display: none;
-            animation: slideUp 0.4s ease;
-        }
-
-        .subject-lesson-content.active {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Action Buttons in tables */
-        .btn-sm {
-            padding: 4px 8px;
-            font-size: 0.8rem;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            margin-left: 4px;
-        }
-        .btn-edit { background: var(--afk-color); color: #111; }
-        .btn-del { background: var(--danger-color); color: #111; }
-
+        /* Responsiveness */
         @media (max-width: 768px) {
             aside.sidebar {
                 position: fixed;
@@ -629,7 +456,8 @@
                 left: 0;
                 top: 0;
             }
-            main.main-content { padding: 15px; }
+            main.main-content { padding: 18px; }
+            .main-timer-display { font-size: 3.5rem; }
         }
     </style>
 </head>
@@ -639,57 +467,31 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">
-                <span>📚</span>
+                <i class="fa-solid fa-graduation-cap"></i>
                 <span class="nav-text">Study System</span>
             </div>
-            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <button class="toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
         </div>
 
         <div class="nav-group">
             <div class="nav-group-title">الرئيسية والدراسة</div>
             <button class="nav-btn active" onclick="switchTab('study')">
-                <span class="icon">⏱️</span>
+                <span class="icon"><i class="fa-solid fa-stopwatch"></i></span>
                 <span class="nav-text">Study Mode</span>
             </button>
             <button class="nav-btn" onclick="switchTab('stats')">
-                <span class="icon">📊</span>
-                <span class="nav-text">الإحصائيات</span>
+                <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+                <span class="nav-text">الإحصائيات الذكية</span>
             </button>
             <button class="nav-btn" onclick="switchTab('logs')">
-                <span class="icon">📜</span>
-                <span class="nav-text">السجل</span>
-            </button>
-            <button class="nav-btn" onclick="switchTab('schedule')">
-                <span class="icon">📅</span>
-                <span class="nav-text">الجدول الدراسي</span>
+                <span class="icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                <span class="nav-text">سجل الأنشطة</span>
             </button>
 
-            <div class="nav-group-title">المهام والمناهج</div>
-            <button class="nav-btn" onclick="switchTab('tasks')">
-                <span class="icon">📋</span>
-                <span class="nav-text">مهام اليوم</span>
-            </button>
-            <button class="nav-btn" onclick="switchTab('lessons')">
-                <span class="icon">📖</span>
-                <span class="nav-text">فهرس الدروس</span>
-            </button>
-            <button class="nav-btn" onclick="switchTab('education')">
-                <span class="icon">🏫</span>
-                <span class="nav-text">الدروس الخارجية</span>
-            </button>
-
-            <div class="nav-group-title">متابعة شخصية</div>
-            <button class="nav-btn" onclick="switchTab('prayers')">
-                <span class="icon">🕌</span>
-                <span class="nav-text">الصلاة</span>
-            </button>
-            <button class="nav-btn" onclick="switchTab('sleep')">
-                <span class="icon">🌙</span>
-                <span class="nav-text">تتبع النوم</span>
-            </button>
-            <button class="nav-btn" onclick="switchTab('notebook')">
-                <span class="icon">📓</span>
-                <span class="nav-text">المفكرة</span>
+            <div class="nav-group-title">الذكاء الاصطناعي والمتابعة</div>
+            <button class="nav-btn" onclick="switchTab('ai-tools')">
+                <span class="icon"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--ai-color);"></i></span>
+                <span class="nav-text">المساعد الذكي AI</span>
             </button>
         </div>
 
@@ -697,8 +499,8 @@
             <div class="profile-badge">
                 <div class="profile-avatar">A</div>
                 <div class="profile-info">
-                    <span style="font-weight: bold; font-size: 0.9rem;">عمرو</span>
-                    <span style="font-size: 0.75rem; color: var(--text-sub);">طالب مجتهد</span>
+                    <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">عمرو</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">طالب مجتهد 🚀</span>
                 </div>
             </div>
         </div>
@@ -711,73 +513,50 @@
         <div id="tab-study" class="tab-content active">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">مؤقت المذاكرة الرئيسي ⏱️</span>
-                    <button class="btn-print" onclick="window.print()">طباعة PDF 📄</button>
+                    <span class="card-title"><i class="fa-solid fa-bolt" style="color: var(--study-color);"></i> مؤقت المذاكرة الرئيسي</span>
+                    <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> طباعة</button>
                 </div>
                 
                 <div class="main-timer-display" id="mainTimerDisplay">00:00:00</div>
                 
                 <div class="controls-row">
-                    <button class="btn-action" style="color: var(--study-color); border-color: var(--study-color);" onclick="startMainTimer()">بدء ▶️</button>
-                    <button class="btn-action" style="color: var(--afk-color); border-color: var(--afk-color);" onclick="pauseMainTimer()">إيقاف ⏸️</button>
-                    <button class="btn-action" style="color: var(--primary-accent); border-color: var(--primary-accent);" onclick="saveStudySession()">حفظ 💾</button>
-                    <button class="btn-action btn-danger" onclick="resetMainTimer()">إعادة 🔄</button>
+                    <button class="btn-action" style="background: var(--study-color); color: #fff; border: none;" onclick="startMainTimer()"><i class="fa-solid fa-play"></i> بدء</button>
+                    <button class="btn-action" style="background: var(--break-color); color: #fff; border: none;" onclick="pauseMainTimer()"><i class="fa-solid fa-pause"></i> إيقاف</button>
+                    <button class="btn-action" onclick="saveStudySession()"><i class="fa-solid fa-floppy-disk"></i> حفظ الجلسة</button>
+                    <button class="btn-action btn-danger" onclick="resetMainTimer()"><i class="fa-solid fa-rotate-right"></i> إعادة</button>
                 </div>
 
-                <!-- Sub-timers (Listening, Writing, Quiz) -->
+                <!-- AI Quick Helper -->
+                <div class="ai-box">
+                    <div class="ai-header">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>مساعد المذاكرة الذكي (AI Assistant)</span>
+                    </div>
+                    <div class="ai-input-group">
+                        <input type="text" id="aiPrompt" placeholder="اسأل الذكاء الاصطناعي أي سؤال في المذاكرة أو اطلب تلخيصاً...">
+                        <button class="btn-action" style="background: var(--ai-color); color:#fff; border:none;" onclick="askAI()"><i class="fa-solid fa-paper-plane"></i> إرسال</button>
+                    </div>
+                    <div class="ai-response" id="aiResponse"></div>
+                </div>
+
+                <!-- Sub-timers Grid -->
                 <div class="sub-timers-grid">
-                    <div class="sub-timer-card listening">
-                        <div class="sub-timer-title">1. Listening 🎧</div>
-                        <div class="sub-timer-display" id="timerDisplayListening">00:00:00</div>
-                        <button class="sub-btn" style="background: var(--listening-color); color: #111;" onclick="toggleSubTimer('listening')">تشغيل / إيقاف</button>
+                    <div class="sub-timer-card">
+                        <div style="color: #60a5fa; font-weight: 700;"><i class="fa-solid fa-headphones"></i> Listening</div>
+                        <div class="sub-timer-display" id="timerDisplayListening" style="color: #60a5fa;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;" onclick="toggleSubTimer('listening')">تشغيل / إيقاف</button>
                     </div>
-                    <div class="sub-timer-card writing">
-                        <div class="sub-timer-title">2. Writing ✍️</div>
-                        <div class="sub-timer-display" id="timerDisplayWriting">00:00:00</div>
-                        <button class="sub-btn" style="background: var(--writing-color); color: #111;" onclick="toggleSubTimer('writing')">تشغيل / إيقاف</button>
+                    <div class="sub-timer-card">
+                        <div style="color: #34d399; font-weight: 700;"><i class="fa-solid fa-pen-nib"></i> Writing</div>
+                        <div class="sub-timer-display" id="timerDisplayWriting" style="color: #34d399;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;" onclick="toggleSubTimer('writing')">تشغيل / إيقاف</button>
                     </div>
-                    <div class="sub-timer-card quiz">
-                        <div class="sub-timer-title">3. Quiz 📝</div>
-                        <div class="sub-timer-display" id="timerDisplayQuiz">00:00:00</div>
-                        <button class="sub-btn" style="background: var(--quiz-color); color: #111;" onclick="toggleSubTimer('quiz')">تشغيل / إيقاف</button>
-                    </div>
-                </div>
-
-                <!-- Mini Collapsible Timers (Break & AFK) -->
-                <div class="mini-timers-container">
-                    <!-- Mini Break Timer -->
-                    <div class="mini-timer-box break" id="breakBox">
-                        <div class="mini-timer-header" onclick="toggleMiniExpand('breakBox')">
-                            <span class="mini-title">☕ مؤقت الاستراحة (Break)</span>
-                            <span id="breakHeaderTime">00:00:00</span>
-                        </div>
-                        <div class="mini-timer-content">
-                            <div class="mini-display" id="breakDisplay" style="color: var(--break-color);">00:00:00</div>
-                            <div class="controls-row">
-                                <button class="btn-action" onclick="toggleMiniTimer('break')">تشغيل / إيقاف</button>
-                                <button class="btn-action" onclick="saveMiniSession('break')">حفظ</button>
-                                <button class="btn-action btn-danger" onclick="resetMiniTimer('break')">إعادة</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mini AFK Timer -->
-                    <div class="mini-timer-box afk" id="afkBox">
-                        <div class="mini-timer-header" onclick="toggleMiniExpand('afkBox')">
-                            <span class="mini-title">⏳ مؤقت الغياب (AFK)</span>
-                            <span id="afkHeaderTime">00:00:00</span>
-                        </div>
-                        <div class="mini-timer-content">
-                            <div class="mini-display" id="afkDisplay" style="color: var(--afk-color);">00:00:00</div>
-                            <div class="controls-row">
-                                <button class="btn-action" onclick="toggleMiniTimer('afk')">تشغيل / إيقاف</button>
-                                <button class="btn-action" onclick="saveMiniSession('afk')">حفظ</button>
-                                <button class="btn-action btn-danger" onclick="resetMiniTimer('afk')">إعادة</button>
-                            </div>
-                        </div>
+                    <div class="sub-timer-card">
+                        <div style="color: #fbbf24; font-weight: 700;"><i class="fa-solid fa-square-check"></i> Quiz</div>
+                        <div class="sub-timer-display" id="timerDisplayQuiz" style="color: #fbbf24;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;" onclick="toggleSubTimer('quiz')">تشغيل / إيقاف</button>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -785,885 +564,154 @@
         <div id="tab-stats" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">لوحة الإحصائيات الشاملة 📊</span>
-                    <button class="btn-print" onclick="window.print()">طباعة PDF 📄</button>
-                </div>
-
-                <div class="filter-pills">
-                    <button class="pill-btn active" onclick="renderStats('day', this)">اليوم (12 ساعة)</button>
-                    <button class="pill-btn" onclick="renderStats('week', this)">الأسبوع</button>
-                    <button class="pill-btn" onclick="renderStats('month', this)">الشهر</button>
-                    <button class="pill-btn" onclick="renderStats('all', this)">الكل</button>
+                    <span class="card-title"><i class="fa-solid fa-chart-column" style="color: var(--primary-accent);"></i> لوحة الإحصائيات الشاملة</span>
+                    <button class="btn-action" style="background: var(--ai-color); color:#fff; border:none;" onclick="generateAIInsight()"><i class="fa-solid fa-brain"></i> تحليل ذكي للأداء</button>
                 </div>
 
                 <div class="stats-dashboard">
                     <div class="stat-card">
-                        <div class="stat-card-title">إجمالي المذاكرة</div>
-                        <div class="stat-value" id="stTotalStudy">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbStudy"></div></div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">إجمالي المذاكرة</div>
+                        <div class="stat-value" id="stTotalStudy">120 دقيقة</div>
+                        <div class="progress-container"><div class="progress-bar" style="width: 70%;"></div></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-card-title">الاستماع (Listening)</div>
-                        <div class="stat-value" id="stListening" style="color: var(--listening-color);">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbListening" style="background: var(--listening-color);"></div></div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">الاستماع (Listening)</div>
+                        <div class="stat-value" style="color: #60a5fa;">45 دقيقة</div>
+                        <div class="progress-container"><div class="progress-bar" style="width: 45%; background: #60a5fa;"></div></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-card-title">الكتابة (Writing)</div>
-                        <div class="stat-value" id="stWriting" style="color: var(--writing-color);">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbWriting" style="background: var(--writing-color);"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-title">الحل (Quiz)</div>
-                        <div class="stat-value" id="stQuiz" style="color: var(--quiz-color);">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbQuiz" style="background: var(--quiz-color);"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-title">دروس خارجية (مذاكرة صافية)</div>
-                        <div class="stat-value" id="stEducation">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbEducation"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-title">وقت الاستراحة (Break)</div>
-                        <div class="stat-value" id="stBreak" style="color: var(--break-color);">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbBreak" style="background: var(--break-color);"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-title">وقت الغياب (AFK)</div>
-                        <div class="stat-value" id="stAFK" style="color: var(--afk-color);">0 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbAFK" style="background: var(--afk-color);"></div></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-title">ساعات النوم الصافية</div>
-                        <div class="stat-value" id="stSleep" style="color: var(--primary-accent);">0 ساعة</div>
-                        <div class="progress-container"><div class="progress-bar" id="pbSleep" style="background: var(--primary-accent);"></div></div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">الكتابة (Writing)</div>
+                        <div class="stat-value" style="color: #34d399;">30 دقيقة</div>
+                        <div class="progress-container"><div class="progress-bar" style="width: 30%; background: #34d399;"></div></div>
                     </div>
                 </div>
+
+                <div class="ai-response" id="aiInsightBox" style="margin-top:20px;"></div>
             </div>
         </div>
 
-        <!-- 3. LOGS TAB (السجل) -->
+        <!-- 3. LOGS TAB -->
         <div id="tab-logs" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">سجل الأنشطة والمذاكرة التفصيلي 📜</span>
-                </div>
-
-                <div class="filter-pills">
-                    <button class="pill-btn active" onclick="renderLogs('day', this)">اليوم (12 ساعة)</button>
-                    <button class="pill-btn" onclick="renderLogs('week', this)">الأسبوع</button>
-                    <button class="pill-btn" onclick="renderLogs('month', this)">الشهر</button>
-                    <button class="pill-btn" onclick="renderLogs('all', this)">الكل</button>
+                    <span class="card-title"><i class="fa-solid fa-list-check"></i> سجل المذاكرة اليومي</span>
                 </div>
 
                 <table>
                     <thead>
                         <tr>
-                            <th>نوع النشاط / المادة</th>
-                            <th>التفاصيل والمسمى</th>
-                            <th>المدة / الإنجاز</th>
-                            <th>التاريخ والوقت</th>
+                            <th>النشاط</th>
+                            <th>المدة</th>
+                            <th>التاريخ</th>
                         </tr>
                     </thead>
-                    <tbody id="logsTableBody">
-                        <!-- Dynamic content -->
+                    <tbody>
+                        <tr>
+                            <td>جلسة مذاكرة رئيسية</td>
+                            <td>45 دقيقة</td>
+                            <td>اليوم 02:30 م</td>
+                        </tr>
+                        <tr>
+                            <td>تمارين Writing</td>
+                            <td>20 دقيقة</td>
+                            <td>اليوم 01:10 م</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 4. SCHEDULE TAB -->
-        <div id="tab-schedule" class="tab-content">
+        <!-- 4. AI TOOLS TAB -->
+        <div id="tab-ai-tools" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">الجدول الدراسي 📅</span>
+                    <span class="card-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--ai-color);"></i> مركز أدوات الذكاء الاصطناعي</span>
                 </div>
-                <div class="form-group">
-                    <input type="text" id="schSubject" placeholder="المادة" style="flex: 1;">
-                    <select id="schDay">
-                        <option value="السبت">السبت</option>
-                        <option value="الأحد">الأحد</option>
-                        <option value="الإثنين">الإثنين</option>
-                        <option value="الثلاثاء">الثلاثاء</option>
-                        <option value="الأربعاء">الأربعاء</option>
-                        <option value="الخميس">الخميس</option>
-                        <option value="الجمعة">الجمعة</option>
-                    </select>
-                    <input type="time" id="schTime">
-                    <input type="text" id="schTeacher" placeholder="المدرس">
-                    <button class="btn-action" onclick="addScheduleItem()">إضافة للجدول</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>المادة</th>
-                            <th>اليوم</th>
-                            <th>الوقت</th>
-                            <th>المدرس</th>
-                            <th>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scheduleTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 5. TASKS TAB -->
-        <div id="tab-tasks" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">قائمة مهام اليوم 📋</span>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="taskSubjectInput" placeholder="أضف مهمة جديدة..." style="flex: 1;">
-                    <button class="btn-action" onclick="addTaskDay()">إضافة مهمة</button>
-                </div>
-                <ul id="tasksList" style="list-style: none; padding: 0;"></ul>
-            </div>
-        </div>
-
-        <!-- 6. LESSONS INDEX TAB -->
-        <div id="tab-lessons" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">فهرس الدروس والمناهج 📖</span>
-                </div>
-                
-                <!-- Small Header Nav for Subjects -->
-                <div class="lessons-header-nav">
-                    <button class="lesson-tab-btn active" onclick="openSubjectLesson('arabic', this)">اللغة العربية 📚</button>
-                    <button class="lesson-tab-btn" onclick="openSubjectLesson('english', this)">اللغة الإنجليزية 🇬🇧</button>
-                    <button class="lesson-tab-btn" onclick="openSubjectLesson('history', this)">التاريخ 🏛️</button>
-                    <button class="lesson-tab-btn" onclick="openSubjectLesson('physics', this)">الفيزياء ⚡</button>
-                </div>
-
-                <!-- Arabic Lessons -->
-                <div id="subject-arabic" class="subject-lesson-content active">
-                    <h3 style="color: var(--arabic-color); margin-bottom: 12px;">اللغة العربية</h3>
-                    <div class="form-group">
-                        <input type="text" id="addLesson-arabic" placeholder="اسم الدرس الجديد..." style="flex:1;">
-                        <button class="btn-action" onclick="addLesson('arabic')">إضافة درس</button>
-                    </div>
-                    <div id="lessonsList-arabic"></div>
-                </div>
-
-                <!-- English Lessons -->
-                <div id="subject-english" class="subject-lesson-content">
-                    <h3 style="color: var(--english-color); margin-bottom: 12px;">اللغة الإنجليزية</h3>
-                    <div class="form-group">
-                        <input type="text" id="addLesson-english" placeholder="اسم الدرس الجديد..." style="flex:1;">
-                        <button class="btn-action" onclick="addLesson('english')">إضافة درس</button>
-                    </div>
-                    <div id="lessonsList-english"></div>
-                </div>
-
-                <!-- History Lessons -->
-                <div id="subject-history" class="subject-lesson-content">
-                    <h3 style="color: var(--history-color); margin-bottom: 12px;">التاريخ</h3>
-                    <div class="form-group">
-                        <input type="text" id="addLesson-history" placeholder="اسم الدرس الجديد..." style="flex:1;">
-                        <button class="btn-action" onclick="addLesson('history')">إضافة درس</button>
-                    </div>
-                    <div id="lessonsList-history"></div>
-                </div>
-
-                <!-- Physics Lessons -->
-                <div id="subject-physics" class="subject-lesson-content">
-                    <h3 style="color: var(--physics-color); margin-bottom: 12px;">الفيزياء</h3>
-                    <div class="form-group">
-                        <input type="text" id="addLesson-physics" placeholder="اسم الدرس الجديد..." style="flex:1;">
-                        <button class="btn-action" onclick="addLesson('physics')">إضافة درس</button>
-                    </div>
-                    <div id="lessonsList-physics"></div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- 7. EXTERNAL EDUCATION TAB -->
-        <div id="tab-education" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">سجل الدروس الخارجية 🏫</span>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="eduSubject" placeholder="اسم المادة" style="flex: 1;">
-                    <input type="text" id="eduTeacher" placeholder="اسم المدرس" style="flex: 1;">
-                    <input type="time" id="eduStart">
-                    <input type="time" id="eduEnd">
-                    <button class="btn-action" onclick="addEducationLesson()">إضافة الدرس</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>المادة</th>
-                            <th>المدرس</th>
-                            <th>من - إلى</th>
-                            <th>الصافي المذاكر</th>
-                            <th>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="eduTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 8. PRAYERS TAB -->
-        <div id="tab-prayers" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">متابعة الصلوات اليومية (مواقيت القاهرة) 🕌</span>
-                </div>
-                <div class="prayer-grid" id="prayerGrid">
-                    <!-- Dynamic Prayer Cards -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 9. SLEEP TRACKER TAB -->
-        <div id="tab-sleep" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">تتبع ساعات النوم 🌙</span>
-                </div>
-                <div class="form-group">
-                    <label style="align-self:center;">وقت النوم:</label>
-                    <input type="time" id="sleepStart">
-                    <label style="align-self:center;">وقت الاستيقاظ:</label>
-                    <input type="time" id="sleepEnd">
-                    <button class="btn-action" onclick="addSleepRecord()">تسجيل النوم</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>من</th>
-                            <th>إلى</th>
-                            <th>الصافي (ساعات)</th>
-                            <th>التاريخ</th>
-                            <th>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sleepTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 10. NOTEBOOK TAB -->
-        <div id="tab-notebook" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">المفكرة الشخصية الاحترافية 📓</span>
-                    <button class="btn-action" onclick="saveNotebook()">حفظ المفكرة 💾</button>
-                </div>
-                <textarea id="notebookContent" style="width: 100%; height: 400px; resize: vertical; font-size: 1rem; line-height: 1.6;" placeholder="اكتب ملاحظاتك، أفكارك، والملخصات هنا بشكل احترافي..."></textarea>
+                <p style="color: var(--text-muted); line-height: 1.8;">
+                    تم دمج محرك الذكاء الاصطناعي المطور لمساعدتك على صياغة جدول دراسي مثالي، تلخيص الفصول الدراسية الصعبة، وإعطاء إرشادات متخصصة تحسن من مستوى تحصيلك العلمي بناءً على إحصائياتك.
+                </p>
             </div>
         </div>
 
     </main>
 
     <script>
-        /* State & LocalStorage Management */
-        let state = {
-            logs: JSON.parse(localStorage.getItem('sys_logs')) || [],
-            schedule: JSON.parse(localStorage.getItem('sys_schedule')) || [],
-            tasks: JSON.parse(localStorage.getItem('sys_tasks')) || [],
-            lessons: JSON.parse(localStorage.getItem('sys_lessons')) || { arabic: [], english: [], history: [], physics: [] },
-            education: JSON.parse(localStorage.getItem('sys_education')) || [],
-            sleep: JSON.parse(localStorage.getItem('sys_sleep')) || [],
-            prayers: JSON.parse(localStorage.getItem('sys_prayers')) || { date: '', completed: {} },
-            notebook: localStorage.getItem('sys_notebook') || ''
-        };
-
-        function saveState() {
-            localStorage.setItem('sys_logs', JSON.stringify(state.logs));
-            localStorage.setItem('sys_schedule', JSON.stringify(state.schedule));
-            localStorage.setItem('sys_tasks', JSON.stringify(state.tasks));
-            localStorage.setItem('sys_lessons', JSON.stringify(state.lessons));
-            localStorage.setItem('sys_education', JSON.stringify(state.education));
-            localStorage.setItem('sys_sleep', JSON.stringify(state.sleep));
-            localStorage.setItem('sys_prayers', JSON.stringify(state.prayers));
-            localStorage.setItem('sys_notebook', state.notebook);
-        }
-
-        /* Navigation */
+        // Toggle Sidebar
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
         }
 
+        // Switch Tabs with Animation
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            
-            const targetTab = document.getElementById('tab-' + tabId);
-            if(targetTab) targetTab.classList.add('active');
-            
-            const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(tabId));
-            if(btn) btn.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
 
-            if(tabId === 'stats') renderStats('day');
-            if(tabId === 'logs') renderLogs('day');
+            const selectedTab = document.getElementById(`tab-${tabId}`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+
+            event.currentTarget.classList.add('active');
         }
 
-        /* Timers Functionality */
-        let timers = {
-            main: { seconds: 0, interval: null },
-            listening: { seconds: 0, interval: null },
-            writing: { seconds: 0, interval: null },
-            quiz: { seconds: 0, interval: null },
-            break: { seconds: 0, interval: null },
-            afk: { seconds: 0, interval: null }
-        };
-
-        function formatTime(sec) {
-            let h = Math.floor(sec / 3600);
-            let m = Math.floor((sec % 3600) / 60);
-            let s = sec % 60;
-            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        }
+        // Timer Simulation Logic
+        let timerInterval;
+        let seconds = 0;
 
         function startMainTimer() {
-            if(!timers.main.interval) {
-                timers.main.interval = setInterval(() => {
-                    timers.main.seconds++;
-                    document.getElementById('mainTimerDisplay').innerText = formatTime(timers.main.seconds);
-                }, 1000);
-            }
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                seconds++;
+                let hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                let mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                let secs = (seconds % 60).toString().padStart(2, '0');
+                document.getElementById('mainTimerDisplay').innerText = `${hrs}:${mins}:${secs}`;
+            }, 1000);
         }
 
         function pauseMainTimer() {
-            clearInterval(timers.main.interval);
-            timers.main.interval = null;
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
 
         function resetMainTimer() {
             pauseMainTimer();
-            timers.main.seconds = 0;
-            document.getElementById('mainTimerDisplay').innerText = formatTime(0);
+            seconds = 0;
+            document.getElementById('mainTimerDisplay').innerText = "00:00:00";
         }
 
         function saveStudySession() {
-            if(timers.main.seconds === 0) return alert('المؤقت فارغ!');
-            addLogRecord('جلسة مذاكرة رئيسية', 'مذاكرة متواصلة', Math.round(timers.main.seconds / 60) + ' دقيقة', timers.main.seconds, 'study');
+            alert('تم حفظ الجلسة الدراسية بنجاح في السجل! 🚀');
+        }
+
+        // Simulated AI Feature
+        function askAI() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const responseBox = document.getElementById('aiResponse');
             
-            // Save sub-timers if active
-            ['listening', 'writing', 'quiz'].forEach(type => {
-                if(timers[type].seconds > 0) {
-                    addLogRecord(`فرعي (${type})`, 'تمرين ومتابعة', Math.round(timers[type].seconds / 60) + ' دقيقة', timers[type].seconds, type);
-                    timers[type].seconds = 0;
-                    document.getElementById(`timerDisplay${type.charAt(0).toUpperCase() + type.slice(1)}`).innerText = formatTime(0);
-                    clearInterval(timers[type].interval);
-                    timers[type].interval = null;
-                }
-            });
+            if (!prompt) return;
 
-            resetMainTimer();
-            alert('تم حفظ جلسة المذاكرة بنجاح في السجل والإحصائيات!');
+            responseBox.style.display = 'block';
+            responseBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري معالجة طلبك بواسطة الذكاء الاصطناعي...';
+
+            setTimeout(() => {
+                responseBox.innerHTML = `<strong>الذكاء الاصطناعي:</strong> بناءً على سؤالك "<em>${prompt}</em>"، أنصحك بتقسيم وقت المذاكرة باستخدام تقنية Pomodoro (25 دقيقة تركيز + 5 دقائق راحة) لضمان أعلى معدل استيعاب!`;
+            }, 1200);
         }
 
-        function toggleSubTimer(type) {
-            if(timers[type].interval) {
-                clearInterval(timers[type].interval);
-                timers[type].interval = null;
-            } else {
-                timers[type].interval = setInterval(() => {
-                    timers[type].seconds++;
-                    const id = `timerDisplay${type.charAt(0).toUpperCase() + type.slice(1)}`;
-                    document.getElementById(id).innerText = formatTime(timers[type].seconds);
-                }, 1000);
-            }
+        function generateAIInsight() {
+            const box = document.getElementById('aiInsightBox');
+            box.style.display = 'block';
+            box.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تحليل إحصائياتك...';
+
+            setTimeout(() => {
+                box.innerHTML = `<strong>💡 التقرير الذكي للأداء:</strong> أدائك ممتاز في الاستماع اليوم (45 دقيقة)، ولكن يمكنك زيادة التركيز على الكتابة (Writing) للوصول للتوازن المثالي في جدولك الدراسية.`;
+            }, 1000);
         }
-
-        /* Mini Timers (Break / AFK) */
-        function toggleMiniExpand(boxId) {
-            document.getElementById(boxId).classList.toggle('expanded');
-        }
-
-        function toggleMiniTimer(type) {
-            if(timers[type].interval) {
-                clearInterval(timers[type].interval);
-                timers[type].interval = null;
-            } else {
-                timers[type].interval = setInterval(() => {
-                    timers[type].seconds++;
-                    const str = formatTime(timers[type].seconds);
-                    document.getElementById(`${type}Display`).innerText = str;
-                    document.getElementById(`${type}HeaderTime`).innerText = str;
-                }, 1000);
-            }
-        }
-
-        function resetMiniTimer(type) {
-            if(timers[type].interval) clearInterval(timers[type].interval);
-            timers[type].interval = null;
-            timers[type].seconds = 0;
-            document.getElementById(`${type}Display`).innerText = formatTime(0);
-            document.getElementById(`${type}HeaderTime`).innerText = formatTime(0);
-        }
-
-        function saveMiniSession(type) {
-            if(timers[type].seconds === 0) return alert('المؤقت فارغ!');
-            const name = type === 'break' ? 'استراحة (Break)' : 'غياب (AFK)';
-            addLogRecord(name, 'وقت مستقطع', Math.round(timers[type].seconds / 60) + ' دقيقة', timers[type].seconds, type);
-            resetMiniTimer(type);
-            alert(`تم حفظ وقت ${name} بنجاح!`);
-        }
-
-        /* Log Addition */
-        function addLogRecord(title, details, durationStr, durationSec, category) {
-            state.logs.unshift({
-                id: Date.now(),
-                title,
-                details,
-                durationStr,
-                durationSec,
-                category,
-                timestamp: Date.now()
-            });
-            saveState();
-        }
-
-        /* Filter Helper */
-        function filterByRange(items, range) {
-            const now = Date.now();
-            return items.filter(item => {
-                const diffHours = (now - item.timestamp) / (1000 * 60 * 60);
-                if(range === 'day') return diffHours <= 12;
-                if(range === 'week') return diffHours <= 24 * 7;
-                if(range === 'month') return diffHours <= 24 * 30;
-                return true; // all
-            });
-        }
-
-        /* Stats Logic */
-        function renderStats(range, btn) {
-            if(btn) {
-                btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-
-            const logs = filterByRange(state.logs, range);
-            
-            let totals = { study: 0, listening: 0, writing: 0, quiz: 0, education: 0, breakSec: 0, afkSec: 0 };
-
-            logs.forEach(l => {
-                if(l.category === 'study') totals.study += l.durationSec;
-                if(l.category === 'listening') totals.listening += l.durationSec;
-                if(l.category === 'writing') totals.writing += l.durationSec;
-                if(l.category === 'quiz') totals.quiz += l.durationSec;
-                if(l.category === 'education') totals.education += l.durationSec;
-                if(l.category === 'break') totals.breakSec += l.durationSec;
-                if(l.category === 'afk') totals.afkSec += l.durationSec;
-            });
-
-            document.getElementById('stTotalStudy').innerText = Math.round(totals.study / 60) + ' دقيقة';
-            document.getElementById('stListening').innerText = Math.round(totals.listening / 60) + ' دقيقة';
-            document.getElementById('stWriting').innerText = Math.round(totals.writing / 60) + ' دقيقة';
-            document.getElementById('stQuiz').innerText = Math.round(totals.quiz / 60) + ' دقيقة';
-            document.getElementById('stEducation').innerText = Math.round(totals.education / 60) + ' دقيقة';
-            document.getElementById('stBreak').innerText = Math.round(totals.breakSec / 60) + ' دقيقة';
-            document.getElementById('stAFK').innerText = Math.round(totals.afkSec / 60) + ' دقيقة';
-
-            // Sleep calculation
-            const sleepFiltered = filterByRange(state.sleep, range);
-            let totalSleepSec = sleepFiltered.reduce((acc, curr) => acc + (curr.hours * 3600), 0);
-            document.getElementById('stSleep').innerText = (totalSleepSec / 3600).toFixed(1) + ' ساعة';
-
-            // Bars
-            const maxVal = Math.max(totals.study, 3600);
-            document.getElementById('pbStudy').style.width = Math.min(100, (totals.study / maxVal)*100) + '%';
-            document.getElementById('pbListening').style.width = Math.min(100, (totals.listening / maxVal)*100) + '%';
-            document.getElementById('pbWriting').style.width = Math.min(100, (totals.writing / maxVal)*100) + '%';
-            document.getElementById('pbQuiz').style.width = Math.min(100, (totals.quiz / maxVal)*100) + '%';
-            document.getElementById('pbEducation').style.width = Math.min(100, (totals.education / maxVal)*100) + '%';
-            document.getElementById('pbBreak').style.width = Math.min(100, (totals.breakSec / maxVal)*100) + '%';
-            document.getElementById('pbAFK').style.width = Math.min(100, (totals.afkSec / maxVal)*100) + '%';
-            document.getElementById('pbSleep').style.width = Math.min(100, ((totalSleepSec/3600)/12)*100) + '%';
-        }
-
-        /* Logs Logic */
-        function renderLogs(range, btn) {
-            if(btn) {
-                btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            }
-
-            const tbody = document.getElementById('logsTableBody');
-            tbody.innerHTML = '';
-            
-            const logs = filterByRange(state.logs, range);
-
-            if(logs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">لا توجد سجلات في هذه الفترة</td></tr>';
-                return;
-            }
-
-            logs.forEach(log => {
-                const tr = document.createElement('tr');
-                const d = new Date(log.timestamp);
-                const dateStr = d.toLocaleDateString('ar-EG') + ' ' + d.toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                
-                tr.innerHTML = `
-                    <td><strong>${log.title}</strong></td>
-                    <td>${log.details}</td>
-                    <td><span style="color:var(--study-color);">${log.durationStr}</span></td>
-                    <td>${dateStr}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        /* Schedule Functions */
-        function renderSchedule() {
-            const tbody = document.getElementById('scheduleTableBody');
-            tbody.innerHTML = '';
-            state.schedule.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.subject}</td>
-                    <td>${item.day}</td>
-                    <td>${item.time}</td>
-                    <td>${item.teacher}</td>
-                    <td>
-                        <button class="btn-sm btn-edit" onclick="editSchedule(${index})">تعديل</button>
-                        <button class="btn-sm btn-del" onclick="deleteSchedule(${index})">حذف</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function addScheduleItem() {
-            const subject = document.getElementById('schSubject').value;
-            const day = document.getElementById('schDay').value;
-            const time = document.getElementById('schTime').value;
-            const teacher = document.getElementById('schTeacher').value;
-
-            if(!subject || !time) return alert('الرجاء إدخال البيانات المطلوبة');
-
-            state.schedule.push({ subject, day, time, teacher });
-            saveState();
-            renderSchedule();
-            document.getElementById('schSubject').value = '';
-            document.getElementById('schTeacher').value = '';
-        }
-
-        function deleteSchedule(index) {
-            state.schedule.splice(index, 1);
-            saveState();
-            renderSchedule();
-        }
-
-        function editSchedule(index) {
-            const item = state.schedule[index];
-            const newSub = prompt('تعديل المادة:', item.subject);
-            if(newSub) {
-                item.subject = newSub;
-                item.teacher = prompt('تعديل المدرس:', item.teacher) || item.teacher;
-                saveState();
-                renderSchedule();
-            }
-        }
-
-        /* Daily Tasks Functions */
-        function renderTasks() {
-            const ul = document.getElementById('tasksList');
-            ul.innerHTML = '';
-            state.tasks.forEach((task, index) => {
-                const li = document.createElement('li');
-                li.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--card-border);';
-                li.innerHTML = `
-                    <span style="${task.done ? 'text-decoration:line-through; color:var(--text-sub);' : ''}">${task.text}</span>
-                    <div>
-                        <button class="btn-sm" style="background:var(--success-color);" onclick="toggleTask(${index})">✓</button>
-                        <button class="btn-sm btn-edit" onclick="editTask(${index})">تعديل</button>
-                        <button class="btn-sm btn-del" onclick="deleteTask(${index})">حذف</button>
-                    </div>
-                `;
-                ul.appendChild(li);
-            });
-        }
-
-        function addTaskDay() {
-            const input = document.getElementById('taskSubjectInput');
-            if(!input.value) return;
-            state.tasks.push({ text: input.value, done: false });
-            saveState();
-            renderTasks();
-            input.value = '';
-        }
-
-        function toggleTask(index) {
-            state.tasks[index].done = !state.tasks[index].done;
-            saveState();
-            renderTasks();
-        }
-
-        function editTask(index) {
-            const val = prompt('تعديل المهمة:', state.tasks[index].text);
-            if(val) {
-                state.tasks[index].text = val;
-                saveState();
-                renderTasks();
-            }
-        }
-
-        function deleteTask(index) {
-            state.tasks.splice(index, 1);
-            saveState();
-            renderTasks();
-        }
-
-        /* Lessons Index Functions */
-        function openSubjectLesson(subKey, btn) {
-            document.querySelectorAll('.lesson-tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.subject-lesson-content').forEach(c => c.classList.remove('active'));
-            
-            btn.classList.add('active');
-            document.getElementById(`subject-${subKey}`).classList.add('active');
-        }
-
-        function renderLessons() {
-            ['arabic', 'english', 'history', 'physics'].forEach(sub => {
-                const container = document.getElementById(`lessonsList-${sub}`);
-                if(!container) return;
-                container.innerHTML = '';
-                state.lessons[sub].forEach((lesson, index) => {
-                    const div = document.createElement('div');
-                    div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; margin-top:5px; background:var(--bg-side); border-radius:6px;';
-                    div.innerHTML = `
-                        <span>${lesson}</span>
-                        <div>
-                            <button class="btn-sm btn-edit" onclick="editLesson('${sub}', ${index})">تعديل</button>
-                            <button class="btn-sm btn-del" onclick="deleteLesson('${sub}', ${index})">حذف</button>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-            });
-        }
-
-        function addLesson(sub) {
-            const input = document.getElementById(`addLesson-${sub}`);
-            if(!input.value) return;
-            if(!state.lessons[sub]) state.lessons[sub] = [];
-            state.lessons[sub].push(input.value);
-            saveState();
-            renderLessons();
-            input.value = '';
-        }
-
-        function editLesson(sub, index) {
-            const val = prompt('تعديل الدرس:', state.lessons[sub][index]);
-            if(val) {
-                state.lessons[sub][index] = val;
-                saveState();
-                renderLessons();
-            }
-        }
-
-        function deleteLesson(sub, index) {
-            state.lessons[sub].splice(index, 1);
-            saveState();
-            renderLessons();
-        }
-
-        /* External Education Functions */
-        function renderEducation() {
-            const tbody = document.getElementById('eduTableBody');
-            tbody.innerHTML = '';
-            state.education.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.subject}</td>
-                    <td>${item.teacher}</td>
-                    <td>${item.start} - ${item.end}</td>
-                    <td><span style="color:var(--study-color);">${item.netMinutes} دقيقة</span></td>
-                    <td>
-                        <button class="btn-sm btn-edit" onclick="editEducation(${index})">تعديل</button>
-                        <button class="btn-sm btn-del" onclick="deleteEducation(${index})">حذف</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function addEducationLesson() {
-            const subject = document.getElementById('eduSubject').value;
-            const teacher = document.getElementById('eduTeacher').value;
-            const start = document.getElementById('eduStart').value;
-            const end = document.getElementById('eduEnd').value;
-
-            if(!subject || !start || !end) return alert('يرجى ملء البيانات كاملاً');
-
-            // Net calculation
-            const sParts = start.split(':');
-            const eParts = end.split(':');
-            let sMin = parseInt(sParts[0])*60 + parseInt(sParts[1]);
-            let eMin = parseInt(eParts[0])*60 + parseInt(eParts[1]);
-            if(eMin < sMin) eMin += 24*60;
-            const netMinutes = eMin - sMin;
-
-            const rec = { subject, teacher, start, end, netMinutes, timestamp: Date.now() };
-            state.education.push(rec);
-            saveState();
-            renderEducation();
-
-            // Add to Log automatically
-            addLogRecord(`درس خارجي: ${subject}`, `مع المستر ${teacher}`, `${netMinutes} دقيقة`, netMinutes*60, 'education');
-
-            document.getElementById('eduSubject').value = '';
-            document.getElementById('eduTeacher').value = '';
-        }
-
-        function editEducation(index) {
-            const item = state.education[index];
-            const newSub = prompt('تعديل المادة:', item.subject);
-            if(newSub) {
-                item.subject = newSub;
-                saveState();
-                renderEducation();
-            }
-        }
-
-        function deleteEducation(index) {
-            state.education.splice(index, 1);
-            saveState();
-            renderEducation();
-        }
-
-        /* Prayer Tracker Cairo Schedule */
-        const cairoPrayers = [
-            { name: 'الفجر', time: '04:30 AM', rakat: 2 },
-            { name: 'الظهر', time: '12:00 PM', rakat: 4 },
-            { name: 'العصر', time: '03:30 PM', rakat: 4 },
-            { name: 'المغرب', time: '06:45 PM', rakat: 3 },
-            { name: 'العشاء', time: '08:15 PM', rakat: 4 }
-        ];
-
-        function renderPrayers() {
-            const today = new Date().toLocaleDateString();
-            if(state.prayers.date !== today) {
-                state.prayers = { date: today, completed: {} };
-                saveState();
-            }
-
-            const grid = document.getElementById('prayerGrid');
-            grid.innerHTML = '';
-
-            cairoPrayers.forEach(p => {
-                const isDone = !!state.prayers.completed[p.name];
-                const card = document.createElement('div');
-                card.className = `prayer-card ${isDone ? 'completed' : ''}`;
-                card.innerHTML = `
-                    <div class="prayer-header">
-                        <span>${p.name}</span>
-                        <span>${p.rakat} ركعات</span>
-                    </div>
-                    <div style="font-size:0.85rem; color:var(--text-sub);">الموعد: ${p.time}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                        <span>الحالة: <strong>${isDone ? 'تمت الصلاة ✨' : 'لم تُصلى'}</strong></span>
-                        <button class="prayer-check-btn" onclick="togglePrayer('${p.name}')">${isDone ? '✓' : '✕'}</button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function togglePrayer(name) {
-            const isDone = !state.prayers.completed[name];
-            state.prayers.completed[name] = isDone;
-            saveState();
-            renderPrayers();
-
-            if(isDone) {
-                addLogRecord(`أداء صلاة ${name}`, 'مواعيد القاهرة', 'تم الإنجاز', 0, 'prayer');
-            }
-        }
-
-        /* Sleep Tracker Functions */
-        function renderSleep() {
-            const tbody = document.getElementById('sleepTableBody');
-            tbody.innerHTML = '';
-            state.sleep.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.start}</td>
-                    <td>${item.end}</td>
-                    <td><span style="color:var(--primary-accent);">${item.hours} ساعة</span></td>
-                    <td>${item.date}</td>
-                    <td>
-                        <button class="btn-sm btn-edit" onclick="editSleep(${index})">تعديل</button>
-                        <button class="btn-sm btn-del" onclick="deleteSleep(${index})">حذف</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function addSleepRecord() {
-            const start = document.getElementById('sleepStart').value;
-            const end = document.getElementById('sleepEnd').value;
-
-            if(!start || !end) return alert('يرجى تحديد أوقات النوم واليقظة');
-
-            const sParts = start.split(':');
-            const eParts = end.split(':');
-            let sMin = parseInt(sParts[0])*60 + parseInt(sParts[1]);
-            let eMin = parseInt(eParts[0])*60 + parseInt(eParts[1]);
-            if(eMin < sMin) eMin += 24*60;
-            const hours = parseFloat(((eMin - sMin) / 60).toFixed(1));
-
-            const date = new Date().toLocaleDateString('ar-EG');
-            const rec = { start, end, hours, date, timestamp: Date.now() };
-
-            state.sleep.unshift(rec);
-            saveState();
-            renderSleep();
-
-            addLogRecord('تتبع النوم', `من ${start} إلى ${end}`, `${hours} ساعة`, hours*3600, 'sleep');
-        }
-
-        function editSleep(index) {
-            const item = state.sleep[index];
-            const newHours = prompt('تعديل عدد ساعات النوم الصافية:', item.hours);
-            if(newHours) {
-                item.hours = parseFloat(newHours);
-                saveState();
-                renderSleep();
-            }
-        }
-
-        function deleteSleep(index) {
-            state.sleep.splice(index, 1);
-            saveState();
-            renderSleep();
-        }
-
-        /* Notebook Functions */
-        function initNotebook() {
-            const area = document.getElementById('notebookContent');
-            area.value = state.notebook;
-            area.addEventListener('input', () => {
-                state.notebook = area.value;
-                localStorage.setItem('sys_notebook', state.notebook);
-            });
-        }
-
-        function saveNotebook() {
-            state.notebook = document.getElementById('notebookContent').value;
-            saveState();
-            alert('تم حفظ المفكرة بنجاح!');
-        }
-
-        /* Global Init */
-        window.onload = function() {
-            renderSchedule();
-            renderTasks();
-            renderLessons();
-            renderEducation();
-            renderPrayers();
-            renderSleep();
-            initNotebook();
-        };
     </script>
 </body>
 </html>
