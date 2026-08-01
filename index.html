@@ -14,7 +14,7 @@
         :root {
             --bg-main: #070a13;
             --bg-side: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-bg: #1e293b;
             --card-border: rgba(255, 255, 255, 0.08);
             
             --text-main: #f8fafc;
@@ -22,20 +22,18 @@
             --text-sub: #64748b;
             
             --primary-accent: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.35);
             
-            /* الألوان المبهجة للأنشطة والقوائم */
             --color-study: #10b981;
             --color-listening: #3b82f6;
             --color-writing: #f59e0b;
             --color-quiz: #ec4899;
-            --color-afk: #eab308; /* تم تعديل لون AFK إلى الأصفر المشرق */
-            --color-break: #ef4444; /* تم تعديل لون Break إلى الأحمر */
+            --color-afk: #eab308;
+            --color-break: #ef4444;
             --color-danger: #ef4444;
 
             --sidebar-width: 270px;
             --sidebar-collapsed: 80px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.2s ease;
         }
 
         * {
@@ -51,13 +49,9 @@
             min-height: 100vh;
             display: flex;
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-            background-attachment: fixed;
         }
 
-        /* ----- Side Navigation Bar ----- */
+        /* Side Navigation Bar */
         aside.sidebar {
             width: var(--sidebar-width);
             background: var(--bg-side);
@@ -70,8 +64,6 @@
             z-index: 100;
             flex-shrink: 0;
             transition: var(--transition);
-            backdrop-filter: blur(12px);
-            will-change: width;
         }
 
         aside.sidebar.collapsed {
@@ -98,7 +90,6 @@
 
         .brand-logo i {
             color: var(--primary-accent);
-            filter: drop-shadow(0 0 8px var(--primary-glow));
         }
 
         .toggle-btn {
@@ -118,7 +109,6 @@
         .toggle-btn:hover {
             background: var(--primary-accent);
             color: #fff;
-            box-shadow: 0 0 12px var(--primary-glow);
         }
 
         .nav-group {
@@ -164,13 +154,11 @@
         .nav-btn:hover {
             background: rgba(255, 255, 255, 0.06);
             color: #fff;
-            transform: translateX(-3px);
         }
 
         .nav-btn.active {
-            background: linear-gradient(135deg, var(--primary-accent), #4f46e5);
+            background: var(--primary-accent);
             color: #fff;
-            box-shadow: 0 4px 20px var(--primary-glow);
         }
 
         .nav-btn .icon {
@@ -179,7 +167,7 @@
             text-align: center;
         }
 
-        /* Login & User Profile Box */
+        /* User Profile Box */
         .user-profile {
             padding: 16px;
             border-top: 1px solid var(--card-border);
@@ -197,17 +185,16 @@
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: #10b981;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 900;
             font-size: 1.1rem;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
         }
 
-        /* ----- Main Content Area ----- */
+        /* Main Content Area */
         main.main-content {
             flex-grow: 1;
             padding: 28px;
@@ -221,24 +208,15 @@
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.25s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Modern Glass Cards */
+        /* Lightweight Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            will-change: transform;
         }
 
         .card-header {
@@ -259,31 +237,19 @@
             font-weight: 800;
         }
 
-        /* Timers & Glow Effects */
+        /* Timers */
         .timer-header-label {
             font-size: 1.35rem;
             font-weight: 800;
             text-align: center;
             margin-bottom: 5px;
             letter-spacing: 0.5px;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            transition: color 0.2s ease;
         }
 
-        /* أنماط الحالات للمؤقت الرئيسية */
-        .mode-study {
-            color: #10b981 !important;
-            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6), 0 0 30px rgba(16, 185, 129, 0.3) !important;
-        }
-        
-        .mode-break {
-            color: #ef4444 !important;
-            text-shadow: 0 0 15px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239, 68, 68, 0.3) !important;
-        }
-
-        .mode-afk {
-            color: #eab308 !important;
-            text-shadow: 0 0 15px rgba(234, 179, 8, 0.6), 0 0 30px rgba(234, 179, 8, 0.3) !important;
-        }
+        .mode-study { color: #10b981 !important; }
+        .mode-break { color: #ef4444 !important; }
+        .mode-afk { color: #eab308 !important; }
 
         .main-timer-display {
             font-size: 4.5rem;
@@ -292,7 +258,7 @@
             font-family: 'Plus Jakarta Sans', monospace;
             margin: 10px 0 20px 0;
             letter-spacing: 2px;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            transition: color 0.2s ease;
         }
 
         .controls-row {
@@ -319,15 +285,14 @@
         }
 
         .btn-action:hover {
-            transform: translateY(-2px);
             background: rgba(255, 255, 255, 0.12);
         }
 
         .btn-success { background: var(--color-study); color: #fff; border: none; }
-        .btn-success:hover { background: #059669; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+        .btn-success:hover { background: #059669; }
         
         .btn-danger { background: var(--color-danger); color: #fff; border: none; }
-        .btn-danger:hover { background: #dc2626; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+        .btn-danger:hover { background: #dc2626; }
 
         /* Sub Timers Grid */
         .sub-timers-grid {
@@ -338,17 +303,11 @@
         }
 
         .sub-timer-card {
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(15, 23, 42, 0.5);
             border-radius: 16px;
             padding: 18px;
             text-align: center;
             border: 1px solid var(--card-border);
-            transition: var(--transition);
-        }
-
-        .sub-timer-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .sub-timer-display {
@@ -393,12 +352,10 @@
         }
 
         .stat-card {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.5);
             padding: 20px;
             border-radius: 16px;
             border: 1px solid var(--card-border);
-            position: relative;
-            overflow: hidden;
         }
 
         .stat-value {
@@ -413,7 +370,6 @@
             font-weight: 600;
         }
 
-        /* Custom Inputs & Tables */
         input, select, textarea {
             width: 100%;
             padding: 10px 14px;
@@ -424,12 +380,6 @@
             outline: none;
             margin-bottom: 12px;
             font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary-accent);
-            box-shadow: 0 0 10px var(--primary-glow);
         }
 
         table {
@@ -451,29 +401,8 @@
             font-weight: 800;
         }
 
-        /* Checkbox & Status Effects */
-        .check-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .check-btn.success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .check-btn.success.active { background: #10b981; color: #fff; box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
-
-        .check-btn.danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .check-btn.danger.active { background: #ef4444; color: #fff; box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
-
-        /* Notification Banner */
         .notice-banner {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.2));
+            background: rgba(99, 102, 241, 0.15);
             border: 1px solid var(--primary-accent);
             border-radius: 14px;
             padding: 14px 18px;
@@ -484,29 +413,6 @@
             font-weight: 700;
         }
 
-        /* Modal Overlay for Login */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal-card {
-            background: var(--bg-side);
-            border: 1px solid var(--card-border);
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Printable Area */
         @media print {
             body * { visibility: hidden; }
             .printable, .printable * { visibility: visible; }
@@ -584,7 +490,7 @@
         </div>
 
         <div class="user-profile">
-            <div class="profile-badge" onclick="openLoginModal()">
+            <div class="profile-badge">
                 <div class="profile-avatar" id="avatarText">A</div>
                 <div class="profile-info">
                     <span id="userNameDisplay" style="font-weight: 800; font-size: 0.95rem; color: #fff; display:block;">عمرو (Amr)</span>
@@ -599,7 +505,7 @@
 
         <!-- Banner for Notifications -->
         <div class="notice-banner" id="prayerAlert" style="display: none;">
-            <i class="fa-solid fa-bell fa-bounce" style="color: #10b981; font-size: 1.3rem;"></i>
+            <i class="fa-solid fa-bell" style="color: #10b981; font-size: 1.3rem;"></i>
             <span id="prayerAlertText">تنبيه الصلاة: متبقي 10 دقائق على صلاة الظهر!</span>
         </div>
 
@@ -611,10 +517,10 @@
                     <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة PDF</button>
                 </div>
                 
-                <!-- اسم المؤقت متوهج بلون ديناميكي فوق الرقم -->
+                <!-- اسم الوضع الحالى -->
                 <div class="timer-header-label mode-study" id="timerHeaderTitle">Study timer</div>
                 
-                <!-- الرقم الرئيسي متوهج بلون ديناميكي -->
+                <!-- عرض الوقت -->
                 <div class="main-timer-display mode-study" id="mainTimerDisplay">00:00:00</div>
                 
                 <div class="controls-row">
@@ -624,9 +530,11 @@
                     <button class="btn-action btn-danger" onclick="resetMainTimer()"><i class="fa-solid fa-rotate-right"></i> ريسيت</button>
                 </div>
 
+                <!-- أزرار اختيار الوضع (لا تبدأ العد تلقائياً) -->
                 <div class="controls-row" style="margin-top: 15px;">
-                    <button class="btn-action" style="background: rgba(234, 179, 8, 0.2); color: #facc15;" onclick="toggleAuxTimer('afk')"><i class="fa-solid fa-user-slash"></i> AFK (وضع الغياب)</button>
-                    <button class="btn-action" style="background: rgba(239, 68, 68, 0.2); color: #f87171;" onclick="toggleAuxTimer('break')"><i class="fa-solid fa-mug-hot"></i> Break (الراحة)</button>
+                    <button class="btn-action" style="background: rgba(16, 185, 129, 0.2); color: #34d399;" onclick="switchTimerMode('study')"><i class="fa-solid fa-book-open"></i> Study (وضع المذاكرة)</button>
+                    <button class="btn-action" style="background: rgba(234, 179, 8, 0.2); color: #facc15;" onclick="switchTimerMode('afk')"><i class="fa-solid fa-user-slash"></i> AFK (وضع الغياب)</button>
+                    <button class="btn-action" style="background: rgba(239, 68, 68, 0.2); color: #f87171;" onclick="switchTimerMode('break')"><i class="fa-solid fa-mug-hot"></i> Break (الراحة)</button>
                 </div>
 
                 <!-- Sub Timers inside Study Mode -->
@@ -662,28 +570,6 @@
                     <span class="card-title"><i class="fa-solid fa-calendar-days" style="color: #3b82f6;"></i> جدول الدروس والمواعيد (Schedule) 🗓️</span>
                     <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة PDF</button>
                 </div>
-
-                <form onsubmit="addScheduleItem(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                    <input type="text" id="schSubject" placeholder="المادة" required>
-                    <select id="schDay" required>
-                        <option value="السبت">السبت</option>
-                        <option value="الأحد">الأحد</option>
-                        <option value="الإثنين">الإثنين</option>
-                        <option value="الثلاثاء">الثلاثاء</option>
-                        <option value="الأربعاء">الأربعاء</option>
-                        <option value="الخميس">الخميس</option>
-                        <option value="الجمعة">الجمعة</option>
-                    </select>
-                    <input type="time" id="schTime" required>
-                    <input type="text" id="schLocation" placeholder="المكان/السنتر" required>
-                    <input type="text" id="schTeacher" placeholder="اسم المستر" required>
-                    <select id="schType">
-                        <option value="سنتر">سنتر 🏫</option>
-                        <option value="منصة">منصة 💻</option>
-                    </select>
-                    <button type="submit" class="btn-action btn-success" style="height: 42px; justify-content: center;">إضافة للجدول</button>
-                </form>
-
                 <table>
                     <thead>
                         <tr>
@@ -692,133 +578,37 @@
                             <th>المدرس</th>
                             <th>المكان والنوع</th>
                             <th>حالة الإنجاز</th>
-                            <th>إجراء</th>
                         </tr>
                     </thead>
-                    <tbody id="scheduleTableBody">
-                        <!-- Dynamic content -->
-                    </tbody>
+                    <tbody id="scheduleTableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 3. TASKS DAY TAB -->
-        <div id="tab-tasks" class="tab-content printable">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title"><i class="fa-solid fa-list-check" style="color: #f59e0b;"></i> مهام اليوم المخصصة (Tasks Day) 📝</span>
-                    <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة PDF</button>
-                </div>
-
-                <div class="notice-banner" id="taskTodayNotice">
-                    <i class="fa-solid fa-circle-info" style="color: #3b82f6;"></i>
-                    <span id="taskTodayNoticeText">جاري فحص جدولك لهذا اليوم...</span>
-                </div>
-
-                <form onsubmit="addTaskItem(event)" style="display: flex; gap: 10px;">
-                    <input type="text" id="taskSubject" placeholder="أدخل اسم المادة أو المهمة المحددة..." required>
-                    <button type="submit" class="btn-action btn-success" style="white-space: nowrap;">إضافة مهمة</button>
-                </form>
-
-                <table style="margin-top: 15px;">
-                    <thead>
-                        <tr>
-                            <th>المهمة / المادة</th>
-                            <th>حالة الإنجاز</th>
-                            <th>حذف</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tasksTableBody">
-                        <!-- Dynamic content -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 4. STATS TAB -->
+        <!-- 3. STATS TAB -->
         <div id="tab-stats" class="tab-content printable">
             <div class="card">
                 <div class="card-header">
                     <span class="card-title"><i class="fa-solid fa-chart-pie" style="color: #ec4899;"></i> تحليلات الأداء والإحصائيات الذكية (Stats) 📊</span>
-                    <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة PDF</button>
                 </div>
-
-                <!-- Sub tabs for stats -->
-                <div class="stats-tabs">
-                    <button class="stat-tab-btn active" onclick="switchStatPeriod('day')">اليوم (24h)</button>
-                    <button class="stat-tab-btn" onclick="switchStatPeriod('week')">الأسبوع</button>
-                    <button class="stat-tab-btn" onclick="switchStatPeriod('month')">الشهر</button>
-                    <!-- استبدال اسم الفترة بناءً على الطلب -->
-                    <button class="stat-tab-btn" onclick="switchStatPeriod('all')">الكل</button>
-                </div>
-
                 <div class="stats-grid">
                     <div class="stat-card" style="border-right: 4px solid var(--color-study);">
                         <div class="stat-label">صافي المذاكرة الفعلي</div>
                         <div class="stat-value" id="stStudyTime" style="color: var(--color-study);">00:00:00</div>
-                        <span id="stStudyPercent" style="font-size: 0.8rem; color: var(--text-muted);">0% من الوقت</span>
-                    </div>
-
-                    <div class="stat-card" style="border-right: 4px solid var(--color-listening);">
-                        <div class="stat-label">Listening (استماع)</div>
-                        <div class="stat-value" id="stListeningTime" style="color: var(--color-listening);">00:00:00</div>
-                    </div>
-
-                    <div class="stat-card" style="border-right: 4px solid var(--color-writing);">
-                        <div class="stat-label">Writing (كتابة)</div>
-                        <div class="stat-value" id="stWritingTime" style="color: var(--color-writing);">00:00:00</div>
-                    </div>
-
-                    <div class="stat-card" style="border-right: 4px solid var(--color-quiz);">
-                        <div class="stat-label">Quiz (اختبارات)</div>
-                        <div class="stat-value" id="stQuizTime" style="color: var(--color-quiz);">00:00:00</div>
-                    </div>
-
-                    <div class="stat-card" style="border-right: 4px solid var(--color-break);">
-                        <div class="stat-label">الراحة (Break)</div>
-                        <div class="stat-value" id="stBreakTime" style="color: var(--color-break);">00:00:00</div>
-                    </div>
-
-                    <div class="stat-card" style="border-right: 4px solid var(--color-afk);">
-                        <div class="stat-label">الغياب (AFK)</div>
-                        <div class="stat-value" id="stAfkTime" style="color: var(--color-afk);">00:00:00</div>
                     </div>
                 </div>
-
-                <!-- AI Evaluation Box -->
-                <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--primary-accent); border-radius: 16px; padding: 20px; margin-top: 15px;">
-                    <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--primary-accent);">
-                        <i class="fa-solid fa-robot"></i> تقييم الذكاء الاصطناعي للأداء:
-                    </div>
-                    <div id="aiEvaluationText" style="font-size: 1.1rem; font-weight: 700; margin-top: 10px; color: #fff;">
-                        جاري تحليل بيانات المذاكرة والأنشطة...
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. LESSONS TASK (فهرس المواد) -->
-        <div id="tab-lessons" class="tab-content printable">
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title"><i class="fa-solid fa-book-bookmark" style="color: #8b5cf6;"></i> فهرس الدروس والمناهج (Lessons Task) 📚</span>
-                    <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة PDF</button>
-                </div>
-                <p style="color: var(--text-muted);">فهرس الدروس والمناهج المتاحة لطلاب المنظومة.</p>
             </div>
         </div>
 
     </main>
 
-    <!-- JS Logic Optimized & Lightweight -->
+    <!-- JS Optimized Logic -->
     <script>
-        // DOM Elements Caching for performance
         const sidebar = document.getElementById('sidebar');
         const timerHeaderTitle = document.getElementById('timerHeaderTitle');
         const mainTimerDisplay = document.getElementById('mainTimerDisplay');
 
-        // State variables
-        let currentMode = 'study'; // 'study', 'break', 'afk'
+        let currentMode = 'study';
         let mainTimerSeconds = 0;
         let mainTimerInterval = null;
 
@@ -828,7 +618,6 @@
             quiz: { seconds: 0, interval: null, running: false, el: document.getElementById('timerQuiz') }
         };
 
-        // Utility: Format seconds to HH:MM:SS
         function formatTime(totalSec) {
             const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
             const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
@@ -836,12 +625,10 @@
             return `${h}:${m}:${s}`;
         }
 
-        // Toggle Sidebar
         function toggleSidebar() {
             sidebar.classList.toggle('collapsed');
         }
 
-        // Switch Main Tabs
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -855,8 +642,8 @@
             if(activeBtn) activeBtn.classList.add('active');
         }
 
-        // Main Timer Operations
-        function setMode(mode) {
+        // تغيير الوضع بدون تشغيل العد التلقائي
+        function switchTimerMode(mode) {
             currentMode = mode;
             timerHeaderTitle.classList.remove('mode-study', 'mode-break', 'mode-afk');
             mainTimerDisplay.classList.remove('mode-study', 'mode-break', 'mode-afk');
@@ -896,9 +683,8 @@
             pauseMainTimer();
             mainTimerSeconds = 0;
             mainTimerDisplay.innerText = "00:00:00";
-            setMode('study'); // إرجاع الوضع للمذاكرة الأخضر
+            switchTimerMode('study');
 
-            // إعادة ضبط المؤقتات الفرعية أيضاً (Writing, Listening, Quiz)
             Object.keys(subTimers).forEach(key => {
                 if (subTimers[key].interval) {
                     clearInterval(subTimers[key].interval);
@@ -910,20 +696,10 @@
             });
         }
 
-        function toggleAuxTimer(type) {
-            if (type === 'break') {
-                setMode('break');
-            } else if (type === 'afk') {
-                setMode('afk');
-            }
-            startMainTimer();
-        }
-
         function saveStudySession() {
             alert('تم حفظ الجلسة بنجاح!');
         }
 
-        // Sub Timers Operations
         function toggleSubTimer(type) {
             const timerObj = subTimers[type];
             if (!timerObj) return;
@@ -940,16 +716,6 @@
                 }, 1000);
             }
         }
-
-        // Switch Stat Period
-        function switchStatPeriod(period) {
-            document.querySelectorAll('.stat-tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function addScheduleItem(e) { e.preventDefault(); }
-        function addTaskItem(e) { e.preventDefault(); }
-        function openLoginModal() {}
     </script>
 </body>
 </html>
