@@ -1,910 +1,1410 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Study Timer & Notebook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study System</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
-    <style id="dynamicStyle">
+    <style>
         :root {
+            --bg-color: #0f0f17;
+            --card-bg: #181825;
+            --card-border: #313244;
+            --text-main: #cdd6f4;
+            --text-sub: #a6adc8;
+            
             --study-color: #a6e3a1;
             --break-color: #cba6f7;
-            --social-color: #89b4fa;
             --afk-color: #f9e2af;
-            --clock-color: #a6adc8; 
-            --exam-color: #89b4fa; /* Soft Blue / Indigo (calming, non-red color) */
-            --current-theme: var(--study-color);
+            --primary-accent: #89b4fa;
+            --danger-color: #f38ba8;
             
-            /* ألوان المواد الخاصة بالمفكرة */
+            /* ألوان المؤقتات الفرعية */
+            --listening-color: #89dceb;
+            --writing-color: #a6e3a1;
+            --quiz-color: #f9e2af;
+
+            /* ألوان المواد */
             --arabic-color: #89b4fa;
             --english-color: #a6e3a1;
             --history-color: #f9e2af;
             --physics-color: #f38ba8;
         }
 
-        body { 
-            background: #0f0f16; 
-            color: var(--current-theme); 
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden;
-            transition: background 0.5s, color 0.5s;
-        }
-
-        .cairo-live-widget {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #181825;
-            border: 1px solid #313244;
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.85rem;
-            color: #6c7086; 
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            z-index: 15;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            text-align: left;
-            transition: opacity 0.3s ease;
-        }
-        .cairo-live-widget .widget-clock {
-            color: var(--clock-color);
-            font-weight: bold;
-            font-size: 1.1rem;
-            letter-spacing: 0.5px;
-            direction: rtl;
-        }
-
-        .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
-        
-        /* 🎯 Sleek, Frameless, Professional Countdown Container */
-        .exam-countdown-container {
-            position: absolute;
-            bottom: 45px;
-            text-align: center;
-            background: transparent;
-            border: none;
+        * {
+            box-sizing: border-box;
+            margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Header Navigation */
+        header {
+            background: #11111b;
+            border-bottom: 1px solid var(--card-border);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 2px;
-            z-index: 5;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .exam-countdown-text {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--exam-color);
-            letter-spacing: 1px;
-            text-shadow: 0 0 12px rgba(137, 180, 250, 0.3);
-            font-family: 'Segoe UI', sans-serif;
+        .brand-logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--study-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .exam-countdown-sub {
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary-accent);
+            color: #11111b;
+            font-weight: bold;
+            border-color: var(--primary-accent);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--study-color);
+        }
+
+        .profile-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--study-color);
+            color: #11111b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Layout Container */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Generic Card Styling */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary-accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Print Button */
+        .btn-print {
+            background: #313244;
+            color: var(--study-color);
+            border: 1px solid var(--study-color);
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .btn-print:hover { background: var(--study-color); color: #111; }
+
+        /* Timers Section */
+        .main-timer-display {
+            font-size: 5rem;
+            font-weight: bold;
+            text-align: center;
+            font-family: monospace;
+            color: var(--study-color);
+            margin: 15px 0;
+            text-shadow: 0 0 20px rgba(166, 227, 161, 0.2);
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .btn-action {
+            padding: 10px 22px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            background: #1e1e2e;
+            color: var(--text-main);
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-action:hover { background: var(--primary-accent); color: #111; }
+
+        /* Sub Timers Row */
+        .sub-timers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            border-top: 1px solid var(--card-border);
+            padding-top: 20px;
+        }
+
+        .sub-timer-card {
+            background: #11111b;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--card-border);
+        }
+
+        .sub-timer-card.listening { border-color: var(--listening-color); }
+        .sub-timer-card.writing { border-color: var(--writing-color); }
+        .sub-timer-card.quiz { border-color: var(--quiz-color); }
+
+        .sub-timer-title { font-weight: bold; margin-bottom: 5px; }
+        .sub-timer-card.listening .sub-timer-title { color: var(--listening-color); }
+        .sub-timer-card.writing .sub-timer-title { color: var(--writing-color); }
+        .sub-timer-card.quiz .sub-timer-title { color: var(--quiz-color); }
+
+        .sub-timer-display {
+            font-size: 1.8rem;
+            font-family: monospace;
+            margin: 8px 0;
+        }
+
+        .sub-btn {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Interactive Status Buttons (Check/Cross) */
+        .status-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0 2px;
+        }
+
+        .status-btn.check { background: #27a69a; color: white; }
+        .status-btn.cross { background: #e53935; color: white; }
+
+        .status-btn.active-glow {
+            transform: scale(1.15);
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        /* Forms and Inputs */
+        .form-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        input, select, textarea {
+            background: #11111b;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-accent);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.9rem;
+        }
+
+        th { background: #11111b; color: var(--primary-accent); }
+
+        /* Lessons Task Grid */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .lesson-subject-card {
+            border-top: 4px solid var(--card-border);
+        }
+        .lesson-subject-card.arabic { border-color: var(--arabic-color); }
+        .lesson-subject-card.english { border-color: var(--english-color); }
+        .lesson-subject-card.history { border-color: var(--history-color); }
+        .lesson-subject-card.physics { border-color: var(--physics-color); }
+
+        .lesson-item {
+            background: #11111b;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .lesson-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            flex-wrap: wrap;
             font-size: 0.75rem;
-            color: #a6adc8; /* Dark White / Off-White */
-            letter-spacing: 1.5px;
-            font-weight: 500;
-            font-family: monospace, 'Segoe UI', sans-serif;
         }
 
-        .footer-credits { position: absolute; bottom: 15px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-        #mainContainer { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; transition: all 0.3s ease; }
-        #mainContainer.sidebar-open { padding-right: 380px; }
-        #mainContainer.notebook-open { padding-left: 50vw; } 
-        
-        #mainApp { text-align: center; width: 100%; max-width: 600px; transition: all 0.3s ease; }
-        .timer-box { display: none; }
-        .timer-box.active { display: block; }
-        .timer-display { font-size: 6rem; font-weight: bold; text-shadow: 0 0 20px rgba(255,255,255,0.1); margin-bottom: 10px; }
-        
-        .break-input-group { margin-bottom: 15px; display: flex; justify-content: center; gap: 15px; align-items: center; }
-        .break-input-group .input-field { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
-        .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
+        .stat-card {
+            background: #11111b;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            text-align: center;
+        }
 
-        .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; transition: opacity 0.3s ease; }
-        .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
-        
-        .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
-        .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--study-color);
+            margin: 5px 0;
+        }
 
-        .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; transition: opacity 0.3s ease; }
-        #bottomModeSelectors { transition: opacity 0.3s ease; }
-        
-        button { padding: 12px 25px; cursor: pointer; border-radius: 25px; border: 1px solid var(--current-theme); background: #1e1e2e; color: var(--current-theme); font-weight: bold; transition: 0.3s; font-family: inherit; }
-        button:hover { background: var(--current-theme); color: #11111b; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        .mode-btn { background: #11111b; font-size: 0.9rem; }
-        #btn-study { border-color: var(--study-color); color: var(--study-color); }
-        #btn-break { border-color: var(--break-color); color: var(--break-color); }
-        #btn-social { border-color: var(--social-color); color: var(--social-color); }
-        #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
+        .ai-eval-box {
+            background: linear-gradient(135deg, #181825, #1e1e2e);
+            border: 1px solid var(--primary-accent);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
 
-        .sidebar { position: fixed; right: -400px; top: 0; width: 360px; height: 100%; background: #11111b; border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
-        .sidebar.open { right: 0; }
-        .sidebar-header { padding: 15px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: var(--current-theme); }
-        .header-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-header-share { background: #313244; border: 1px solid var(--current-theme); color: #fff; padding: 4px 10px; font-size: 0.75rem; border-radius: 5px; cursor: pointer; }
-        .btn-header-share:hover { background: var(--current-theme); color: #11111b; }
-        .close-sidebar-btn { background: none; border: none; color: #888; font-size: 1.3rem; cursor: pointer; }
+        .ai-badge {
+            display: inline-block;
+            background: var(--primary-accent);
+            color: #111;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
 
-        .sidebar-content { padding: 12px; flex-grow: 1; overflow-y: scroll; }
-        .sidebar-content::-webkit-scrollbar { width: 14px; }
-        .sidebar-content::-webkit-scrollbar-track { background: #181825; }
-        .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
 
-        /* المفكرة */
-        .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; border-right: 2px solid #cba6f7; }
-        .notebook-sidebar.open { left: 0; }
-        
-        .nb-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; direction: rtl; }
-        .nb-header-right { display: flex; align-items: center; gap: 15px; }
-        .nb-title { margin: 0; font-size: 1.4rem; font-weight: bold; }
-        .close-nb-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-accent);
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            max-width: 90%;
+        }
 
-        .nb-content { padding: 20px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
-        .nb-content::-webkit-scrollbar { width: 8px; }
-        .nb-content::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
-
-        .subject-block { background: #181825; border: 1px solid #313244; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; }
-        .subject-block.arabic { border-top: 4px solid var(--arabic-color); }
-        .subject-block.english { border-top: 4px solid var(--english-color); }
-        .subject-block.history { border-top: 4px solid var(--history-color); }
-        .subject-block.physics { border-top: 4px solid var(--physics-color); }
-        
-        .sub-block-title { font-size: 1.15rem; font-weight: bold; text-align: right; margin: 0; direction: rtl; }
-        .subject-block.arabic .sub-block-title { color: var(--arabic-color); }
-        .subject-block.english .sub-block-title { color: var(--english-color); }
-        .subject-block.history .sub-block-title { color: var(--history-color); }
-        .subject-block.physics .sub-block-title { color: var(--physics-color); }
-
-        .nb-tabs-row { display: flex; gap: 10px; width: 100%; direction: rtl; }
-        .nb-tab-btn { flex: 1; padding: 8px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; border: 1px solid #313244; background: #11111b; cursor: pointer; transition: 0.2s; }
-        .nb-tab-btn.btn-done-tab { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.3); }
-        .nb-tab-btn.btn-done-tab.active-tab { background: rgba(166, 227, 161, 0.15); border-color: #a6e3a1; }
-        .nb-tab-btn.btn-remaining-tab { color: #f38ba8; border-color: rgba(243, 139, 168, 0.3); }
-        .nb-tab-btn.btn-remaining-tab.active-tab { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
-
-        .nb-text-container { width: 100%; display: none; direction: rtl; }
-        .nb-text-container.active-pane { display: block; }
-        
-        .nb-textarea { width: 100%; height: 110px; background: #11111b; border: 1px solid #313244; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 0.95rem; line-height: 1.5; outline: none; transition: border-color 0.2s; text-align: right; }
-        
-        .nb-text-container.done-pane .nb-textarea { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.2); }
-        .nb-text-container.done-pane .nb-textarea:focus { border-color: #a6e3a1; }
-        .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
-        .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
-
-        .hide-in-notebook { opacity: 0 !important; pointer-events: none !important; }
-
-        .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; }
-        .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
-        .card-subject { font-weight: bold; color: #fff; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
-        .card-duration { font-weight: bold; color: var(--current-theme); }
-        .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: #11111b; padding: 4px 6px; border-radius: 4px; text-align: right; direction: rtl; word-wrap: break-word; }
-        
-        .card-time-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 5px; font-family: inherit; direction: rtl; gap: 5px; }
-        .time-tag { padding: 2px 5px; border-radius: 4px; font-weight: 500; white-space: nowrap; }
-        .time-tag.start { background: rgba(166, 227, 161, 0.1); color: #a6e3a1; }
-        .time-tag.end { background: rgba(243, 139, 168, 0.1); color: #f38ba8; }
-        
-        .pause-tag-row { display: flex; justify-content: center; margin-top: 5px; }
-        .pause-tag { background: rgba(249, 226, 175, 0.08); color: #f9e2af; border: 1px dashed rgba(249, 226, 175, 0.25); font-size: 0.73rem; padding: 2px 10px; border-radius: 12px; font-weight: 500; text-align: center; direction: rtl; }
-
-        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
-        .card-actions { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; align-items: center;}
-        .card-actions button { padding: 3px 8px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #313244; background: none;}
-        .btn-edit { color: #f9e2af; border-color: #f9e2af !important; }
-        .btn-delete { color: #f38ba8; border-color: #f38ba8 !important; }
-        .btn-recovery { color: #a6e3a1; border-color: #a6e3a1 !important; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
-        .modal-content { background: #1e1e2e; border: 2px solid var(--current-theme); padding: 20px; border-radius: 12px; width: 320px; text-align: right; direction: rtl; color: #cdd6f4; }
-        .modal-content h3 { margin-top: 0; color: var(--current-theme); text-align: center; font-size: 1.1rem;}
-        .modal-content label { display: block; margin: 8px 0 4px; font-size: 0.85rem;}
-        .modal-content input, .modal-content textarea { width: 100%; padding: 8px; background: #11111b; border: 1px solid #313244; border-radius: 6px; color: #fff; box-sizing: border-box; outline: none; font-family: inherit;}
-        .modal-content textarea { resize: none; height: 60px; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
-        .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
-
+        /* Print Media Style */
         @media print {
-            body * { visibility: hidden; background: white !important; color: black !important; }
-            #sidebarHistory, #sidebarHistory * { visibility: hidden; }
-            body.printing-notebook #notebookSidebar, body.printing-notebook #notebookSidebar * { visibility: visible; }
-            body.printing-notebook #notebookSidebar { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            header, .nav-links, .controls-row, .btn-action, .btn-print, button {
+                display: none !important;
+            }
+            body { background: white !important; color: black !important; }
+            .card { border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; color: black !important; }
+            th, td { color: black !important; }
         }
     </style>
 </head>
 <body>
 
-    <div id="cairoWidget" class="cairo-live-widget">
-        <div id="cairoClock" class="widget-clock">جاري الحساب...</div>
-        <div id="cairoDate">جاري الحساب...</div>
-    </div>
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand-logo">
+            <span>📚</span> Study System
+        </div>
 
-    <div id="topBarNav" class="top-bar">
-        <button class="btn-notebook-trigger" onclick="openNotebook()">Notebook 📓</button>
-        <button onclick="openHistory('study')">Study History 📚</button>
-        <button onclick="openHistory('break')">Break History ☕</button>
-        <button onclick="openMergeHistory('social')">Social & AFK History 📱⏳</button>
-        <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openHistory('trash')">Trash / Recovery 🗑️</button>
-    </div>
+        <div class="nav-links">
+            <button class="nav-btn active" onclick="switchTab('study')">Study Mode ⏱️</button>
+            <button class="nav-btn" onclick="switchTab('schedule')">Schedule 📅</button>
+            <button class="nav-btn" onclick="switchTab('tasks')">Tasks Day 📋</button>
+            <button class="nav-btn" onclick="switchTab('lessons')">Lessons Task 📖</button>
+            <button class="nav-btn" onclick="switchTab('education')">Education 🏫</button>
+            <button class="nav-btn" onclick="switchTab('stats')">Stats 📊</button>
+            <button class="nav-btn" onclick="switchTab('prayers')">Prayers 🕌</button>
+            <button class="nav-btn" onclick="switchTab('sleep')">Sleep 🌙</button>
+            <button class="nav-btn" onclick="switchTab('notice')">Notice 📝</button>
+            <button class="nav-btn" onclick="switchTab('notebook')">Notebook 📓</button>
+            <button class="nav-btn" onclick="switchTab('history')">History Logs 📜</button>
+        </div>
 
-    <div id="mainContainer">
-        <div id="appTitle" class="brand-title">Study Timer</div>
-
-        <div id="mainApp">
-            <div id="container-study" class="timer-box active">
-                <div id="display-study" class="timer-display">00:00</div>
-                <div class="controls">
-                    <button onclick="startTimer()">Start</button>
-                    <button onclick="pauseTimer()">Pause</button>
-                    <button id="saveBtnStudy" onclick="saveSessionPrompt()">Save</button>
-                    <button id="resetBtnStudy" onclick="endTimer()">Reset</button>
-                    <button id="miniBtnStudy" onclick="requestMini()">Mini</button>
-                </div>
+        <div class="user-profile">
+            <div id="loginBtnContainer">
+                <button class="nav-btn" style="border-color: var(--study-color); color: var(--study-color);" onclick="openLoginModal()">Login 🔑</button>
             </div>
-
-            <div id="container-break" class="timer-box">
-                <div id="display-break" class="timer-display">05:00</div>
-                <div class="break-input-group">
-                    <div class="input-field"><label>Hours</label><input type="number" id="breakHoursInput" value="0" min="0" max="24" onchange="setBreakDuration()"></div>
-                    <div class="input-field"><label>Minutes</label><input type="number" id="breakMinutesInput" value="5" min="0" max="59" onchange="setBreakDuration()"></div>
-                </div>
-                <div class="controls">
-                    <button onclick="startTimer()">Start</button>
-                    <button onclick="pauseTimer()">Pause</button>
-                    <button onclick="saveSessionPrompt()">Save</button>
-                    <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini()">Mini</button>
-                </div>
-            </div>
-
-            <div id="container-social" class="timer-box">
-                <div id="display-social" class="timer-display">00:00</div>
-                <div class="controls">
-                    <button onclick="startTimer()">Start</button>
-                    <button onclick="pauseTimer()">Pause</button>
-                    <button onclick="saveSessionPrompt()">Save</button>
-                    <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini()">Mini</button>
-                </div>
-            </div>
-
-            <div id="container-afk" class="timer-box">
-                <div id="display-afk" class="timer-display">00:00</div>
-                <div class="controls">
-                    <button onclick="startTimer()">Start</button>
-                    <button onclick="pauseTimer()">Pause</button>
-                    <button onclick="saveSessionPrompt()">Save</button>
-                    <button onclick="endTimer()">Reset</button>
-                    <button onclick="requestMini()">Mini</button>
-                </div>
-            </div>
-
-            <div id="bottomModeSelectors" class="controls" style="margin-top: 35px; border-top: 1px solid #181825; padding-top: 20px;">
-                <button id="btn-study" class="mode-btn" onclick="switchMode('study')">Study Mode 📚</button>
-                <button id="btn-break" class="mode-btn" onclick="switchMode('break')">Break Mode ☕</button>
-                <button id="btn-social" class="mode-btn" onclick="switchMode('social')">Social Timer 📱</button>
-                <button id="btn-afk" class="mode-btn" onclick="switchMode('afk')">AFK Timer ⏳</button>
+            <div id="profileBadge" class="profile-badge" style="display: none;">
+                <div class="profile-avatar">A</div>
+                <span style="font-weight: bold; font-size: 0.9rem;">Amr</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- واجهة المفكرة -->
-    <div id="notebookSidebar" class="notebook-sidebar">
-        <div class="nb-header">
-            <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeNotebook()">✕</button>
-            <div class="nb-header-right">
-                <button class="btn-nb-share" style="background:#181825; border:1px solid #a6e3a1; color:#a6e3a1; padding:6px 14px; font-size:0.85rem; border-radius:20px; font-weight:bold;" onclick="printNotebook()">Share PDF 📄</button>
-                <h2 class="nb-title" style="color: #cba6f7;">Notebook 📓</h2>
-            </div>
-        </div>
-        <div class="nb-content">
-            <div class="subject-block arabic">
-                <p class="sub-block-title">1. اللغة العربية 📚</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-arabic-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('arabic', 'done')">Done ✅</button>
-                    <button id="tab-arabic-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('arabic', 'rem')">Remaining ⏳</button>
+    <div class="container">
+
+        <!-- 1. STUDY MODE TAB -->
+        <div id="tab-study" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">مؤقت المذاكرة الرئيسي</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
                 </div>
-                <div id="pane-arabic-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-arabic-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
+                
+                <div class="main-timer-display" id="mainTimerDisplay">00:00:00</div>
+                
+                <div class="controls-row">
+                    <button class="btn-action" style="color: var(--study-color); border-color: var(--study-color);" onclick="startMainTimer()">Start ▶️</button>
+                    <button class="btn-action" style="color: var(--afk-color); border-color: var(--afk-color);" onclick="pauseMainTimer()">Pause ⏸️</button>
+                    <button class="btn-action" style="color: var(--primary-accent); border-color: var(--primary-accent);" onclick="openSaveStudyModal()">Save 💾</button>
+                    <button class="btn-action" style="color: var(--danger-color); border-color: var(--danger-color);" onclick="resetMainTimer()">Reset 🔄</button>
                 </div>
-                <div id="pane-arabic-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-arabic-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
-                </div>
-            </div>
-            <div class="subject-block english">
-                <p class="sub-block-title">2. اللغة الإنجليزية 🇬🇧</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-english-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('english', 'done')">Done ✅</button>
-                    <button id="tab-english-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('english', 'rem')">Remaining ⏳</button>
-                </div>
-                <div id="pane-english-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-english-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-english-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-english-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
-                </div>
-            </div>
-            <div class="subject-block history">
-                <p class="sub-block-title">3. التاريخ 🏛️</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-history-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('history', 'done')">Done ✅</button>
-                    <button id="tab-history-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('history', 'rem')">Remaining ⏳</button>
-                </div>
-                <div id="pane-history-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-history-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-history-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-history-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
+
+                <!-- Sub Timers Section -->
+                <div class="sub-timers-grid">
+                    <div class="sub-timer-card listening">
+                        <div class="sub-timer-title">1. Listening 🎧</div>
+                        <div class="sub-timer-display" id="timerDisplayListening">00:00:00</div>
+                        <button class="sub-btn" style="background: var(--listening-color); color: #111;" onclick="toggleSubTimer('listening')">Start / Pause</button>
+                    </div>
+                    <div class="sub-timer-card writing">
+                        <div class="sub-timer-title">2. Writing ✍️</div>
+                        <div class="sub-timer-display" id="timerDisplayWriting">00:00:00</div>
+                        <button class="sub-btn" style="background: var(--writing-color); color: #111;" onclick="toggleSubTimer('writing')">Start / Pause</button>
+                    </div>
+                    <div class="sub-timer-card quiz">
+                        <div class="sub-timer-title">3. Quiz 📝</div>
+                        <div class="sub-timer-display" id="timerDisplayQuiz">00:00:00</div>
+                        <button class="sub-btn" style="background: var(--quiz-color); color: #111;" onclick="toggleSubTimer('quiz')">Start / Pause</button>
+                    </div>
                 </div>
             </div>
-            <div class="subject-block physics">
-                <p class="sub-block-title">4. الفيزياء ⚡</p>
-                <div class="nb-tabs-row">
-                    <button id="tab-physics-done" class="nb-tab-btn btn-done-tab active-tab" onclick="switchNbPane('physics', 'done')">Done ✅</button>
-                    <button id="tab-physics-rem" class="nb-tab-btn btn-remaining-tab" onclick="switchNbPane('physics', 'rem')">Remaining ⏳</button>
+
+            <!-- AFK Timer Box -->
+            <div class="card" style="border-color: var(--afk-color);">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--afk-color);">مؤقت AFK (الاستراحة والغياب) ⏳</span>
                 </div>
-                <div id="pane-physics-done" class="nb-text-container done-pane active-pane">
-                    <textarea id="note-physics-done" class="nb-textarea" placeholder="اكتب ما تم إنجازه..." oninput="saveNotebookData()"></textarea>
-                </div>
-                <div id="pane-physics-rem" class="nb-text-container remaining-pane">
-                    <textarea id="note-physics-rem" class="nb-textarea" placeholder="اكتب المتبقي عليك..." oninput="saveNotebookData()"></textarea>
+                <div class="main-timer-display" id="afkTimerDisplay" style="color: var(--afk-color); font-size: 3rem;">00:00:00</div>
+                <div class="controls-row">
+                    <button class="btn-action" onclick="toggleAFKTimer()">تشغيل / إيقاف AFK</button>
+                    <button class="btn-action" onclick="saveAFKSession()">حفظ في سجل AFK</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- القائمة الجانبية للسجلات -->
-    <div id="sidebarHistory" class="sidebar">
-        <div class="sidebar-header">
-            <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
-            <div class="header-actions">
-                <button id="printHistoryBtn" class="btn-header-share" onclick="printFullHistory()">Share PDF 📄</button>
-                <h2 id="sidebarTitle">History</h2>
+        <!-- 2. SCHEDULE TAB -->
+        <div id="tab-schedule" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">جدول الدروس والمواعيد 📅</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="schSubject" placeholder="المادة" style="flex: 1;">
+                    <select id="schDay">
+                        <option value="السبت">السبت</option>
+                        <option value="الأحد">الأحد</option>
+                        <option value="الإثنين">الإثنين</option>
+                        <option value="الثلاثاء">الثلاثاء</option>
+                        <option value="الأربعاء">الأربعاء</option>
+                        <option value="الخميس">الخميس</option>
+                        <option value="الجمعة">الجمعة</option>
+                    </select>
+                    <input type="time" id="schTime">
+                    <input type="text" id="schPlace" placeholder="المكان">
+                    <input type="text" id="schTeacher" placeholder="اسم المستر">
+                    <select id="schType">
+                        <option value="سنتر">سنتر</option>
+                        <option value="منصة">منصة</option>
+                    </select>
+                    <button class="btn-action" onclick="addScheduleItem()">إضافة للجدول</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المادة</th>
+                            <th>اليوم</th>
+                            <th>الوقت</th>
+                            <th>المكان</th>
+                            <th>المدرس</th>
+                            <th>النوع</th>
+                            <th>الحالة اليومية</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody"></tbody>
+                </table>
             </div>
         </div>
-        <div id="mergeTabsRow" class="nb-tabs-row" style="padding: 10px; display: none;">
-            <button id="mergeTabSocial" class="nb-tab-btn" style="color: #89b4fa; border-color: #89b4fa;" onclick="switchMergeView('social')">Social History 📱</button>
-            <button id="mergeTabAfk" class="nb-tab-btn" style="color: #f9e2af; border-color: #f9e2af;" onclick="switchMergeView('afk')">AFK History ⏳</button>
+
+        <!-- 3. TASKS DAY TAB -->
+        <div id="tab-tasks" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">قائمة مهام اليوم 📋</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div id="taskNotificationBox" style="display:none; background: rgba(137, 180, 250, 0.15); border: 1px solid var(--primary-accent); padding: 10px; border-radius: 8px; margin-bottom: 15px; color: var(--primary-accent);"></div>
+
+                <div class="form-group">
+                    <input type="text" id="taskSubjectInput" placeholder="المادة التي سأذاكرها اليوم..." style="flex: 1;">
+                    <button class="btn-action" onclick="addTaskDay()">إضافة مهمة</button>
+                </div>
+
+                <ul id="tasksList" style="list-style: none;"></ul>
+            </div>
         </div>
-        <div id="sidebarContent" class="sidebar-content"></div>
+
+        <!-- 4. STATS TAB -->
+        <div id="tab-stats" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">لوحة الإحصائيات الشاملة والتقييم الذكي 📊</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="form-group" style="justify-content: center; margin-bottom: 20px;">
+                    <button class="btn-action" onclick="renderStats('day')">اليوم</button>
+                    <button class="btn-action" onclick="renderStats('week')">الأسبوع</button>
+                    <button class="btn-action" onclick="renderStats('month')">الشهر</button>
+                    <button class="btn-action" style="border-color: var(--danger-color); color: var(--danger-color);" onclick="renderStats('exams')">فترة Exams (2026/8/1 - 2027/6/1)</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>إجمالي المذاكرة</div>
+                        <div class="stat-value" id="stTotalStudy">0 ساعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>الاستماع (Listening)</div>
+                        <div class="stat-value" id="stListening" style="color: var(--listening-color);">0 دقيقة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>الكتابة (Writing)</div>
+                        <div class="stat-value" id="stWriting" style="color: var(--writing-color);">0 دقيقة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>الحل (Quiz)</div>
+                        <div class="stat-value" id="stQuiz" style="color: var(--quiz-color);">0 دقيقة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>الدروس الخارجية</div>
+                        <div class="stat-value" id="stEducation">0 ساعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>وقت AFK / الراحة</div>
+                        <div class="stat-value" id="stAFK" style="color: var(--afk-color);">0 ساعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>ساعات النوم</div>
+                        <div class="stat-value" id="stSleep" style="color: var(--break-color);">0 ساعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>نسبة المذاكرة من اليوم</div>
+                        <div class="stat-value" id="stRatio" style="color: var(--arabic-color);">0%</div>
+                    </div>
+                </div>
+
+                <!-- AI Evaluation -->
+                <div class="ai-eval-box">
+                    <span class="ai-badge">AI Assistant Grade</span>
+                    <h3 id="aiGradeText" style="color: var(--study-color); margin: 5px 0;">Evaluating...</h3>
+                    <p id="aiAdviceText" style="font-size: 0.9rem; color: var(--text-sub);"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. LESSONS TASK TAB -->
+        <div id="tab-lessons" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">فهرس المناهج والدروس 📖</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="lessons-grid">
+                    <!-- Arabic -->
+                    <div class="card lesson-subject-card arabic">
+                        <h3 style="color: var(--arabic-color); margin-bottom: 10px;">اللغة العربية 📚</h3>
+                        <div class="form-group">
+                            <input type="text" id="addLesson-arabic" placeholder="اسم الدرس الجديد..." style="width:70%;">
+                            <button class="btn-action" onclick="addLesson('arabic')">+</button>
+                        </div>
+                        <div id="lessonsList-arabic"></div>
+                    </div>
+
+                    <!-- English -->
+                    <div class="card lesson-subject-card english">
+                        <h3 style="color: var(--english-color); margin-bottom: 10px;">اللغة الإنجليزية 🇬🇧</h3>
+                        <div class="form-group">
+                            <input type="text" id="addLesson-english" placeholder="اسم الدرس الجديد..." style="width:70%;">
+                            <button class="btn-action" onclick="addLesson('english')">+</button>
+                        </div>
+                        <div id="lessonsList-english"></div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="card lesson-subject-card history">
+                        <h3 style="color: var(--history-color); margin-bottom: 10px;">التاريخ 🏛️</h3>
+                        <div class="form-group">
+                            <input type="text" id="addLesson-history" placeholder="اسم الدرس الجديد..." style="width:70%;">
+                            <button class="btn-action" onclick="addLesson('history')">+</button>
+                        </div>
+                        <div id="lessonsList-history"></div>
+                    </div>
+
+                    <!-- Physics -->
+                    <div class="card lesson-subject-card physics">
+                        <h3 style="color: var(--physics-color); margin-bottom: 10px;">الفيزياء ⚡</h3>
+                        <div class="form-group">
+                            <input type="text" id="addLesson-physics" placeholder="اسم الدرس الجديد..." style="width:70%;">
+                            <button class="btn-action" onclick="addLesson('physics')">+</button>
+                        </div>
+                        <div id="lessonsList-physics"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. EDUCATION TAB -->
+        <div id="tab-education" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">سجل الدروس الخارجية (السنتر) 🏫</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="eduSubject" placeholder="المادة">
+                    <input type="text" id="eduTeacher" placeholder="المدرس">
+                    <input type="text" id="eduLesson" placeholder="الدرس الذي تم مذاكرته">
+                    <label>وقت الذهاب:</label> <input type="time" id="eduStartTime">
+                    <label>وقت العودة:</label> <input type="time" id="eduEndTime">
+                    <button class="btn-action" onclick="addEducationRecord()">حفظ الدرس</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المادة</th>
+                            <th>المدرس</th>
+                            <th>الدرس</th>
+                            <th>من</th>
+                            <th>إلى</th>
+                            <th>الوقت المحسوب</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eduTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. PRAYERS TAB -->
+        <div id="tab-prayers" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">أوقات الصلاة - سوهاج، مصر 🕌</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px;">يتم إرسال إشعار تنبيهي قبل كل صلاة بـ 10 دقائق تلقائياً.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الصلاة</th>
+                            <th>الوقت</th>
+                            <th>عدد الركعات</th>
+                            <th>الأداء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prayersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 8. SLEEP TAB -->
+        <div id="tab-sleep" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">تتبع ساعات النوم 🌙</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="form-group">
+                    <label>نمت الساعة:</label> <input type="datetime-local" id="sleepStart">
+                    <label>صحيت الساعة:</label> <input type="datetime-local" id="sleepEnd">
+                    <button class="btn-action" onclick="addSleepRecord()">حساب وحفظ</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>وقت النوم</th>
+                            <th>وقت الاستيقاظ</th>
+                            <th>عدد الساعات</th>
+                            <th>حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sleepTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 9. NOTICE TAB -->
+        <div id="tab-notice" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">الملاحظات السريعة 📝</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="noticeInput" placeholder="اكتب ملاحظتك هنا (مثال: وقفت في فيديو الفيزياء عند الدقيقة 14:20)..." style="width: 100%; height: 80px;"></textarea>
+                    <button class="btn-action" onclick="addNotice()">حفظ الملاحظة</button>
+                </div>
+
+                <div id="noticesContainer"></div>
+            </div>
+        </div>
+
+        <!-- 10. NOTEBOOK TAB -->
+        <div id="tab-notebook" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">المفكرة الدائمة (Notebook) 📓</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+
+                <div class="lessons-grid">
+                    <div class="card" style="border-top: 4px solid var(--arabic-color);">
+                        <h3 style="color: var(--arabic-color);">اللغة العربية</h3>
+                        <textarea id="nb-arabic" style="width:100%; height:120px; margin-top:10px;" oninput="autoSaveNotebook()"></textarea>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--english-color);">
+                        <h3 style="color: var(--english-color);">اللغة الإنجليزية</h3>
+                        <textarea id="nb-english" style="width:100%; height:120px; margin-top:10px;" oninput="autoSaveNotebook()"></textarea>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--history-color);">
+                        <h3 style="color: var(--history-color);">التاريخ</h3>
+                        <textarea id="nb-history" style="width:100%; height:120px; margin-top:10px;" oninput="autoSaveNotebook()"></textarea>
+                    </div>
+                    <div class="card" style="border-top: 4px solid var(--physics-color);">
+                        <h3 style="color: var(--physics-color);">الفيزياء</h3>
+                        <textarea id="nb-physics" style="width:100%; height:120px; margin-top:10px;" oninput="autoSaveNotebook()"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. HISTORY LOGS TAB -->
+        <div id="tab-history" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">سجل الجلسات المحفوظة 📜</span>
+                    <button class="btn-print" onclick="window.print()">Print PDF 📄</button>
+                </div>
+                <div id="historyLogsContainer"></div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- المودالز -->
-    <div id="saveModal" class="modal">
+    <!-- MODALS -->
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalHeaderTitle">حفظ السجل الجديد</h3>
-            <label>اسم المادة / النشاط:</label>
-            <input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
-            <label>وصف المذاكرة:</label>
-            <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا..."></textarea>
-            <div class="modal-actions">
-                <button onclick="confirmSaveSession()">حفظ السجل</button>
-                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button>
+            <h3 style="color: var(--primary-accent); margin-bottom: 10px;">تسجيل الدخول للحساب</h3>
+            <div class="form-group">
+                <input type="text" id="loginUser" placeholder="Username" style="width:100%;">
+                <input type="password" id="loginPass" placeholder="Password" style="width:100%;">
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn-action" onclick="performLogin()">دخول</button>
+                <button class="btn-action" style="color:var(--danger-color)" onclick="closeModal('loginModal')">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <div id="editModal" class="modal">
+    <!-- Save Study Modal -->
+    <div id="saveStudyModal" class="modal">
         <div class="modal-content">
-            <h3>تعديل بيانات السجل</h3>
-            <label>اسم المادة / النشاط:</label>
-            <input type="text" id="editSubjectInput">
-            <label>وصف النشاط:</label>
-            <textarea id="editDescInput"></textarea>
-            <label>اليوم:</label>
-            <input type="text" id="editDayInput">
-            <label>التاريخ:</label>
-            <input type="text" id="editDateInput">
-            <div class="modal-actions">
-                <button onclick="confirmEditSession()">تحديث</button>
-                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('editModal')">إلغاء</button>
+            <h3 style="color: var(--study-color); margin-bottom: 10px;">حفظ جلسة المذاكرة</h3>
+            <div class="form-group">
+                <input type="text" id="saveSubject" placeholder="اسم المادة..." style="width:100%;">
+                <textarea id="saveLessonDetails" placeholder="تفاصيل اسم الدرس وما تم إنجازه..." style="width:100%; height:60px;"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn-action" onclick="confirmSaveStudy()">حفظ في السجل</button>
+                <button class="btn-action" style="color:var(--danger-color)" onclick="closeModal('saveStudyModal')">إلغاء</button>
             </div>
         </div>
     </div>
-
-    <!-- 🎯 Frameless & Automatic Countdown Widget -->
-    <div class="exam-countdown-container">
-        <div class="exam-countdown-text" id="daysRemainingText">314 Day</div>
-        <div class="exam-countdown-sub">2026/8/1 to 2027/6/1</div>
-        <div class="exam-countdown-sub">10 شهور</div>
-    </div>
-
-    <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
-
-    <!-- عناصر الخفاء الخاصة بالـ Mini Mode -->
-    <canvas id="videoCanvas" width="400" height="160" style="display:none;"></canvas>
-    <video id="pipVideo" autoplay muted playsinline style="display:none;"></video>
 
     <script>
-        let timers = {
-            study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type: 'up' },
-            break: { seconds: parseInt(localStorage.getItem('savedBreakSeconds')) || 300, type: 'down', default: 300 },
-            social: { seconds: parseInt(localStorage.getItem('savedSocialSeconds')) || 0, type: 'up' },
-            afk: { seconds: parseInt(localStorage.getItem('savedAfkSeconds')) || 0, type: 'up' }
+        /* ================= GLOBAL STATE & STORAGE ================= */
+        let state = {
+            currentUser: localStorage.getItem('ss_user') || null,
+            studyLogs: JSON.parse(localStorage.getItem('ss_studyLogs')) || [],
+            afkLogs: JSON.parse(localStorage.getItem('ss_afkLogs')) || [],
+            schedule: JSON.parse(localStorage.getItem('ss_schedule')) || [],
+            tasks: JSON.parse(localStorage.getItem('ss_tasks')) || [],
+            lessons: JSON.parse(localStorage.getItem('ss_lessons')) || {
+                arabic: [], english: [], history: [], physics: []
+            },
+            education: JSON.parse(localStorage.getItem('ss_education')) || [],
+            sleep: JSON.parse(localStorage.getItem('ss_sleep')) || [],
+            notices: JSON.parse(localStorage.getItem('ss_notices')) || [],
+            prayersStatus: JSON.parse(localStorage.getItem('ss_prayersStatus')) || {},
+            notebook: JSON.parse(localStorage.getItem('ss_notebook')) || { arabic: '', english: '', history: '', physics: '' }
         };
 
-        let currentActiveMode = 'study';
-        let isRunning = false;
-        let globalIntervalId = null;
-        let lastTimestamp = null; 
+        function saveData() {
+            localStorage.setItem('ss_studyLogs', JSON.stringify(state.studyLogs));
+            localStorage.setItem('ss_afkLogs', JSON.stringify(state.afkLogs));
+            localStorage.setItem('ss_schedule', JSON.stringify(state.schedule));
+            localStorage.setItem('ss_tasks', JSON.stringify(state.tasks));
+            localStorage.setItem('ss_lessons', JSON.stringify(state.lessons));
+            localStorage.setItem('ss_education', JSON.stringify(state.education));
+            localStorage.setItem('ss_sleep', JSON.stringify(state.sleep));
+            localStorage.setItem('ss_notices', JSON.stringify(state.notices));
+            localStorage.setItem('ss_prayersStatus', JSON.stringify(state.prayersStatus));
+            localStorage.setItem('ss_notebook', JSON.stringify(state.notebook));
+        }
 
-        let sessionStartTime = null; 
-        let currentCairoGlobalDateObject = new Date(); 
-
-        let historyData = JSON.parse(localStorage.getItem('timerHistoryData')) || { study: [], break: [], social: [], afk: [], trash: [] };
-        let activeHistoryView = 'study'; 
-        let currentEditingIndex = null;
-
-        const MY_AUDIO_URL = "https://files.catbox.moe/d5k1bg.mp3"; 
-        let customAudio = new Audio(MY_AUDIO_URL);
-
-        let canvasStream = null;
-        let pipCanvas = document.getElementById('videoCanvas');
-        let pipCtx = pipCanvas.getContext('2d');
-        let pipVideo = document.getElementById('pipVideo');
-
-        window.onload = function() {
-            updateDisplay('study');
-            updateDisplay('break');
-            updateDisplay('social');
-            updateDisplay('afk');
+        /* ================= NAVIGATION ================= */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
-            if (localStorage.getItem('savedBreakDefault')) {
-                timers.break.default = parseInt(localStorage.getItem('savedBreakDefault'));
-            }
-            
-            updateThemeColors();
-            startCairoLiveClockAndEngine(); 
-            loadNotebookData();
-            setupPipStream();
-            updateExamCountdown();
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabId === 'stats') renderStats('day');
+            if (tabId === 'tasks') checkTaskNotifications();
         }
 
-        // 🎯 Auto-decrements precisely at 00:00 (Midnight) every day
-        function updateExamCountdown() {
-            const examTargetDate = new Date('2027-06-01T00:00:00');
-            const now = new Date();
-            const timeDiff = examTargetDate - now;
-            
-            let daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-            if (daysLeft < 0) daysLeft = 0;
+        /* ================= LOGIN SYSTEM ================= */
+        function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-            const textElem = document.getElementById('daysRemainingText');
-            if (textElem) {
-                textElem.innerText = `${daysLeft} Day`;
-            }
-        }
-
-        function getCairoPrayerPeriodInfo(dateObj) {
-            if (!dateObj) return "00:00";
-            let formatter24 = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', hour: 'numeric', hour12: false });
-            let formatterMinutes = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', minute: 'numeric' });
-            let hours24 = parseInt(formatter24.format(dateObj), 10);
-            let minutes = parseInt(formatterMinutes.format(dateObj), 10);
-            let totalMinutes = (hours24 * 60) + minutes;
-            let periodName = "";
-
-            let m430_am = (4 * 60) + 30;  
-            let m600_am = (6 * 60);       
-            let m800_am = (8 * 60);       
-            let m1200_pm = (12 * 60);     
-            let m430_pm = (16 * 60) + 30; 
-            let m800_pm = (20 * 60);      
-            let m930_pm = (21 * 60) + 30; 
-
-            if (totalMinutes >= 0 && totalMinutes < m430_am) periodName = "الليل";
-            else if (totalMinutes >= m430_am && totalMinutes < m600_am) periodName = "فجراً";
-            else if (totalMinutes >= m600_am && totalMinutes < m800_am) periodName = "الشروق";
-            else if (totalMinutes >= m800_am && totalMinutes < m1200_pm) periodName = "صباحاً";
-            else if (totalMinutes >= m1200_pm && totalMinutes < m430_pm) periodName = "ظهراً";
-            else if (totalMinutes >= m430_pm && totalMinutes < m800_pm) periodName = "عصراً";
-            else if (totalMinutes >= m800_pm && totalMinutes < m930_pm) periodName = "المغرب";
-            else periodName = "العشاء";
-
-            let displayHours = hours24 % 12;
-            if (displayHours === 0) displayHours = 12;
-            return `${displayHours}:${minutes.toString().padStart(2, '0')} ${periodName}`;
-        }
-
-        function startCairoLiveClockAndEngine() {
-            setInterval(() => {
-                currentCairoGlobalDateObject = new Date(); 
-                let prayerFormattedTime = getCairoPrayerPeriodInfo(currentCairoGlobalDateObject);
-                let dateFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'Africa/Cairo', day: '2-digit', month: '2-digit', year: 'numeric', weekday: 'long' });
-                let dateParts = dateFormatter.formatToParts(currentCairoGlobalDateObject);
-                let dayNameStr = ""; let dayNum = ""; let monthNum = ""; let yearNum = "";
-                
-                dateParts.forEach(p => {
-                    if (p.type === 'weekday') dayNameStr = p.value;
-                    if (p.type === 'day') dayNum = p.value;
-                    if (p.type === 'month') monthNum = p.value;
-                    if (p.type === 'year') yearNum = p.value;
-                });
-                
-                let arabicDay = dayNameStr;
-                if(dayNameStr.includes("Sunday") || dayNameStr.includes("الأحد")) arabicDay = "الأحد";
-                if(dayNameStr.includes("Monday") || dayNameStr.includes("الإثنين")) arabicDay = "الإثنين";
-                if(dayNameStr.includes("Tuesday") || dayNameStr.includes("الثلاثاء")) arabicDay = "الثلاثاء";
-                if(dayNameStr.includes("Wednesday") || dayNameStr.includes("الأربعاء")) arabicDay = "الأربعاء";
-                if(dayNameStr.includes("Thursday") || dayNameStr.includes("الخميس")) arabicDay = "الخميس";
-                if(dayNameStr.includes("Friday") || dayNameStr.includes("الجمعة")) arabicDay = "الجمعة";
-                if(dayNameStr.includes("Saturday") || dayNameStr.includes("السبت")) arabicDay = "السبت";
-
-                document.getElementById("cairoClock").innerText = prayerFormattedTime;
-                document.getElementById("cairoDate").innerText = `${arabicDay}، ${dayNum}/${monthNum}/${yearNum}`;
-                
-                updateExamCountdown();
-            }, 1000);
-        }
-
-        function startTimer() {
-            if (isRunning) return;
-            isRunning = true;
-            lastTimestamp = Date.now();
-            
-            if (!sessionStartTime) {
-                sessionStartTime = new Date();
-            }
-
-            globalIntervalId = setInterval(() => {
-                let now = Date.now();
-                let delta = Math.floor((now - lastTimestamp) / 1000);
-                
-                if (delta >= 1) {
-                    lastTimestamp = now;
-                    let currentObj = timers[currentActiveMode];
-                    
-                    if (currentObj.type === 'up') {
-                        currentObj.seconds += delta;
-                    } else {
-                        currentObj.seconds -= delta;
-                        if (currentObj.seconds <= 0) {
-                            currentObj.seconds = 0;
-                            pauseTimer();
-                            try { customAudio.play(); } catch(e){}
-                            alert("انتهى وقت الاستراحة!");
-                        }
-                    }
-                    
-                    saveCurrentState();
-                    updateDisplay(currentActiveMode);
-                    updatePipCanvas();
-                }
-            }, 500);
-        }
-
-        function pauseTimer() {
-            if (!isRunning) return;
-            isRunning = false;
-            clearInterval(globalIntervalId);
-            saveCurrentState();
-        }
-
-        function endTimer() {
-            pauseTimer();
-            let currentObj = timers[currentActiveMode];
-            if (currentObj.type === 'up') {
-                currentObj.seconds = 0;
+        function performLogin() {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            if (u === 'amr' && p === '2010') {
+                state.currentUser = 'Amr';
+                localStorage.setItem('ss_user', 'Amr');
+                updateUserUI();
+                closeModal('loginModal');
             } else {
-                currentObj.seconds = currentObj.default;
+                alert('خطأ في اسم المستخدم أو كلمة السر');
             }
-            sessionStartTime = null;
-            saveCurrentState();
-            updateDisplay(currentActiveMode);
-            updatePipCanvas();
         }
 
-        function saveCurrentState() {
-            localStorage.setItem('savedStudySeconds', timers.study.seconds);
-            localStorage.setItem('savedBreakSeconds', timers.break.seconds);
-            localStorage.setItem('savedSocialSeconds', timers.social.seconds);
-            localStorage.setItem('savedAfkSeconds', timers.afk.seconds);
+        function updateUserUI() {
+            if (state.currentUser) {
+                document.getElementById('loginBtnContainer').style.display = 'none';
+                document.getElementById('profileBadge').style.display = 'flex';
+            }
         }
 
-        function switchMode(mode) {
-            pauseTimer();
-            currentActiveMode = mode;
-            document.querySelectorAll('.timer-box').forEach(b => b.classList.remove('active'));
-            document.getElementById(`container-${mode}`).classList.add('active');
-            updateThemeColors();
-            updatePipCanvas();
-        }
-
-        function updateThemeColors() {
-            let root = document.documentElement;
-            if (currentActiveMode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
-            else if (currentActiveMode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
-            else if (currentActiveMode === 'social') root.style.setProperty('--current-theme', 'var(--social-color)');
-            else if (currentActiveMode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
-        }
+        /* ================= TIMERS SYSTEM ================= */
+        let mainTimerInterval = null, mainSeconds = 0;
+        let subTimers = {
+            listening: { interval: null, seconds: 0 },
+            writing: { interval: null, seconds: 0 },
+            quiz: { interval: null, seconds: 0 }
+        };
+        let afkInterval = null, afkSeconds = 0;
 
         function formatTime(sec) {
             let h = Math.floor(sec / 3600);
             let m = Math.floor((sec % 3600) / 60);
             let s = sec % 60;
-            if (h > 0) {
-                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        }
+
+        function startMainTimer() {
+            if (!mainTimerInterval) {
+                mainTimerInterval = setInterval(() => {
+                    mainSeconds++;
+                    document.getElementById('mainTimerDisplay').innerText = formatTime(mainSeconds);
+                }, 1000);
             }
-            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        function updateDisplay(mode) {
-            let displayElem = document.getElementById(`display-${mode}`);
-            if (displayElem) {
-                displayElem.innerText = formatTime(timers[mode].seconds);
-            }
+        function pauseMainTimer() {
+            clearInterval(mainTimerInterval);
+            mainTimerInterval = null;
         }
 
-        function setBreakDuration() {
-            let h = parseInt(document.getElementById('breakHoursInput').value) || 0;
-            let m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-            let total = (h * 3600) + (m * 60);
-            if (total <= 0) total = 300;
-            timers.break.default = total;
-            timers.break.seconds = total;
-            localStorage.setItem('savedBreakDefault', total);
-            saveCurrentState();
-            updateDisplay('break');
-        }
-
-        function saveSessionPrompt() {
-            if (timers[currentActiveMode].seconds <= 0) {
-                alert("لا يوجد وقت مسجل للحفظ!");
-                return;
-            }
-            document.getElementById('modalSubjectInput').value = "";
-            document.getElementById('modalDescInput').value = "";
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
-        function confirmSaveSession() {
-            let subject = document.getElementById('modalSubjectInput').value.trim() || "بدون عنوان";
-            let desc = document.getElementById('modalDescInput').value.trim() || "لا يوجد وصف";
-            
-            let now = new Date();
-            let startFormatted = getCairoPrayerPeriodInfo(sessionStartTime || now);
-            let endFormatted = getCairoPrayerPeriodInfo(now);
-
-            let dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-            let dayStr = dayNames[now.getDay()];
-            let dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()}`;
-
-            let sessionRecord = {
-                id: Date.now(),
-                subject: subject,
-                desc: desc,
-                duration: formatTime(timers[currentActiveMode].seconds),
-                startTime: startFormatted,
-                endTime: endFormatted,
-                day: dayStr,
-                date: dateStr
-            };
-
-            historyData[currentActiveMode].unshift(sessionRecord);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            closeModal('saveModal');
-            endTimer();
-            alert("تم حفظ السجل بنجاح!");
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function openHistory(type) {
-            activeHistoryView = type;
-            document.getElementById('mergeTabsRow').style.display = 'none';
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            
-            let titles = { study: "Study History 📚", break: "Break History ☕", trash: "Trash / Recovery 🗑️" };
-            document.getElementById('sidebarTitle').innerText = titles[type] || "History";
-            renderHistoryCards();
-        }
-
-        function openMergeHistory() {
-            activeHistoryView = 'social';
-            document.getElementById('mergeTabsRow').style.display = 'flex';
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('sidebarTitle').innerText = "Social & AFK History";
-            switchMergeView('social');
-        }
-
-        function switchMergeView(type) {
-            activeHistoryView = type;
-            document.getElementById('mergeTabSocial').style.opacity = type === 'social' ? '1' : '0.5';
-            document.getElementById('mergeTabAfk').style.opacity = type === 'afk' ? '1' : '0.5';
-            renderHistoryCards();
-        }
-
-        function closeHistory() {
-            document.getElementById('sidebarHistory').classList.remove('open');
-            document.getElementById('mainContainer').classList.remove('sidebar-open');
-        }
-
-        function renderHistoryCards() {
-            let container = document.getElementById('sidebarContent');
-            container.innerHTML = "";
-            let list = historyData[activeHistoryView] || [];
-
-            if (list.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">لا توجد سجلات محفوظة.</div>`;
-                return;
-            }
-
-            list.forEach((item, idx) => {
-                let isTrash = activeHistoryView === 'trash';
-                let card = document.createElement('div');
-                card.className = 'history-card';
-                card.innerHTML = `
-                    <div class="card-main-line">
-                        <span class="card-subject">${item.subject}</span>
-                        <span class="card-duration">${item.duration}</span>
-                    </div>
-                    <div class="card-desc">${item.desc}</div>
-                    <div class="card-time-row">
-                        <span class="time-tag start">البداية: ${item.startTime}</span>
-                        <span class="time-tag end">النهاية: ${item.endTime}</span>
-                    </div>
-                    <div class="card-bottom-info">
-                        <span>${item.day} - ${item.date}</span>
-                        <div class="card-actions">
-                            ${!isTrash ? `<button class="btn-edit" onclick="editHistoryItem(${idx})">تعديل</button>` : ''}
-                            ${!isTrash ? `<button class="btn-delete" onclick="deleteHistoryItem(${idx})">حذف</button>` : `<button class="btn-recovery" onclick="recoverHistoryItem(${idx})">استرجاع</button>`}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
+        function resetMainTimer() {
+            pauseMainTimer();
+            mainSeconds = 0;
+            document.getElementById('mainTimerDisplay').innerText = formatTime(0);
+            ['listening', 'writing', 'quiz'].forEach(k => {
+                clearInterval(subTimers[k].interval);
+                subTimers[k].interval = null;
+                subTimers[k].seconds = 0;
+                document.getElementById('timerDisplay' + k.charAt(0).toUpperCase() + k.slice(1)).innerText = formatTime(0);
             });
         }
 
-        function deleteHistoryItem(idx) {
-            let item = historyData[activeHistoryView].splice(idx, 1)[0];
-            historyData.trash.unshift(item);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-        }
-
-        function recoverHistoryItem(idx) {
-            let item = historyData.trash.splice(idx, 1)[0];
-            historyData.study.unshift(item);
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            renderHistoryCards();
-        }
-
-        function editHistoryItem(idx) {
-            currentEditingIndex = idx;
-            let item = historyData[activeHistoryView][idx];
-            document.getElementById('editSubjectInput').value = item.subject;
-            document.getElementById('editDescInput').value = item.desc;
-            document.getElementById('editDayInput').value = item.day;
-            document.getElementById('editDateInput').value = item.date;
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function confirmEditSession() {
-            if (currentEditingIndex === null) return;
-            let item = historyData[activeHistoryView][currentEditingIndex];
-            item.subject = document.getElementById('editSubjectInput').value;
-            item.desc = document.getElementById('editDescInput').value;
-            item.day = document.getElementById('editDayInput').value;
-            item.date = document.getElementById('editDateInput').value;
-
-            localStorage.setItem('timerHistoryData', JSON.stringify(historyData));
-            closeModal('editModal');
-            renderHistoryCards();
-        }
-
-        function openNotebook() {
-            document.getElementById('notebookSidebar').classList.add('open');
-            document.getElementById('mainContainer').classList.add('notebook-open');
-        }
-
-        function closeNotebook() {
-            document.getElementById('notebookSidebar').classList.remove('open');
-            document.getElementById('mainContainer').classList.remove('notebook-open');
-        }
-
-        function switchNbPane(sub, paneType) {
-            document.getElementById(`tab-${sub}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${sub}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${sub}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${sub}-rem`).classList.remove('active-pane');
-
-            if (paneType === 'done') {
-                document.getElementById(`tab-${sub}-done`).classList.add('active-tab');
-                document.getElementById(`pane-${sub}-done`).classList.add('active-pane');
+        function toggleSubTimer(key) {
+            if (subTimers[key].interval) {
+                clearInterval(subTimers[key].interval);
+                subTimers[key].interval = null;
             } else {
-                document.getElementById(`tab-${sub}-rem`).classList.add('active-tab');
-                document.getElementById(`pane-${sub}-rem`).classList.add('active-pane');
+                subTimers[key].interval = setInterval(() => {
+                    subTimers[key].seconds++;
+                    document.getElementById('timerDisplay' + key.charAt(0).toUpperCase() + key.slice(1)).innerText = formatTime(subTimers[key].seconds);
+                }, 1000);
             }
         }
 
-        function saveNotebookData() {
-            let data = {
-                arabicDone: document.getElementById('note-arabic-done').value,
-                arabicRem: document.getElementById('note-arabic-rem').value,
-                englishDone: document.getElementById('note-english-done').value,
-                englishRem: document.getElementById('note-english-rem').value,
-                historyDone: document.getElementById('note-history-done').value,
-                historyRem: document.getElementById('note-history-rem').value,
-                physicsDone: document.getElementById('note-physics-done').value,
-                physicsRem: document.getElementById('note-physics-rem').value,
+        function toggleAFKTimer() {
+            if (afkInterval) {
+                clearInterval(afkInterval);
+                afkInterval = null;
+            } else {
+                afkInterval = setInterval(() => {
+                    afkSeconds++;
+                    document.getElementById('afkTimerDisplay').innerText = formatTime(afkSeconds);
+                }, 1000);
+            }
+        }
+
+        function saveAFKSession() {
+            if (afkSeconds === 0) return;
+            state.afkLogs.push({ date: new Date().toISOString(), seconds: afkSeconds });
+            saveData();
+            afkSeconds = 0;
+            document.getElementById('afkTimerDisplay').innerText = formatTime(0);
+            alert('تم حفظ سجل AFK بنجاح');
+        }
+
+        function openSaveStudyModal() { document.getElementById('saveStudyModal').style.display = 'flex'; }
+
+        function confirmSaveStudy() {
+            const subject = document.getElementById('saveSubject').value || 'عام';
+            const details = document.getElementById('saveLessonDetails').value || '';
+            
+            const log = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                subject: subject,
+                details: details,
+                totalSeconds: mainSeconds,
+                listeningSeconds: subTimers.listening.seconds,
+                writingSeconds: subTimers.writing.seconds,
+                quizSeconds: subTimers.quiz.seconds
             };
-            localStorage.setItem('notebookSavedData', JSON.stringify(data));
+
+            state.studyLogs.push(log);
+            saveData();
+            resetMainTimer();
+            closeModal('saveStudyModal');
+            renderHistoryLogs();
+            alert('تم حفظ جلسة المذاكرة بنجاح');
         }
 
-        function loadNotebookData() {
-            let data = JSON.parse(localStorage.getItem('notebookSavedData'));
-            if (!data) return;
-            document.getElementById('note-arabic-done').value = data.arabicDone || "";
-            document.getElementById('note-arabic-rem').value = data.arabicRem || "";
-            document.getElementById('note-english-done').value = data.englishDone || "";
-            document.getElementById('note-english-rem').value = data.englishRem || "";
-            document.getElementById('note-history-done').value = data.historyDone || "";
-            document.getElementById('note-history-rem').value = data.historyRem || "";
-            document.getElementById('note-physics-done').value = data.physicsDone || "";
-            document.getElementById('note-physics-rem').value = data.physicsRem || "";
+        /* ================= SCHEDULE ================= */
+        function addScheduleItem() {
+            const item = {
+                id: Date.now(),
+                subject: document.getElementById('schSubject').value,
+                day: document.getElementById('schDay').value,
+                time: document.getElementById('schTime').value,
+                place: document.getElementById('schPlace').value,
+                teacher: document.getElementById('schTeacher').value,
+                type: document.getElementById('schType').value,
+                status: null // 'check' or 'cross'
+            };
+            if (!item.subject) return;
+            state.schedule.push(item);
+            saveData();
+            renderSchedule();
         }
 
-        function printNotebook() {
-            document.body.classList.add('printing-notebook');
-            window.print();
-            document.body.classList.remove('printing-notebook');
-        }
-
-        function printFullHistory() {
-            window.print();
-        }
-
-        function setupPipStream() {
-            canvasStream = pipCanvas.captureStream(10);
-            pipVideo.srcObject = canvasStream;
-        }
-
-        function updatePipCanvas() {
-            pipCtx.fillStyle = "#0f0f16";
-            pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
-
-            let themeColor = getComputedStyle(document.documentElement).getPropertyValue('--current-theme').trim();
-            pipCtx.fillStyle = themeColor || "#a6e3a1";
-            pipCtx.font = "bold 45px sans-serif";
-            pipCtx.textAlign = "center";
-            pipCtx.fillText(formatTime(timers[currentActiveMode].seconds), pipCanvas.width / 2, 90);
-
-            pipCtx.font = "16px sans-serif";
-            pipCtx.fillStyle = "#cdd6f4";
-            pipCtx.fillText(`Mode: ${currentActiveMode.toUpperCase()}`, pipCanvas.width / 2, 130);
-        }
-
-        async function requestMini() {
-            try {
-                updatePipCanvas();
-                await pipVideo.play();
-                if (document.pictureInPictureElement) {
-                    await document.exitPictureInPicture();
-                } else {
-                    await pipVideo.requestPictureInPicture();
-                }
-            } catch (err) {
-                alert("خاصية العرض المصغر غير مدعومة أو تم رفضها من المتصفح.");
+        function setScheduleStatus(id, status) {
+            const idx = state.schedule.findIndex(s => s.id === id);
+            if (idx !== -1) {
+                state.schedule[idx].status = status;
+                saveData();
+                renderSchedule();
             }
         }
+
+        function deleteSchedule(id) {
+            state.schedule = state.schedule.filter(s => s.id !== id);
+            saveData();
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            const tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = '';
+            state.schedule.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.subject}</td>
+                        <td>${s.day}</td>
+                        <td>${s.time}</td>
+                        <td>${s.place}</td>
+                        <td>${s.teacher}</td>
+                        <td>${s.type}</td>
+                        <td>
+                            <button class="status-btn check ${s.status==='check'?'active-glow':''}" onclick="setScheduleStatus(${s.id}, 'check')">✓</button>
+                            <button class="status-btn cross ${s.status==='cross'?'active-glow':''}" onclick="setScheduleStatus(${s.id}, 'cross')">✕</button>
+                        </td>
+                        <td><button style="color:var(--danger-color); background:none; border:none; cursor:pointer;" onclick="deleteSchedule(${s.id})">🗑️</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        /* ================= TASKS DAY ================= */
+        function addTaskDay() {
+            const val = document.getElementById('taskSubjectInput').value;
+            if (!val) return;
+            state.tasks.push({ id: Date.now(), title: val, status: null, date: new Date().toLocaleDateString() });
+            document.getElementById('taskSubjectInput').value = '';
+            saveData();
+            renderTasks();
+        }
+
+        function setTaskStatus(id, status) {
+            const idx = state.tasks.findIndex(t => t.id === id);
+            if (idx !== -1) {
+                state.tasks[idx].status = status;
+                saveData();
+                renderTasks();
+            }
+        }
+
+        function renderTasks() {
+            const ul = document.getElementById('tasksList');
+            ul.innerHTML = '';
+            state.tasks.forEach(t => {
+                ul.innerHTML += `
+                    <li style="background:#11111b; padding:10px; margin-bottom:8px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>${t.title}</span>
+                        <div>
+                            <button class="status-btn check ${t.status==='check'?'active-glow':''}" onclick="setTaskStatus(${t.id}, 'check')">✓</button>
+                            <button class="status-btn cross ${t.status==='cross'?'active-glow':''}" onclick="setTaskStatus(${t.id}, 'cross')">✕</button>
+                        </div>
+                    </li>
+                `;
+            });
+        }
+
+        function checkTaskNotifications() {
+            const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const todayStr = days[new Date().getDay()];
+            const todaysClasses = state.schedule.filter(s => s.day === todayStr);
+            const box = document.getElementById('taskNotificationBox');
+            if (todaysClasses.length > 0) {
+                box.style.display = 'block';
+                box.innerHTML = `🔔 <b>تنبيه الجدول:</b> لديك اليوم دروس في: ${todaysClasses.map(c => c.subject + ' (' + c.time + ')').join('، ')}`;
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        /* ================= LESSONS TASK ================= */
+        function addLesson(subjectKey) {
+            const input = document.getElementById(`addLesson-${subjectKey}`);
+            if (!input.value) return;
+            state.lessons[subjectKey].push({
+                id: Date.now(),
+                title: input.value,
+                opts: { listen: false, write: false, quiz: false, platform: false, center: false }
+            });
+            input.value = '';
+            saveData();
+            renderLessons();
+        }
+
+        function toggleLessonOpt(subjectKey, lessonId, optKey) {
+            const l = state.lessons[subjectKey].find(item => item.id === lessonId);
+            if (l) {
+                l.opts[optKey] = !l.opts[optKey];
+                saveData();
+                renderLessons();
+            }
+        }
+
+        function renderLessons() {
+            ['arabic', 'english', 'history', 'physics'].forEach(k => {
+                const container = document.getElementById(`lessonsList-${k}`);
+                container.innerHTML = '';
+                state.lessons[k].forEach(l => {
+                    container.innerHTML += `
+                        <div class="lesson-item">
+                            <div style="font-weight:bold;">${l.title}</div>
+                            <div class="lesson-controls">
+                                <label><input type="checkbox" ${l.opts.listen?'checked':''} onchange="toggleLessonOpt('${k}', ${l.id}, 'listen')"> سماع</label>
+                                <label><input type="checkbox" ${l.opts.write?'checked':''} onchange="toggleLessonOpt('${k}', ${l.id}, 'write')"> كتابة</label>
+                                <label><input type="checkbox" ${l.opts.quiz?'checked':''} onchange="toggleLessonOpt('${k}', ${l.id}, 'quiz')"> حل</label>
+                                <label><input type="checkbox" ${l.opts.platform?'checked':''} onchange="toggleLessonOpt('${k}', ${l.id}, 'platform')"> منصة</label>
+                                <label><input type="checkbox" ${l.opts.center?'checked':''} onchange="toggleLessonOpt('${k}', ${l.id}, 'center')"> سنتر</label>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        /* ================= EDUCATION ================= */
+        function addEducationRecord() {
+            const sub = document.getElementById('eduSubject').value;
+            const teacher = document.getElementById('eduTeacher').value;
+            const lesson = document.getElementById('eduLesson').value;
+            const st = document.getElementById('eduStartTime').value;
+            const et = document.getElementById('eduEndTime').value;
+
+            if (!sub || !st || !et) return;
+
+            let mins = 0;
+            const [sh, sm] = st.split(':').map(Number);
+            const [eh, em] = et.split(':').map(Number);
+            mins = (eh * 60 + em) - (sh * 60 + sm);
+            if (mins < 0) mins += 1440;
+
+            state.education.push({ id: Date.now(), date: new Date().toISOString(), sub, teacher, lesson, st, et, mins });
+            saveData();
+            renderEducation();
+        }
+
+        function renderEducation() {
+            const tbody = document.getElementById('eduTableBody');
+            tbody.innerHTML = '';
+            state.education.forEach(e => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${e.sub}</td>
+                        <td>${e.teacher}</td>
+                        <td>${e.lesson}</td>
+                        <td>${e.st}</td>
+                        <td>${e.et}</td>
+                        <td>${(e.mins/60).toFixed(1)} ساعة</td>
+                        <td><button style="color:var(--danger-color); background:none; border:none; cursor:pointer;" onclick="deleteEdu(${e.id})">🗑️</button></td>
+                    </tr>
+                `;
+            });
+        }
+        function deleteEdu(id) { state.education = state.education.filter(e=>e.id!==id); saveData(); renderEducation(); }
+
+        /* ================= PRAYERS ================= */
+        const prayersData = [
+            { name: 'الفجر', time: '04:35 AM', rakats: 2 },
+            { name: 'الظهر', time: '12:05 PM', rakats: 4 },
+            { name: 'العصر', time: '03:38 PM', rakats: 4 },
+            { name: 'المغرب', time: '06:42 PM', rakats: 3 },
+            { name: 'العشاء', time: '08:05 PM', rakats: 4 }
+        ];
+
+        function renderPrayers() {
+            const tbody = document.getElementById('prayersTableBody');
+            tbody.innerHTML = '';
+            prayersData.forEach(p => {
+                const st = state.prayersStatus[p.name];
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${p.name}</b></td>
+                        <td>${p.time}</td>
+                        <td>${p.rakats}</td>
+                        <td>
+                            <button class="status-btn check ${st==='check'?'active-glow':''}" onclick="setPrayerStatus('${p.name}', 'check')">✓</button>
+                            <button class="status-btn cross ${st==='cross'?'active-glow':''}" onclick="setPrayerStatus('${p.name}', 'cross')">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function setPrayerStatus(name, st) {
+            state.prayersStatus[name] = st;
+            saveData();
+            renderPrayers();
+        }
+
+        /* ================= SLEEP ================= */
+        function addSleepRecord() {
+            const st = document.getElementById('sleepStart').value;
+            const et = document.getElementById('sleepEnd').value;
+            if (!st || !et) return;
+
+            const diffMs = new Date(et) - new Date(st);
+            const hours = (diffMs / (1000 * 60 * 60)).toFixed(1);
+
+            state.sleep.push({ id: Date.now(), st: new Date(st).toLocaleString(), et: new Date(et).toLocaleString(), hours });
+            saveData();
+            renderSleep();
+        }
+
+        function renderSleep() {
+            const tbody = document.getElementById('sleepTableBody');
+            tbody.innerHTML = '';
+            state.sleep.forEach(s => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${s.st}</td>
+                        <td>${s.et}</td>
+                        <td>${s.hours} ساعة</td>
+                        <td><button style="color:var(--danger-color); background:none; border:none; cursor:pointer;" onclick="deleteSleep(${s.id})">🗑️</button></td>
+                    </tr>
+                `;
+            });
+        }
+        function deleteSleep(id) { state.sleep = state.sleep.filter(s=>s.id!==id); saveData(); renderSleep(); }
+
+        /* ================= NOTICE ================= */
+        function addNotice() {
+            const val = document.getElementById('noticeInput').value;
+            if (!val) return;
+            state.notices.push({ id: Date.now(), text: val, time: new Date().toLocaleString() });
+            document.getElementById('noticeInput').value = '';
+            saveData();
+            renderNotices();
+        }
+
+        function renderNotices() {
+            const c = document.getElementById('noticesContainer');
+            c.innerHTML = '';
+            state.notices.forEach(n => {
+                c.innerHTML += `
+                    <div style="background:#11111b; padding:12px; border-radius:8px; margin-bottom:10px; border-right:3px solid var(--primary-accent);">
+                        <div style="font-size:0.75rem; color:var(--text-sub);">${n.time}</div>
+                        <div style="margin-top:5px;">${n.text}</div>
+                    </div>
+                `;
+            });
+        }
+
+        /* ================= NOTEBOOK ================= */
+        function autoSaveNotebook() {
+            state.notebook.arabic = document.getElementById('nb-arabic').value;
+            state.notebook.english = document.getElementById('nb-english').value;
+            state.notebook.history = document.getElementById('nb-history').value;
+            state.notebook.physics = document.getElementById('nb-physics').value;
+            saveData();
+        }
+
+        function loadNotebook() {
+            document.getElementById('nb-arabic').value = state.notebook.arabic || '';
+            document.getElementById('nb-english').value = state.notebook.english || '';
+            document.getElementById('nb-history').value = state.notebook.history || '';
+            document.getElementById('nb-physics').value = state.notebook.physics || '';
+        }
+
+        /* ================= HISTORY LOGS ================= */
+        function renderHistoryLogs() {
+            const c = document.getElementById('historyLogsContainer');
+            c.innerHTML = '';
+            state.studyLogs.forEach(l => {
+                c.innerHTML += `
+                    <div style="background:#11111b; padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid var(--card-border);">
+                        <div style="display:flex; justify-style:space-between; color:var(--study-color); font-weight:bold;">
+                            <span>${l.subject}</span>
+                            <span>${formatTime(l.totalSeconds)}</span>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-sub); margin:5px 0;">${l.details || 'بدون تفاصيل'}</div>
+                        <div style="font-size:0.75rem; color:var(--primary-accent); display:flex; gap:15px;">
+                            <span>Listening: ${Math.floor(l.listeningSeconds/60)}m</span>
+                            <span>Writing: ${Math.floor(l.writingSeconds/60)}m</span>
+                            <span>Quiz: ${Math.floor(l.quizSeconds/60)}m</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        /* ================= STATS ENGINE & AI ================= */
+        function renderStats(mode) {
+            let totalSec = 0, listSec = 0, writSec = 0, quizSec = 0;
+            
+            state.studyLogs.forEach(l => {
+                totalSec += l.totalSeconds || 0;
+                listSec += l.listeningSeconds || 0;
+                writSec += l.writingSeconds || 0;
+                quizSec += l.quizSeconds || 0;
+            });
+
+            const studyHours = (totalSec / 3600).toFixed(1);
+            document.getElementById('stTotalStudy').innerText = studyHours + ' ساعة';
+            document.getElementById('stListening').innerText = Math.floor(listSec / 60) + ' دقيقة';
+            document.getElementById('stWriting').innerText = Math.floor(writSec / 60) + ' دقيقة';
+            document.getElementById('stQuiz').innerText = Math.floor(quizSec / 60) + ' دقيقة';
+
+            let eduMins = state.education.reduce((a,b) => a + (b.mins||0), 0);
+            document.getElementById('stEducation').innerText = (eduMins/60).toFixed(1) + ' ساعة';
+
+            let afkSec = state.afkLogs.reduce((a,b) => a + (b.seconds||0), 0);
+            document.getElementById('stAFK').innerText = (afkSec/3600).toFixed(1) + ' ساعة';
+
+            let sleepHrs = state.sleep.reduce((a,b) => a + parseFloat(b.hours||0), 0);
+            document.getElementById('stSleep').innerText = sleepHrs.toFixed(1) + ' ساعة';
+
+            let ratio = ((totalSec / 86400) * 100).toFixed(1);
+            document.getElementById('stRatio').innerText = ratio + '%';
+
+            // AI Evaluation Logic
+            const gradeText = document.getElementById('aiGradeText');
+            const adviceText = document.getElementById('aiAdviceText');
+
+            if (studyHours >= 8) {
+                gradeText.innerText = "Excellent 🌟";
+                gradeText.style.color = "var(--study-color)";
+                adviceText.innerText = "أداء أسطوري! لقد أنجزت كمية ضخمة من المذاكرة اليوم. حافظ على الاستمرارية ولا تنسَ قسطاً من الراحة.";
+            } else if (studyHours >= 5) {
+                gradeText.innerText = "Good 👍";
+                gradeText.style.color = "var(--primary-accent)";
+                adviceText.innerText = "أداء جيد جداً ومعدل مذاكرة متوازن. يمكنك زيادة ناتج حل الأسئلة (Quiz) لتحقيق أقصى استفادة.";
+            } else if (studyHours >= 2) {
+                gradeText.innerText = "Fair ⚖️";
+                gradeText.style.color = "var(--afk-color)";
+                adviceText.innerText = "مجهود مقبول ولكنك تستطيع تقديم أفضل من ذلك. حاول تقليل أوقات AFK وزيادة تركيزك في الجدول.";
+            } else {
+                gradeText.innerText = "Needs Improvement ⚠️";
+                gradeText.style.color = "var(--danger-color)";
+                adviceText.innerText = "ساعات المذاكرة قليلة اليوم بالنسبة لأهدافك. ابدأ الآن بتشغيل المؤقت والتركيز على مهمة واحدة على الأقل!";
+            }
+        }
+
+        /* ================= INITIALIZATION ================= */
+        window.onload = function() {
+            updateUserUI();
+            renderSchedule();
+            renderTasks();
+            renderLessons();
+            renderEducation();
+            renderPrayers();
+            renderSleep();
+            renderNotices();
+            loadNotebook();
+            renderHistoryLogs();
+        };
     </script>
 </body>
 </html>
