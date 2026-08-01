@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Study Timer & Notebook</title>
+    <title>Study Timer/title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -12,10 +12,9 @@
             --social-color: #89b4fa;
             --afk-color: #f9e2af;
             --clock-color: #a6adc8; 
-            --exam-color: #89b4fa; /* Soft Blue / Indigo (calming, non-red color) */
+            --exam-color: #89b4fa;
             --current-theme: var(--study-color);
             
-            /* ألوان المواد الخاصة بالمفكرة */
             --arabic-color: #89b4fa;
             --english-color: #a6e3a1;
             --history-color: #f9e2af;
@@ -65,7 +64,6 @@
 
         .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
         
-        /* 🎯 Sleek, Frameless, Professional Countdown Container */
         .exam-countdown-container {
             position: absolute;
             bottom: 45px;
@@ -91,7 +89,7 @@
 
         .exam-countdown-sub {
             font-size: 0.75rem;
-            color: #a6adc8; /* Dark White / Off-White */
+            color: #a6adc8;
             letter-spacing: 1.5px;
             font-weight: 500;
             font-family: monospace, 'Segoe UI', sans-serif;
@@ -113,8 +111,55 @@
         .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
         .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
 
-        .top-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; transition: opacity 0.3s ease; }
-        .top-bar button { background: #1e1e2e; border: 1px solid #313244; color: #cdd6f4; padding: 8px 16px; font-size: 0.85rem; }
+        /* تعديل القائمة العلوية لتصبح في الجانب الأيمن مع زر 3 نقاط وتأثير انيميشن */
+        .menu-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #1e1e2e;
+            border: 1px solid #313244;
+            color: #cdd6f4;
+            padding: 10px 14px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 110;
+            transition: 0.3s;
+        }
+        .menu-toggle-btn:hover {
+            background: var(--current-theme);
+            color: #11111b;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 260px;
+            height: 100%;
+            background: #11111b;
+            border-left: 2px solid #313244;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 80px 20px 20px 20px;
+            z-index: 105;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .top-bar.active {
+            right: 0;
+        }
+        .top-bar button {
+            background: #1e1e2e;
+            border: 1px solid #313244;
+            color: #cdd6f4;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            text-align: right;
+            border-radius: 8px;
+            width: 100%;
+        }
         
         .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
         .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
@@ -144,7 +189,6 @@
         .sidebar-content::-webkit-scrollbar-track { background: #181825; }
         .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* المفكرة */
         .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; border-right: 2px solid #cba6f7; }
         .notebook-sidebar.open { left: 0; }
         
@@ -233,12 +277,15 @@
         <div id="cairoDate">جاري الحساب...</div>
     </div>
 
+    <!-- زر الثلاث نقاط لإظهار القوائم الجانبية -->
+    <button class="menu-toggle-btn" onclick="toggleTopMenu()">☰</button>
+
     <div id="topBarNav" class="top-bar">
-        <button class="btn-notebook-trigger" onclick="openNotebook()">Notebook 📓</button>
-        <button onclick="openHistory('study')">Study History 📚</button>
-        <button onclick="openHistory('break')">Break History ☕</button>
-        <button onclick="openMergeHistory('social')">Social & AFK History 📱⏳</button>
-        <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openHistory('trash')">Trash / Recovery 🗑️</button>
+        <button class="btn-notebook-trigger" onclick="openNotebook(); toggleTopMenu();">Notebook 📓</button>
+        <button onclick="openHistory('study'); toggleTopMenu();">Study History 📚</button>
+        <button onclick="openHistory('break'); toggleTopMenu();">Break History ☕</button>
+        <button onclick="openMergeHistory('social'); toggleTopMenu();">Social & AFK History 📱⏳</button>
+        <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openHistory('trash'); toggleTopMenu();">Trash / Recovery 🗑️</button>
     </div>
 
     <div id="mainContainer">
@@ -416,7 +463,6 @@
         </div>
     </div>
 
-    <!-- 🎯 Frameless & Automatic Countdown Widget -->
     <div class="exam-countdown-container">
         <div class="exam-countdown-text" id="daysRemainingText">314 Day</div>
         <div class="exam-countdown-sub">2026/8/1 to 2027/6/1</div>
@@ -425,10 +471,276 @@
 
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
-    <!-- عناصر الخفاء الخاصة بالـ Mini Mode -->
     <canvas id="videoCanvas" width="400" height="160" style="display:none;"></canvas>
     <video id="pipVideo" autoplay muted playsinline style="display:none;"></video>
 
     <script>
+        let currentMode = 'study';
+        let timerInterval = null;
+        let isRunning = false;
+        
         let timers = {
-            study: { seconds: parseInt(localStorage.getItem('savedStudySeconds')) || 0, type 
+            study: { seconds: 0, initial: 0, isCountdown: false },
+            break: { seconds: 300, initial: 300, isCountdown: true },
+            social: { seconds: 0, initial: 0, isCountdown: false },
+            afk: { seconds: 0, initial: 0, isCountdown: false }
+        };
+
+        let currentHistoryType = 'study';
+        let editingIndex = null;
+        let mergeActiveTab = 'social';
+
+        // تفعيل الساعة والتاريخ الحي
+        function updateClockAndDate() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            
+            document.getElementById('cairoClock').innerText = `${hours}:${minutes}:${seconds} ${ampm}`;
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('cairoDate').innerText = now.toLocaleDateString('ar-EG', options);
+        }
+        setInterval(updateClockAndDate, 1000);
+        updateClockAndDate();
+
+        // تحكم في القائمة الجانبية بالثلاث نقاط
+        function toggleTopMenu() {
+            const nav = document.getElementById('topBarNav');
+            nav.classList.toggle('active');
+        }
+
+        // تبديل الأوضاع (Study, Break, Social, AFK)
+        function switchMode(mode) {
+            pauseTimer();
+            currentMode = mode;
+            
+            document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
+            document.getElementById(`container-${mode}`).classList.add('active');
+            
+            let themeVar = `var(--${mode}-color)`;
+            if(mode === 'exam') themeVar = 'var(--exam-color)';
+            document.documentElement.style.setProperty('--current-theme', themeVar);
+            
+            let titles = { study: 'Study Timer', break: 'Break Timer', social: 'Social Timer', afk: 'AFK Timer' };
+            document.getElementById('appTitle').innerText = titles[mode];
+        }
+
+        // المؤقت (Start, Pause, Reset)
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timerInterval = setInterval(() => {
+                if (timers[currentMode].isCountdown) {
+                    if (timers[currentMode].seconds > 0) {
+                        timers[currentMode].seconds--;
+                    } else {
+                        pauseTimer();
+                        alert('انتهى الوقت المخصص!');
+                    }
+                } else {
+                    timers[currentMode].seconds++;
+                }
+                updateDisplay(currentMode);
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+        }
+
+        function endTimer() {
+            pauseTimer();
+            timers[currentMode].seconds = timers[currentMode].initial;
+            updateDisplay(currentMode);
+        }
+
+        function updateDisplay(mode) {
+            let totalSecs = timers[mode].seconds;
+            let m = Math.floor(totalSecs / 60);
+            let s = totalSecs % 60;
+            let h = Math.floor(m / 60);
+            m = m % 60;
+
+            let displayStr = "";
+            if (h > 0) {
+                displayStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            } else {
+                displayStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+            document.getElementById(`display-${mode}`).innerText = displayStr;
+        }
+
+        function setBreakDuration() {
+            let h = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            let m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            let totalSecs = (h * 3600) + (m * 60);
+            timers.break.initial = totalSecs;
+            timers.break.seconds = totalSecs;
+            updateDisplay('break');
+        }
+
+        // المفكرة والسجلات
+        function openNotebook() {
+            document.getElementById('notebookSidebar').classList.add('open');
+            document.getElementById('mainContainer').classList.add('notebook-open');
+        }
+
+        function closeNotebook() {
+            document.getElementById('notebookSidebar').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('notebook-open');
+        }
+
+        function switchNbPane(subject, pane) {
+            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
+            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
+
+            if(pane === 'done') {
+                document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
+                document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
+            } else {
+                document.getElementById(`tab-${subject}-rem`).classList.add('active-tab');
+                document.getElementById(`pane-${subject}-rem`).classList.add('active-pane');
+            }
+        }
+
+        function saveNotebookData() {
+            // حفظ بيانات المفكرة محلياً
+            let data = {
+                arabicDone: document.getElementById('note-arabic-done').value,
+                arabicRem: document.getElementById('note-arabic-rem').value,
+                englishDone: document.getElementById('note-english-done').value,
+                englishRem: document.getElementById('note-english-rem').value,
+                historyDone: document.getElementById('note-history-done').value,
+                historyRem: document.getElementById('note-history-rem').value,
+                physicsDone: document.getElementById('note-physics-done').value,
+                physicsRem: document.getElementById('note-physics-rem').value,
+            };
+            localStorage.setItem('notebookData', JSON.stringify(data));
+        }
+
+        // تحميل بيانات المفكرة عند البدء
+        window.addEventListener('DOMContentLoaded', () => {
+            let savedNb = localStorage.getItem('notebookData');
+            if(savedNb) {
+                let data = JSON.parse(savedNb);
+                document.getElementById('note-arabic-done').value = data.arabicDone || '';
+                document.getElementById('note-arabic-rem').value = data.arabicRem || '';
+                document.getElementById('note-english-done').value = data.englishDone || '';
+                document.getElementById('note-english-rem').value = data.englishRem || '';
+                document.getElementById('note-history-done').value = data.historyDone || '';
+                document.getElementById('note-history-rem').value = data.historyRem || '';
+                document.getElementById('note-physics-done').value = data.physicsDone || '';
+                document.getElementById('note-physics-rem').value = data.physicsRem || '';
+            }
+        });
+
+        function openHistory(type) {
+            currentHistoryType = type;
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('mergeTabsRow').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = `${type.toUpperCase()} History`;
+            renderHistoryContent(type);
+        }
+
+        function openMergeHistory() {
+            currentHistoryType = 'social-afk';
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('mergeTabsRow').style.display = 'flex';
+            document.getElementById('sidebarTitle').innerText = `Social & AFK History`;
+            renderHistoryContent(mergeActiveTab);
+        }
+
+        function switchMergeView(tab) {
+            mergeActiveTab = tab;
+            renderHistoryContent(tab);
+        }
+
+        function closeHistory() {
+            document.getElementById('sidebarHistory').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('sidebar-open');
+        }
+
+        function renderHistoryContent(type) {
+            let container = document.getElementById('sidebarContent');
+            let historyData = JSON.parse(localStorage.getItem(`${type}History`)) || [];
+            if(historyData.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#6c7086; margin-top:20px;">لا توجد سجلات بعد</p>';
+                return;
+            }
+            container.innerHTML = historyData.map((item, index) => `
+                <div class="history-card">
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.subject || 'نشاط'}</span>
+                        <span class="card-duration">${item.duration || '00:00'}</span>
+                    </div>
+                    <div class="card-desc">${item.desc || 'بدون وصف'}</div>
+                    <div class="card-bottom-info">
+                        <span>${item.date || ''}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-delete" onclick="deleteHistoryItem('${type}', ${index})">حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteHistoryItem(type, index) {
+            let historyData = JSON.parse(localStorage.getItem(`${type}History`)) || [];
+            historyData.splice(index, 1);
+            localStorage.setItem(`${type}History`, JSON.stringify(historyData));
+            renderHistoryContent(type);
+        }
+
+        function saveSessionPrompt() {
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function confirmSaveSession() {
+            let subject = document.getElementById('modalSubjectInput').value;
+            let desc = document.getElementById('modalDescInput').value;
+            let duration = document.getElementById(`display-${currentMode}`).innerText;
+            let date = new Date().toLocaleDateString('ar-EG');
+
+            let newItem = { subject, desc, duration, date };
+            let historyData = JSON.parse(localStorage.getItem(`${currentMode}History`)) || [];
+            historyData.unshift(newItem);
+            localStorage.setItem(`${currentMode}History`, JSON.stringify(historyData));
+
+            closeModal('saveModal');
+            document.getElementById('modalSubjectInput').value = '';
+            document.getElementById('modalDescInput').value = '';
+            alert('تم حفظ السجل بنجاح!');
+        }
+
+        function printNotebook() {
+            document.body.classList.add('printing-notebook');
+            window.print();
+            document.body.classList.remove('printing-notebook');
+        }
+
+        function printFullHistory() {
+            window.print();
+        }
+
+        function requestMini() {
+            alert('تم تفعيل وضع Mini Mode');
+        }
+    </script>
+</body>
+</html>
