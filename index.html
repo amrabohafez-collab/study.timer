@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study System</title>
+    <title>Study System - نظام المذاكرة المتطور</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
-    <!-- Google Fonts & Font Awesome Icons -->
+    <!-- Icons & Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --bg-main: #0b0f19;
             --bg-side: #111827;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
+            --card-bg: #1e293b;
+            --card-border: rgba(255, 255, 255, 0.1);
             
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --text-sub: #6b7280;
             
             --primary-accent: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.35);
+            --primary-glow: rgba(99, 102, 241, 0.4);
             --study-color: #10b981;
             --break-color: #f59e0b;
             --afk-color: #ec4899;
             --danger-color: #ef4444;
-            --ai-color: #8b5cf6;
 
             --sidebar-width: 260px;
             --sidebar-collapsed: 78px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --fast-transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
         }
 
         * {
@@ -39,6 +38,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif;
+            /* تسريع الاستجابة واستغلال أداء كارت الشاشة */
+            will-change: transform, opacity;
         }
 
         body {
@@ -48,24 +49,24 @@
             display: flex;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 40%);
+            background-attachment: fixed;
         }
 
         /* Sidebar Styling */
         aside.sidebar {
             width: var(--sidebar-width);
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(16px);
+            background: var(--bg-side);
             border-left: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
-            transition: var(--transition);
             position: sticky;
             top: 0;
             height: 100vh;
             z-index: 100;
             flex-shrink: 0;
+            transition: width 0.2s ease;
         }
 
         aside.sidebar.collapsed {
@@ -73,7 +74,7 @@
         }
 
         .sidebar-header {
-            padding: 24px 20px;
+            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -81,7 +82,7 @@
         }
 
         .brand-logo {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: #fff;
             display: flex;
@@ -92,7 +93,6 @@
 
         .brand-logo i {
             color: var(--primary-accent);
-            filter: drop-shadow(0 0 8px var(--primary-glow));
         }
 
         .toggle-btn {
@@ -103,31 +103,29 @@
             font-size: 1rem;
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
+            transition: var(--fast-transition);
         }
 
         .toggle-btn:hover {
             background: var(--primary-accent);
             color: #fff;
-            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         .nav-group {
-            padding: 20px 12px;
+            padding: 15px 10px;
             flex-grow: 1;
             overflow-y: auto;
         }
 
         .nav-group-title {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             color: var(--text-sub);
             font-weight: 700;
-            padding: 12px 12px 6px;
-            letter-spacing: 0.5px;
+            padding: 10px 12px 6px;
             white-space: nowrap;
         }
 
@@ -143,29 +141,28 @@
             border: none;
             color: var(--text-muted);
             padding: 12px 14px;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 0.95rem;
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 14px;
-            transition: var(--transition);
-            margin-bottom: 6px;
+            gap: 12px;
+            transition: var(--fast-transition);
+            margin-bottom: 4px;
             white-space: nowrap;
         }
 
         .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             color: #fff;
-            transform: translateX(-4px);
         }
 
         .nav-btn.active {
-            background: linear-gradient(135deg, var(--primary-accent), #4f46e5);
+            background: var(--primary-accent);
             color: #fff;
             font-weight: 700;
-            box-shadow: 0 4px 20px var(--primary-glow);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .nav-btn .icon {
@@ -187,66 +184,54 @@
         }
 
         .profile-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             background: linear-gradient(135deg, #10b981, #059669);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
         }
 
-        /* Main Content */
+        /* Main Content Area */
         main.main-content {
             flex-grow: 1;
-            padding: 35px;
+            padding: 30px;
             overflow-y: auto;
             max-width: 1400px;
         }
 
         .tab-content {
             display: none;
-            opacity: 0;
-            transform: translateY(15px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .tab-content.active {
             display: block;
-            opacity: 1;
-            transform: translateY(0);
         }
 
-        /* Modern Glass Cards */
+        /* High-Performance Cards */
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 28px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            border-color: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             border-bottom: 1px solid var(--card-border);
-            padding-bottom: 16px;
+            padding-bottom: 14px;
         }
 
         .card-title {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             color: #fff;
             display: flex;
             align-items: center;
@@ -254,48 +239,44 @@
             font-weight: 700;
         }
 
-        /* Timer Section */
+        /* Timers */
         .main-timer-display {
-            font-size: 5rem;
+            font-size: 4.8rem;
             font-weight: 800;
             text-align: center;
             font-family: 'Plus Jakarta Sans', monospace;
-            background: linear-gradient(180deg, #ffffff, var(--study-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 20px 0;
-            filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.2));
+            color: #ffffff;
+            margin: 15px 0;
             letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
         }
 
         .controls-row {
             display: flex;
             justify-content: center;
-            gap: 14px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .btn-action {
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             border: 1px solid var(--card-border);
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-main);
             font-weight: 700;
             cursor: pointer;
-            transition: var(--transition);
+            transition: var(--fast-transition);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .btn-action:hover {
-            transform: translateY(-2px);
             background: var(--primary-accent);
             color: #fff;
             border-color: var(--primary-accent);
-            box-shadow: 0 8px 25px var(--primary-glow);
         }
 
         .btn-danger {
@@ -305,165 +286,84 @@
         .btn-danger:hover {
             background: var(--danger-color);
             color: #fff;
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-        }
-
-        /* AI Assistant Box */
-        .ai-box {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05));
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 25px;
-        }
-
-        .ai-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--ai-color);
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .ai-input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .ai-input-group input {
-            flex-grow: 1;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: #fff;
-            outline: none;
-        }
-
-        .ai-response {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            font-size: 0.92rem;
-            line-height: 1.6;
-            color: #d1d5db;
-            display: none;
         }
 
         /* Sub Timers Grid */
         .sub-timers-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
-            margin-top: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
             border-top: 1px solid var(--card-border);
-            padding-top: 25px;
+            padding-top: 20px;
         }
 
         .sub-timer-card {
-            background: rgba(17, 24, 39, 0.5);
-            border-radius: 14px;
-            padding: 18px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 16px;
             text-align: center;
             border: 1px solid var(--card-border);
-            transition: var(--transition);
-        }
-
-        .sub-timer-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .sub-timer-display {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-family: 'Plus Jakarta Sans', monospace;
             font-weight: 700;
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
-        /* Stats Cards */
+        /* Stats Dashboard Grid */
         .stats-dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            gap: 18px;
         }
 
         .stat-card {
-            background: rgba(17, 24, 39, 0.6);
-            padding: 22px;
-            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 20px;
+            border-radius: 14px;
             border: 1px solid var(--card-border);
-            transition: var(--transition);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             color: var(--study-color);
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--study-color), #34d399);
-            width: 0%;
-            transition: width 0.6s ease;
-        }
-
-        /* Table Design */
+        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         th, td {
-            padding: 14px 16px;
+            padding: 12px 14px;
             text-align: right;
             border-bottom: 1px solid var(--card-border);
             font-size: 0.95rem;
         }
 
         th {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
             color: var(--primary-accent);
             font-weight: 700;
         }
 
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        /* Responsiveness */
         @media (max-width: 768px) {
-            aside.sidebar {
-                position: fixed;
-                height: 100%;
-                left: 0;
-                top: 0;
-            }
-            main.main-content { padding: 18px; }
-            .main-timer-display { font-size: 3.5rem; }
+            aside.sidebar { position: fixed; left: 0; top: 0; }
+            main.main-content { padding: 16px; }
+            .main-timer-display { font-size: 3.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation (تم استرجاع كل القوائم بالتفصيل) -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">
@@ -474,24 +374,28 @@
         </div>
 
         <div class="nav-group">
-            <div class="nav-group-title">الرئيسية والدراسة</div>
+            <div class="nav-group-title">الأقسام الرئيسية</div>
             <button class="nav-btn active" onclick="switchTab('study')">
                 <span class="icon"><i class="fa-solid fa-stopwatch"></i></span>
-                <span class="nav-text">Study Mode</span>
+                <span class="nav-text">وضع المذاكرة (Study)</span>
             </button>
             <button class="nav-btn" onclick="switchTab('stats')">
                 <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
-                <span class="nav-text">الإحصائيات الذكية</span>
+                <span class="nav-text">الإحصائيات والتحليل</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('sub-timers')">
+                <span class="icon"><i class="fa-solid fa-list-check"></i></span>
+                <span class="nav-text">المؤقتات الفرعية</span>
             </button>
             <button class="nav-btn" onclick="switchTab('logs')">
                 <span class="icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
-                <span class="nav-text">سجل الأنشطة</span>
+                <span class="nav-text">سجل الأنشطة والتدريب</span>
             </button>
 
-            <div class="nav-group-title">الذكاء الاصطناعي والمتابعة</div>
-            <button class="nav-btn" onclick="switchTab('ai-tools')">
-                <span class="icon"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--ai-color);"></i></span>
-                <span class="nav-text">المساعد الذكي AI</span>
+            <div class="nav-group-title">الإعدادات والتخصيص</div>
+            <button class="nav-btn" onclick="switchTab('settings')">
+                <span class="icon"><i class="fa-solid fa-sliders"></i></span>
+                <span class="nav-text">إعدادات المؤقت</span>
             </button>
         </div>
 
@@ -499,8 +403,8 @@
             <div class="profile-badge">
                 <div class="profile-avatar">A</div>
                 <div class="profile-info">
-                    <span style="font-weight: 700; font-size: 0.95rem; color: #fff;">عمرو</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">طالب مجتهد 🚀</span>
+                    <span style="font-weight: 700; font-size: 0.9rem; color: #fff; display:block;">عمرو</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">طالب متميز 🚀</span>
                 </div>
             </div>
         </div>
@@ -514,48 +418,16 @@
             <div class="card">
                 <div class="card-header">
                     <span class="card-title"><i class="fa-solid fa-bolt" style="color: var(--study-color);"></i> مؤقت المذاكرة الرئيسي</span>
-                    <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> طباعة</button>
+                    <button class="btn-action" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة التقرير</button>
                 </div>
                 
                 <div class="main-timer-display" id="mainTimerDisplay">00:00:00</div>
                 
                 <div class="controls-row">
-                    <button class="btn-action" style="background: var(--study-color); color: #fff; border: none;" onclick="startMainTimer()"><i class="fa-solid fa-play"></i> بدء</button>
-                    <button class="btn-action" style="background: var(--break-color); color: #fff; border: none;" onclick="pauseMainTimer()"><i class="fa-solid fa-pause"></i> إيقاف</button>
+                    <button class="btn-action" style="background: var(--study-color); color: #fff; border: none;" onclick="startMainTimer()"><i class="fa-solid fa-play"></i> بدء المذاكرة</button>
+                    <button class="btn-action" style="background: var(--break-color); color: #fff; border: none;" onclick="pauseMainTimer()"><i class="fa-solid fa-pause"></i> إيقاف مؤقت</button>
                     <button class="btn-action" onclick="saveStudySession()"><i class="fa-solid fa-floppy-disk"></i> حفظ الجلسة</button>
-                    <button class="btn-action btn-danger" onclick="resetMainTimer()"><i class="fa-solid fa-rotate-right"></i> إعادة</button>
-                </div>
-
-                <!-- AI Quick Helper -->
-                <div class="ai-box">
-                    <div class="ai-header">
-                        <i class="fa-solid fa-robot"></i>
-                        <span>مساعد المذاكرة الذكي (AI Assistant)</span>
-                    </div>
-                    <div class="ai-input-group">
-                        <input type="text" id="aiPrompt" placeholder="اسأل الذكاء الاصطناعي أي سؤال في المذاكرة أو اطلب تلخيصاً...">
-                        <button class="btn-action" style="background: var(--ai-color); color:#fff; border:none;" onclick="askAI()"><i class="fa-solid fa-paper-plane"></i> إرسال</button>
-                    </div>
-                    <div class="ai-response" id="aiResponse"></div>
-                </div>
-
-                <!-- Sub-timers Grid -->
-                <div class="sub-timers-grid">
-                    <div class="sub-timer-card">
-                        <div style="color: #60a5fa; font-weight: 700;"><i class="fa-solid fa-headphones"></i> Listening</div>
-                        <div class="sub-timer-display" id="timerDisplayListening" style="color: #60a5fa;">00:00:00</div>
-                        <button class="btn-action" style="width: 100%; justify-content: center;" onclick="toggleSubTimer('listening')">تشغيل / إيقاف</button>
-                    </div>
-                    <div class="sub-timer-card">
-                        <div style="color: #34d399; font-weight: 700;"><i class="fa-solid fa-pen-nib"></i> Writing</div>
-                        <div class="sub-timer-display" id="timerDisplayWriting" style="color: #34d399;">00:00:00</div>
-                        <button class="btn-action" style="width: 100%; justify-content: center;" onclick="toggleSubTimer('writing')">تشغيل / إيقاف</button>
-                    </div>
-                    <div class="sub-timer-card">
-                        <div style="color: #fbbf24; font-weight: 700;"><i class="fa-solid fa-square-check"></i> Quiz</div>
-                        <div class="sub-timer-display" id="timerDisplayQuiz" style="color: #fbbf24;">00:00:00</div>
-                        <button class="btn-action" style="width: 100%; justify-content: center;" onclick="toggleSubTimer('quiz')">تشغيل / إيقاف</button>
-                    </div>
+                    <button class="btn-action btn-danger" onclick="resetMainTimer()"><i class="fa-solid fa-rotate-right"></i> إعادة ضبط</button>
                 </div>
             </div>
         </div>
@@ -564,45 +436,76 @@
         <div id="tab-stats" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title"><i class="fa-solid fa-chart-column" style="color: var(--primary-accent);"></i> لوحة الإحصائيات الشاملة</span>
-                    <button class="btn-action" style="background: var(--ai-color); color:#fff; border:none;" onclick="generateAIInsight()"><i class="fa-solid fa-brain"></i> تحليل ذكي للأداء</button>
+                    <span class="card-title"><i class="fa-solid fa-chart-column" style="color: var(--primary-accent);"></i> الإحصائيات الشاملة</span>
                 </div>
 
                 <div class="stats-dashboard">
                     <div class="stat-card">
-                        <div style="color: var(--text-muted); font-size: 0.85rem;">إجمالي المذاكرة</div>
-                        <div class="stat-value" id="stTotalStudy">120 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" style="width: 70%;"></div></div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">إجمالي وقت المذاكرة</div>
+                        <div class="stat-value" id="stTotalStudy">02:45:00</div>
                     </div>
                     <div class="stat-card">
-                        <div style="color: var(--text-muted); font-size: 0.85rem;">الاستماع (Listening)</div>
-                        <div class="stat-value" style="color: #60a5fa;">45 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" style="width: 45%; background: #60a5fa;"></div></div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">وقت الراحة (Break)</div>
+                        <div class="stat-value" style="color: var(--break-color);">00:30:00</div>
                     </div>
                     <div class="stat-card">
-                        <div style="color: var(--text-muted); font-size: 0.85rem;">الكتابة (Writing)</div>
-                        <div class="stat-value" style="color: #34d399;">30 دقيقة</div>
-                        <div class="progress-container"><div class="progress-bar" style="width: 30%; background: #34d399;"></div></div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">وقت الغياب (AFK)</div>
+                        <div class="stat-value" style="color: var(--afk-color);">00:10:00</div>
                     </div>
                 </div>
-
-                <div class="ai-response" id="aiInsightBox" style="margin-top:20px;"></div>
             </div>
         </div>
 
-        <!-- 3. LOGS TAB -->
+        <!-- 3. SUB TIMERS TAB (المؤقتات الفرعية الكاملة) -->
+        <div id="tab-sub-timers" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title"><i class="fa-solid fa-stopwatch-20"></i> المؤقتات الفرعية لكل المهارات</span>
+                </div>
+
+                <div class="sub-timers-grid">
+                    <div class="sub-timer-card">
+                        <div style="color: #60a5fa; font-weight: 700;"><i class="fa-solid fa-headphones"></i> Listening</div>
+                        <div class="sub-timer-display" style="color: #60a5fa;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;">تشغيل / إيقاف</button>
+                    </div>
+                    <div class="sub-timer-card">
+                        <div style="color: #34d399; font-weight: 700;"><i class="fa-solid fa-pen-nib"></i> Writing</div>
+                        <div class="sub-timer-display" style="color: #34d399;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;">تشغيل / إيقاف</button>
+                    </div>
+                    <div class="sub-timer-card">
+                        <div style="color: #fbbf24; font-weight: 700;"><i class="fa-solid fa-square-check"></i> Quiz</div>
+                        <div class="sub-timer-display" style="color: #fbbf24;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;">تشغيل / إيقاف</button>
+                    </div>
+                    <div class="sub-timer-card">
+                        <div style="color: #a78bfa; font-weight: 700;"><i class="fa-solid fa-book-open"></i> Reading</div>
+                        <div class="sub-timer-display" style="color: #a78bfa;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;">تشغيل / إيقاف</button>
+                    </div>
+                    <div class="sub-timer-card">
+                        <div style="color: #f472b6; font-weight: 700;"><i class="fa-solid fa-comments"></i> Speaking</div>
+                        <div class="sub-timer-display" style="color: #f472b6;">00:00:00</div>
+                        <button class="btn-action" style="width: 100%; justify-content: center;">تشغيل / إيقاف</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. LOGS TAB -->
         <div id="tab-logs" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title"><i class="fa-solid fa-list-check"></i> سجل المذاكرة اليومي</span>
+                    <span class="card-title"><i class="fa-solid fa-list-check"></i> سجل الجلسات والأنشطة</span>
                 </div>
 
                 <table>
                     <thead>
                         <tr>
-                            <th>النشاط</th>
-                            <th>المدة</th>
-                            <th>التاريخ</th>
+                            <th>نوع النشاط</th>
+                            <th>المدة الزمنية</th>
+                            <th>التاريخ والوقت</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -612,7 +515,7 @@
                             <td>اليوم 02:30 م</td>
                         </tr>
                         <tr>
-                            <td>تمارين Writing</td>
+                            <td>تدريب Writing</td>
                             <td>20 دقيقة</td>
                             <td>اليوم 01:10 م</td>
                         </tr>
@@ -621,27 +524,23 @@
             </div>
         </div>
 
-        <!-- 4. AI TOOLS TAB -->
-        <div id="tab-ai-tools" class="tab-content">
+        <!-- 5. SETTINGS TAB -->
+        <div id="tab-settings" class="tab-content">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--ai-color);"></i> مركز أدوات الذكاء الاصطناعي</span>
+                    <span class="card-title"><i class="fa-solid fa-sliders"></i> إعدادات النظام</span>
                 </div>
-                <p style="color: var(--text-muted); line-height: 1.8;">
-                    تم دمج محرك الذكاء الاصطناعي المطور لمساعدتك على صياغة جدول دراسي مثالي، تلخيص الفصول الدراسية الصعبة، وإعطاء إرشادات متخصصة تحسن من مستوى تحصيلك العلمي بناءً على إحصائياتك.
-                </p>
+                <p style="color: var(--text-muted);">يمكنك تخصيص أوقات الراحة والتنبيهات هنا بسهولة.</p>
             </div>
         </div>
 
     </main>
 
     <script>
-        // Toggle Sidebar
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
         }
 
-        // Switch Tabs with Animation
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -658,7 +557,7 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Timer Simulation Logic
+        // Timer Logic
         let timerInterval;
         let seconds = 0;
 
@@ -685,32 +584,7 @@
         }
 
         function saveStudySession() {
-            alert('تم حفظ الجلسة الدراسية بنجاح في السجل! 🚀');
-        }
-
-        // Simulated AI Feature
-        function askAI() {
-            const prompt = document.getElementById('aiPrompt').value;
-            const responseBox = document.getElementById('aiResponse');
-            
-            if (!prompt) return;
-
-            responseBox.style.display = 'block';
-            responseBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري معالجة طلبك بواسطة الذكاء الاصطناعي...';
-
-            setTimeout(() => {
-                responseBox.innerHTML = `<strong>الذكاء الاصطناعي:</strong> بناءً على سؤالك "<em>${prompt}</em>"، أنصحك بتقسيم وقت المذاكرة باستخدام تقنية Pomodoro (25 دقيقة تركيز + 5 دقائق راحة) لضمان أعلى معدل استيعاب!`;
-            }, 1200);
-        }
-
-        function generateAIInsight() {
-            const box = document.getElementById('aiInsightBox');
-            box.style.display = 'block';
-            box.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تحليل إحصائياتك...';
-
-            setTimeout(() => {
-                box.innerHTML = `<strong>💡 التقرير الذكي للأداء:</strong> أدائك ممتاز في الاستماع اليوم (45 دقيقة)، ولكن يمكنك زيادة التركيز على الكتابة (Writing) للوصول للتوازن المثالي في جدولك الدراسية.`;
-            }, 1000);
+            alert('تم حفظ الجلسة بنجاح! 🚀');
         }
     </script>
 </body>
