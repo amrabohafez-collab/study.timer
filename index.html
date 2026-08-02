@@ -320,6 +320,8 @@
         .auth-input-group input:focus { border-color: var(--current-theme); box-shadow: 0 0 8px rgba(166, 227, 161, 0.2); }
         .auth-submit-btn { background: var(--current-theme); color: #11111b; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: 0.3s; margin-top: 5px; }
         .auth-submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .auth-google-btn { background: #4285F4; color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; }
+        .auth-google-btn:hover { background: #3367d6; }
         .auth-logout-btn { background: rgba(243, 139, 168, 0.1); border: 1px solid #f38ba8; color: #f38ba8; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .auth-logout-btn:hover { background: #f38ba8; color: #11111b; }
         .close-auth-card { position: absolute; top: 15px; left: 15px; background: none; border: none; color: #6c7086; font-size: 1.2rem; cursor: pointer; }
@@ -361,6 +363,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button id="saveBtnStudy" onclick="saveSessionPrompt()">Save</button>
                     <button id="resetBtnStudy" onclick="endTimer()">Reset</button>
+                    <button id="miniBtnStudy" onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -375,6 +378,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -385,6 +389,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -395,6 +400,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -405,14 +411,6 @@
                 <button id="btn-afk" class="mode-btn" onclick="switchMode('afk')">AFK Timer ⏳</button>
             </div>
         </div>
-    </div>
-
-    <!-- العداد التنازلي وحقوق الملكية -->
-    <div class="exam-countdown-container">
-        <div id="daysCounter" class="exam-countdown-text">303 Day</div>
-    </div>
-    <div class="footer-credits">
-        © 2026 Amr Abdelhalim. All rights reserved
     </div>
 
     <!-- واجهة المفكرة -->
@@ -544,102 +542,666 @@
         </div>
     </div>
 
+    <!-- مودال تسجيل الدخول / إنشاء حساب -->
+    <div id="authModal" class="modal">
+        <div class="auth-card">
+            <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
+            <div class="auth-header">
+                <h2 id="authTitle">تسجيل الدخول</h2>
+                <p id="authSubtitle">قم بتسجيل الدخول للحفاظ على بياناتك وسجلاتك عبر السحابة</p>
+            </div>
+
+            <div id="authTabs" class="auth-tabs">
+                <button id="loginTabBtn" class="auth-tab-btn active" onclick="switchAuthTab('login')">تسجيل دخول</button>
+                <button id="registerTabBtn" class="auth-tab-btn" onclick="switchAuthTab('register')">حساب جديد</button>
+            </div>
+
+            <div id="authFormArea">
+                <div class="auth-input-group">
+                    <label>البريد الإلكتروني (Email)</label>
+                    <input type="email" id="authUsername" placeholder="example@gmail.com">
+                </div>
+                <div class="auth-input-group" style="margin-top: 10px;">
+                    <label>كلمة السر</label>
+                    <input type="password" id="authPassword" placeholder="Enter password">
+                </div>
+                <div id="authErrorMsg" style="color: #f38ba8; font-size: 0.8rem; text-align: center; display: none; margin-top: 5px;"></div>
+                <button id="authSubmitBtn" class="auth-submit-btn" style="width: 100%; margin-top: 15px;" onclick="handleAuthSubmit()">دخول</button>
+                <button class="auth-google-btn" style="width: 100%;" onclick="handleGoogleSignIn()">
+                    <span>🌐</span> الدخول باستخدام Google
+                </button>
+            </div>
+
+            <div id="userProfileArea" style="display: none; text-align: center;">
+                <p style="color: #cdd6f4; font-size: 1rem; margin-bottom: 15px;">مرحباً بك، <b id="loggedInUserName" style="color: var(--current-theme);"></b></p>
+                <button class="auth-logout-btn" style="width: 100%;" onclick="handleLogout()">تسجيل الخروج 🚪</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Modules Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ⚠️ قم باستبدال الكائن الأدناه بـ Firebase Config الخاص بك من لوحة Firebase Console
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global User Reference
+        window.fbUser = null;
+
+        // Sync Listener for Auth State
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.fbUser = user;
+                window.currentUser = user.email;
+                await loadCloudData();
+            } else {
+                window.fbUser = null;
+                window.currentUser = null;
+                window.loadUserData();
+            }
+            window.updateAuthStatusUI();
+        });
+
+        // Email & Password Auth Handlers
+        window.handleAuthSubmit = async function() {
+            const email = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const errorEl = document.getElementById('authErrorMsg');
+
+            if (!email || !password) {
+                errorEl.innerText = 'يرجى إدخال البريد الإلكتروني وكلمة السر!';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                if (window.authMode === 'register') {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                window.closeModal('authModal');
+            } catch (err) {
+                errorEl.innerText = err.message;
+                errorEl.style.display = 'block';
+            }
+        };
+
+        // Google Sign-In Handler
+        window.handleGoogleSignIn = async function() {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                window.closeModal('authModal');
+            } catch (err) {
+                const errorEl = document.getElementById('authErrorMsg');
+                errorEl.innerText = err.message;
+                errorEl.style.display = 'block';
+            }
+        };
+
+        // Logout Handler
+        window.handleLogout = async function() {
+            await signOut(auth);
+            window.closeModal('authModal');
+        };
+
+        // Cloud Firestore Synchronization Methods
+        window.saveCloudData = async function() {
+            if (!window.fbUser) {
+                window.saveUserData();
+                return;
+            }
+            try {
+                const userRef = doc(db, "users", window.fbUser.uid);
+                await setDoc(userRef, {
+                    history: window.userHistory,
+                    schedule: window.userSchedule,
+                    trash: window.userTrash,
+                    notebook: JSON.parse(localStorage.getItem('temp_notebook_cache') || '{}')
+                }, { merge: true });
+            } catch (e) {
+                console.error("Cloud Save Error: ", e);
+            }
+        };
+
+        window.loadCloudData = async function() {
+            if (!window.fbUser) return;
+            try {
+                const userRef = doc(db, "users", window.fbUser.uid);
+                const docSnap = await getDoc(userRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    window.userHistory = data.history || [];
+                    window.userSchedule = data.schedule || [];
+                    window.userTrash = data.trash || [];
+                    
+                    if (data.notebook) {
+                        document.getElementById('note-arabic-done').value = data.notebook.arabic_done || '';
+                        document.getElementById('note-arabic-rem').value = data.notebook.arabic_rem || '';
+                        document.getElementById('note-english-done').value = data.notebook.english_done || '';
+                        document.getElementById('note-english-rem').value = data.notebook.english_rem || '';
+                        document.getElementById('note-history-done').value = data.notebook.history_done || '';
+                        document.getElementById('note-history-rem').value = data.notebook.history_rem || '';
+                        document.getElementById('note-physics-done').value = data.notebook.physics_done || '';
+                        document.getElementById('note-physics-rem').value = data.notebook.physics_rem || '';
+                    }
+                } else {
+                    window.userHistory = [];
+                    window.userSchedule = [];
+                    window.userTrash = [];
+                }
+            } catch (e) {
+                console.error("Cloud Load Error: ", e);
+            }
+        };
+    </script>
+
+    <!-- JS Logic Code Implementation -->
     <script>
-        function updateWidgetClock() {
+        // State Management & LocalStorage
+        let currentUser = localStorage.getItem('study_system_logged_user') || null;
+        let authMode = 'login'; // 'login' or 'register'
+        let currentTimerMode = 'study'; // study, break, quiz, afk
+        let activeHistorySubTab = 'study';
+        
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let isRunning = false;
+
+        // Data Models
+        let userHistory = [];
+        let userSchedule = [];
+        let userTrash = [];
+
+        // Dynamic Storage Key Helpers
+        function getStorageKey(key) {
+            return currentUser ? `user_${currentUser}_${key}` : `guest_${key}`;
+        }
+
+        function loadUserData() {
+            userHistory = JSON.parse(localStorage.getItem(getStorageKey('history')) || '[]');
+            userSchedule = JSON.parse(localStorage.getItem(getStorageKey('schedule')) || '[]');
+            userTrash = JSON.parse(localStorage.getItem(getStorageKey('trash')) || '[]');
+            loadNotebookData();
+            updateAuthStatusUI();
+        }
+
+        function saveUserData() {
+            localStorage.setItem(getStorageKey('history'), JSON.stringify(userHistory));
+            localStorage.setItem(getStorageKey('schedule'), JSON.stringify(userSchedule));
+            localStorage.setItem(getStorageKey('trash'), JSON.stringify(userTrash));
+            if (window.saveCloudData) window.saveCloudData();
+        }
+
+        // Live Cairo Clock
+        function updateCairoClock() {
             const now = new Date();
-            const hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            let periodName = '';
-            if (hours >= 4 && hours <= 5) {
-                periodName = 'فجر';
-            } else if (hours >= 6 && hours <= 11) {
-                periodName = 'صبح';
-            } else if (hours >= 12 && hours <= 15) {
-                periodName = 'الظهر';
-            } else if (hours >= 16 && hours <= 18) {
-                periodName = 'العصر';
-            } else if (hours >= 19 && hours <= 20) {
-                periodName = 'المغرب';
-            } else if (hours >= 21 && hours <= 23) {
-                periodName = 'العشا';
-            } else { // 0 to 3
-                periodName = 'الليل';
+            const clockEl = document.getElementById('cairoClock');
+            const dateEl = document.getElementById('cairoDate');
+            if (clockEl && dateEl) {
+                clockEl.innerText = now.toLocaleTimeString('ar-EG', { timeZone: 'Africa/Cairo' });
+                dateEl.innerText = now.toLocaleDateString('ar-EG', { timeZone: 'Africa/Cairo', weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
             }
+        }
+        setInterval(updateCairoClock, 1000);
+        updateCairoClock();
 
-            const clockElement = document.getElementById('cairoClock');
-            if (clockElement) {
-                clockElement.textContent = `${hours}:${minutes}:${seconds} (${periodName})`;
-            }
-
-            const dateElement = document.getElementById('cairoDate');
-            if (dateElement) {
-                const options = { year: 'numeric', month: 'short', day: 'numeric' };
-                dateElement.textContent = now.toLocaleDateString('ar-EG', options);
+        // Auth Logic
+        function openAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('authErrorMsg').style.display = 'none';
+            if (currentUser) {
+                document.getElementById('authTabs').style.display = 'none';
+                document.getElementById('authFormArea').style.display = 'none';
+                document.getElementById('userProfileArea').style.display = 'block';
+                document.getElementById('loggedInUserName').innerText = currentUser;
+                document.getElementById('authTitle').innerText = 'حسابي';
+                document.getElementById('authSubtitle').innerText = 'أنت مسجل الدخول حالياً';
+            } else {
+                document.getElementById('authTabs').style.display = 'flex';
+                document.getElementById('authFormArea').style.display = 'block';
+                document.getElementById('userProfileArea').style.display = 'none';
+                switchAuthTab(authMode);
             }
         }
 
-        function updateDaysCounter() {
-            const startDate = new Date(2026, 7, 2); // August 2, 2026
-            const currentDate = new Date();
-            
-            const startZero = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-            const currentZero = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-            
-            const diffTime = currentZero - startZero;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
-            let remainingDays = 303 - diffDays;
-            if (remainingDays < 1) remainingDays = 1;
-            
-            const daysElement = document.getElementById('daysCounter');
-            if (daysElement) {
-                daysElement.textContent = `${remainingDays} Day`;
+        function switchAuthTab(mode) {
+            authMode = mode;
+            document.getElementById('authErrorMsg').style.display = 'none';
+            if (mode === 'login') {
+                document.getElementById('loginTabBtn').classList.add('active');
+                document.getElementById('registerTabBtn').classList.remove('active');
+                document.getElementById('authTitle').innerText = 'تسجيل الدخول';
+                document.getElementById('authSubtitle').innerText = 'قم بتسجيل الدخول للحفاظ على بياناتك وسجلاتك عبر السحابة';
+                document.getElementById('authSubmitBtn').innerText = 'دخول';
+            } else {
+                document.getElementById('registerTabBtn').classList.add('active');
+                document.getElementById('loginTabBtn').classList.remove('active');
+                document.getElementById('authTitle').innerText = 'إنشاء حساب جديد';
+                document.getElementById('authSubtitle').innerText = 'أنشئ حساباً جديداً لحفظ بياناتك الخاصة';
+                document.getElementById('authSubmitBtn').innerText = 'إنشاء حساب';
             }
         }
 
-        setInterval(updateWidgetClock, 1000);
-        updateWidgetClock();
-        updateDaysCounter();
+        function updateAuthStatusUI() {
+            const label = document.getElementById('authBtnLabel');
+            if (currentUser) {
+                label.innerText = `أهلاً، ${currentUser}`;
+            } else {
+                label.innerText = 'تسجيل الدخول / حساب جديد';
+            }
+        }
 
+        // Navigation & Modals
         function toggleTopMenu() {
-            const topBar = document.getElementById('topBarNav');
-            topBar.classList.toggle('active');
+            document.getElementById('topBarNav').classList.toggle('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
 
         function switchMode(mode) {
-            document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
+            pauseTimer();
+            currentTimerMode = mode;
+            document.querySelectorAll('.timer-box').forEach(b => b.classList.remove('active'));
             document.getElementById(`container-${mode}`).classList.add('active');
-            
+
             const root = document.documentElement;
             if (mode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
-            if (mode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
-            if (mode === 'quiz') root.style.setProperty('--current-theme', 'var(--quiz-color)');
-            if (mode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+            else if (mode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            else if (mode === 'quiz') root.style.setProperty('--current-theme', 'var(--quiz-color)');
+            else if (mode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
         }
 
-        function startTimer() {}
-        function pauseTimer() {}
-        function saveSessionPrompt() {}
-        function endTimer() {}
-        function setBreakDuration() {}
-        function openNotebook() {}
-        function closeNotebook() {}
-        function openUnifiedHistory(type) {}
-        function closeHistory() {}
-        function openScheduleView() {}
-        function openTrash() {}
-        function openAuthModal() {}
-        function switchNbPane(subject, pane) {}
-        function saveNotebookData() {}
-        function printNotebook() {}
-        function switchHistorySubTab(tab) {}
-        function printFullHistory() {}
-        function openAddScheduleModal() {}
-        function confirmSaveSession() {}
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function saveScheduleItem() {}
+        // Timer Functionality
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                updateDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearInterval(timerInterval);
+        }
+
+        function endTimer() {
+            pauseTimer();
+            secondsElapsed = 0;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            
+            const text = (hrs !== '00') ? `${hrs}:${mins}:${secs}` : `${mins}:${secs}`;
+            const displayEl = document.getElementById(`display-${currentTimerMode}`);
+            if (displayEl) displayEl.innerText = text;
+        }
+
+        function setBreakDuration() {
+            const h = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            const m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            secondsElapsed = (h * 3600) + (m * 60);
+            updateDisplay();
+        }
+
+        function saveSessionPrompt() {
+            if (secondsElapsed === 0) {
+                alert('لا يمكن حفظ جلسة مدتها صفر!');
+                return;
+            }
+            pauseTimer();
+            document.getElementById('modalSubjectInput').value = '';
+            document.getElementById('modalDescInput').value = '';
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            const subject = document.getElementById('modalSubjectInput').value.trim() || 'بدون عنوان';
+            const desc = document.getElementById('modalDescInput').value.trim() || '';
+            
+            const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            const durationText = (hrs !== '00') ? `${hrs}:${mins}:${secs}` : `${mins}:${secs}`;
+
+            const entry = {
+                id: Date.now(),
+                mode: currentTimerMode,
+                subject: subject,
+                desc: desc,
+                duration: durationText,
+                date: new Date().toLocaleDateString('ar-EG') + ' ' + new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})
+            };
+
+            userHistory.unshift(entry);
+            saveUserData();
+            closeModal('saveModal');
+            endTimer();
+            openUnifiedHistory(currentTimerMode);
+        }
+
+        function requestMini() {
+            if ('pictureInPictureEnabled' in document) {
+                alert('خاصية Mini Timer متوافقة مع المتصفحات التي تدعم PiP.');
+            } else {
+                alert('خاصية المصغر تعمل عبر شاشات مستقلة.');
+            }
+        }
+
+        // Sidebar History & Views
+        function openUnifiedHistory(mode = 'study') {
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('printHistoryBtn').style.display = 'inline-block';
+            document.getElementById('historyTabsNav').style.display = 'flex';
+            document.getElementById('sidebarTitle').innerText = 'History';
+            switchHistorySubTab(mode);
+        }
+
+        function closeHistory() {
+            document.getElementById('sidebarHistory').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('sidebar-open');
+        }
+
+        function switchHistorySubTab(subTab) {
+            activeHistorySubTab = subTab;
+            document.querySelectorAll('.history-tab-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`htab-${subTab}`);
+            if (btn) btn.classList.add('active');
+
+            const content = document.getElementById('sidebarContent');
+            content.innerHTML = '';
+
+            const filtered = userHistory.filter(item => item.mode === subTab);
+            if (filtered.length === 0) {
+                content.innerHTML = '<div style="color:#6c7086; text-align:center; margin-top:20px;">لا يوجد سجلات لهذه الفئة</div>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.subject}</span>
+                        <span class="card-duration">${item.duration}</span>
+                    </div>
+                    ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+                    <div class="card-bottom-info">
+                        <span>${item.date}</span>
+                        <button style="background:none; border:none; color:#f38ba8; cursor:pointer; font-size:0.75rem;" onclick="deleteHistoryItem(${item.id})">حذف 🗑️</button>
+                    </div>
+                `;
+                content.appendChild(card);
+            });
+        }
+
+        function deleteHistoryItem(id) {
+            const index = userHistory.findIndex(i => i.id === id);
+            if (index !== -1) {
+                const removed = userHistory.splice(index, 1)[0];
+                userTrash.push({ ...removed, trashType: 'history' });
+                saveUserData();
+                switchHistorySubTab(activeHistorySubTab);
+            }
+        }
+
+        // Schedule View
+        function openScheduleView() {
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('addSchBtn').style.display = 'inline-block';
+            document.getElementById('printHistoryBtn').style.display = 'none';
+            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = 'Schedule';
+
+            renderScheduleItems();
+        }
+
+        function renderScheduleItems() {
+            const content = document.getElementById('sidebarContent');
+            content.innerHTML = '';
+
+            if (userSchedule.length === 0) {
+                content.innerHTML = '<div style="color:#6c7086; text-align:center; margin-top:20px;">الجدول فارغ حالياً</div>';
+                return;
+            }
+
+            userSchedule.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'schedule-card';
+                card.innerHTML = `
+                    <div class="sch-header">
+                        <span class="sch-subject">${item.subject}</span>
+                        <span class="sch-teacher">${item.teacher}</span>
+                    </div>
+                    <div class="sch-body">
+                        <div><b>📌 العنوان:</b> ${item.title}</div>
+                        <div><b>📅 الميعاد:</b> ${item.date} - ${item.time} (${item.place})</div>
+                    </div>
+                    <div class="sch-actions">
+                        <button class="btn-sch-action btn-sch-edit" onclick="editScheduleItem(${index})">تعديل ✏️</button>
+                        <button class="btn-sch-action btn-sch-del" onclick="deleteScheduleItem(${index})">حذف 🗑️</button>
+                    </div>
+                `;
+                content.appendChild(card);
+            });
+        }
+
+        function openAddScheduleModal() {
+            document.getElementById('schEditIndex').value = "-1";
+            document.getElementById('schSubjectInput').value = "";
+            document.getElementById('schTeacherInput').value = "";
+            document.getElementById('schTitleInput').value = "";
+            document.getElementById('schDateInput').value = "";
+            document.getElementById('schTimeInput').value = "";
+            document.getElementById('schModalTitle').innerText = "إضافة حصة/درس للجدول";
+            document.getElementById('scheduleModal').style.display = "flex";
+        }
+
+        function saveScheduleItem() {
+            const idx = parseInt(document.getElementById('schEditIndex').value);
+            const item = {
+                subject: document.getElementById('schSubjectInput').value.trim() || 'مادة',
+                teacher: document.getElementById('schTeacherInput').value.trim() || 'أستاذ',
+                title: document.getElementById('schTitleInput').value.trim() || '',
+                date: document.getElementById('schDateInput').value.trim() || '',
+                time: document.getElementById('schTimeInput').value.trim() || '',
+                place: document.getElementById('schPlaceInput').value
+            };
+
+            if (idx === -1) {
+                userSchedule.push(item);
+            } else {
+                userSchedule[idx] = item;
+            }
+
+            saveUserData();
+            closeModal('scheduleModal');
+            renderScheduleItems();
+        }
+
+        function editScheduleItem(index) {
+            const item = userSchedule[index];
+            document.getElementById('schEditIndex').value = index;
+            document.getElementById('schSubjectInput').value = item.subject;
+            document.getElementById('schTeacherInput').value = item.teacher;
+            document.getElementById('schTitleInput').value = item.title;
+            document.getElementById('schDateInput').value = item.date;
+            document.getElementById('schTimeInput').value = item.time;
+            document.getElementById('schPlaceInput').value = item.place;
+            document.getElementById('schModalTitle').innerText = "تعديل حِصة/درس";
+            document.getElementById('scheduleModal').style.display = "flex";
+        }
+
+        function deleteScheduleItem(index) {
+            const removed = userSchedule.splice(index, 1)[0];
+            userTrash.push({ ...removed, trashType: 'schedule' });
+            saveUserData();
+            renderScheduleItems();
+        }
+
+        // Trash & Recovery
+        function openTrash() {
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('printHistoryBtn').style.display = 'none';
+            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = 'Trash / Recovery';
+
+            const content = document.getElementById('sidebarContent');
+            content.innerHTML = '';
+
+            if (userTrash.length === 0) {
+                content.innerHTML = '<div style="color:#6c7086; text-align:center; margin-top:20px;">المحذوفات فارغة</div>';
+                return;
+            }
+
+            userTrash.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.subject || item.title || 'عنصر محذوف'}</span>
+                        <span class="card-duration">${item.trashType === 'history' ? 'سجل' : 'حصة'}</span>
+                    </div>
+                    <div class="card-bottom-info">
+                        <button class="btn-sch-action btn-sch-restore" onclick="restoreTrashItem(${index})">استعادة 🔄</button>
+                        <button class="btn-sch-action btn-sch-del" onclick="permanentlyDeleteTrash(${index})">حذف نهائي ❌</button>
+                    </div>
+                `;
+                content.appendChild(card);
+            });
+        }
+
+        function restoreTrashItem(index) {
+            const item = userTrash.splice(index, 1)[0];
+            if (item.trashType === 'history') {
+                delete item.trashType;
+                userHistory.unshift(item);
+            } else {
+                delete item.trashType;
+                userSchedule.push(item);
+            }
+            saveUserData();
+            openTrash();
+        }
+
+        function permanentlyDeleteTrash(index) {
+            userTrash.splice(index, 1);
+            saveUserData();
+            openTrash();
+        }
+
+        // Notebook Logic
+        function openNotebook() {
+            document.getElementById('notebookSidebar').classList.add('open');
+            document.getElementById('mainContainer').classList.add('notebook-open');
+        }
+
+        function closeNotebook() {
+            document.getElementById('notebookSidebar').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('notebook-open');
+        }
+
+        function switchNbPane(subject, pane) {
+            const doneBtn = document.getElementById(`tab-${subject}-done`);
+            const remBtn = document.getElementById(`tab-${subject}-rem`);
+            const donePane = document.getElementById(`pane-${subject}-done`);
+            const remPane = document.getElementById(`pane-${subject}-rem`);
+
+            if (pane === 'done') {
+                doneBtn.classList.add('active-tab');
+                remBtn.classList.remove('active-tab');
+                donePane.classList.add('active-pane');
+                remPane.classList.remove('active-pane');
+            } else {
+                remBtn.classList.add('active-tab');
+                doneBtn.classList.remove('active-tab');
+                remPane.classList.add('active-pane');
+                donePane.classList.remove('active-pane');
+            }
+        }
+
+        function saveNotebookData() {
+            const data = {
+                arabic_done: document.getElementById('note-arabic-done').value,
+                arabic_rem: document.getElementById('note-arabic-rem').value,
+                english_done: document.getElementById('note-english-done').value,
+                english_rem: document.getElementById('note-english-rem').value,
+                history_done: document.getElementById('note-history-done').value,
+                history_rem: document.getElementById('note-history-rem').value,
+                physics_done: document.getElementById('note-physics-done').value,
+                physics_rem: document.getElementById('note-physics-rem').value
+            };
+            localStorage.setItem(getStorageKey('notebook'), JSON.stringify(data));
+            localStorage.setItem('temp_notebook_cache', JSON.stringify(data));
+            if (window.saveCloudData) window.saveCloudData();
+        }
+
+        function loadNotebookData() {
+            const data = JSON.parse(localStorage.getItem(getStorageKey('notebook')) || '{}');
+            document.getElementById('note-arabic-done').value = data.arabic_done || '';
+            document.getElementById('note-arabic-rem').value = data.arabic_rem || '';
+            document.getElementById('note-english-done').value = data.english_done || '';
+            document.getElementById('note-english-rem').value = data.english_rem || '';
+            document.getElementById('note-history-done').value = data.history_done || '';
+            document.getElementById('note-history-rem').value = data.history_rem || '';
+            document.getElementById('note-physics-done').value = data.physics_done || '';
+            document.getElementById('note-physics-rem').value = data.physics_rem || '';
+        }
+
+        function printNotebook() {
+            window.print();
+        }
+
+        function printFullHistory() {
+            window.print();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            loadUserData();
+        };
     </script>
 </body>
 </html>
