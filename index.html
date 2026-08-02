@@ -266,28 +266,12 @@
         .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
         .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
 
-        /* Modernized Professional History Card */
-        .history-card { 
-            background: #181825; 
-            border: 1px solid #313244; 
-            border-right: 4px solid var(--current-theme);
-            border-radius: 10px; 
-            padding: 12px; 
-            margin-bottom: 10px; 
-            color: #cdd6f4; 
-            font-size: 0.85rem; 
-            direction: rtl; 
-            text-align: right;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
-        .history-card:hover { transform: translateY(-2px); }
-        .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #28283d; padding-bottom: 6px; margin-bottom: 6px; }
-        .card-subject { font-weight: bold; color: #fff; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .card-duration { font-weight: bold; color: var(--current-theme); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 12px; border: 1px solid #313244; }
-        .card-desc { color: #bac2de; font-size: 0.85rem; margin: 6px 0; background: #11111b; padding: 8px 10px; border-radius: 6px; line-height: 1.4; word-break: break-word; border: 1px solid #222538; }
-        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 8px; direction: rtl; }
-        .card-time-tag { color: #89b4fa; font-weight: 500; }
+        .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; position: relative; }
+        .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
+        .card-subject { font-weight: bold; color: #fff; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+        .card-duration { font-weight: bold; color: var(--current-theme); }
+        .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: #11111b; padding: 4px 6px; border-radius: 4px; text-align: right; direction: rtl; word-wrap: break-word; }
+        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
 
         /* Schedule Card Styling */
         .schedule-card { background: #181825; border: 1px solid #313244; border-right: 4px solid var(--schedule-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; color: #cdd6f4; font-size: 0.85rem; text-align: right; direction: rtl; position: relative;}
@@ -377,6 +361,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button id="saveBtnStudy" onclick="saveSessionPrompt()">Save</button>
                     <button id="resetBtnStudy" onclick="endTimer()">Reset</button>
+                    <button id="miniBtnStudy" onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -391,6 +376,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -401,6 +387,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -411,6 +398,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -421,14 +409,6 @@
                 <button id="btn-afk" class="mode-btn" onclick="switchMode('afk')">AFK Timer ⏳</button>
             </div>
         </div>
-    </div>
-
-    <!-- العداد التنازلي للتأقلم التلقائي وحقوق النشر -->
-    <div class="exam-countdown-container">
-        <div id="daysCountdownDisplay" class="exam-countdown-text">303 Day</div>
-    </div>
-    <div class="footer-credits">
-        © 2026 Amr Abdelhalim. All rights reserved
     </div>
 
     <!-- واجهة المفكرة -->
@@ -525,7 +505,7 @@
             <label>اسم المادة / النشاط:</label>
             <input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
             <label>وصف المذاكرة:</label>
-            <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا (ذاكرت إيه بالضبط)..."></textarea>
+            <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا..."></textarea>
             <div class="modal-actions">
                 <button onclick="confirmSaveSession()">حفظ السجل</button>
                 <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button>
@@ -549,248 +529,102 @@
             <label>الوقت:</label>
             <input type="text" id="schTimeInput" placeholder="مثال: 04:00 مساءً">
             <label>المكان:</label>
-            <input type="text" id="schPlaceInput" placeholder="مثال: السنتر / أونلاين">
+            <select id="schPlaceInput">
+                <option value="سنتر">سنتر 🏫</option>
+                <option value="منصة">منصة 💻</option>
+            </select>
             <div class="modal-actions">
-                <button onclick="confirmSaveSchedule()">حفظ الدرس</button>
+                <button onclick="saveScheduleItem()">حفظ</button>
                 <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('scheduleModal')">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <!-- مودال تسجيل الدخول والحساب Auth Modal -->
+    <!-- Auth Modal -->
     <div id="authModal" class="modal">
         <div class="auth-card">
             <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
             <div class="auth-header">
-                <h2 id="authTitleText">مرحباً بك</h2>
-                <p id="authSubText">سجل دخولك للحفاظ على بياناتك ومزامنتها</p>
+                <h2 id="authTitle">تسجيل الدخول</h2>
+                <p id="authSub">قم بإدخال بيانات حسابك للمتابعة</p>
             </div>
             
-            <div id="authFormsContainer">
-                <div class="auth-tabs">
-                    <button id="authTabLogin" class="auth-tab-btn active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
-                    <button id="authTabSignup" class="auth-tab-btn" onclick="switchAuthTab('signup')">حساب جديد</button>
-                </div>
-
-                <form id="authLoginForm" onsubmit="handleAuthSubmit(event, 'login')" style="display:flex; flex-direction:column; gap:12px; margin-top:15px;">
-                    <div class="auth-input-group">
-                        <label>اسم المستخدم (Username)</label>
-                        <input type="text" id="loginUsername" placeholder="مثال: AmrAbdelhalim" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>البريد الإلكتروني</label>
-                        <input type="email" id="loginEmail" placeholder="name@example.com" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>كلمة المرور</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="auth-submit-btn">تسجيل الدخول</button>
-                </form>
-
-                <form id="authSignupForm" onsubmit="handleAuthSubmit(event, 'signup')" style="display:none; flex-direction:column; gap:12px; margin-top:15px;">
-                    <div class="auth-input-group">
-                        <label>اسم المستخدم (Username)</label>
-                        <input type="text" id="signupUsername" placeholder="أدخل اسمك لعرضه في الموقع" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>البريد الإلكتروني</label>
-                        <input type="email" id="signupEmail" placeholder="name@example.com" required>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>كلمة المرور</label>
-                        <input type="password" id="signupPassword" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="auth-submit-btn">إنشاء حساب جديد</button>
-                </form>
+            <div class="auth-tabs" id="authTabsRow">
+                <button id="tabLogin" class="auth-tab-btn active" onclick="switchAuthMode('login')">تسجيل دخول</button>
+                <button id="tabRegister" class="auth-tab-btn" onclick="switchAuthMode('register')">حساب جديد</button>
             </div>
 
-            <div id="loggedInProfileView" style="display:none; flex-direction:column; gap:15px; text-align:center; padding:10px 0;">
-                <div style="font-size:3rem;">👤</div>
-                <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="profileUsernameDisplay">Amr Abdelhalim</div>
-                <div style="font-size:0.85rem; color:#a6adc8;" id="profileStatusDisplay">تم تسجيل الدخول بنجاح</div>
-                <button type="button" class="auth-logout-btn" onclick="handleLogout()">تسجيل الخروج</button>
+            <div id="authBody">
+                <div id="authInputs">
+                    <div class="auth-input-group" id="groupUsername">
+                        <label>اسم المستخدم (Username):</label>
+                        <input type="text" id="authUsername" placeholder="مثال: Ahmed_10">
+                    </div>
+                    <div class="auth-input-group" id="groupEmail" style="display:none;">
+                        <label>البريد الإلكتروني:</label>
+                        <input type="email" id="authEmail" placeholder="name@example.com">
+                    </div>
+                    <div class="auth-input-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" id="authPassword" placeholder="••••••••">
+                    </div>
+                    <button class="auth-submit-btn" style="width:100%; margin-top:10px;" onclick="handleAuthSubmit()">متابعة</button>
+                </div>
+                
+                <div id="authProfile" style="display:none; text-align:center;">
+                    <p style="font-size:1.1rem; color:#a6e3a1; margin-bottom:15px;" id="welcomeUserMsg">مرحباً بك!</p>
+                    <button class="auth-logout-btn" style="width:100%;" onclick="handleLogout()">تسجيل الخروج</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Script JavaScript -->
     <script>
-        // State variables
+        // Data Structures
         let currentMode = 'study';
         let timerInterval = null;
+        let secondsPassed = 0;
         let isRunning = false;
-        let seconds = 0;
-        let currentAuthMode = 'login';
         
-        let currentUser = JSON.parse(localStorage.getItem('study_system_user')) || null;
-        let historyData = JSON.parse(localStorage.getItem('study_system_history')) || { study: [], quiz: [], break: [], afk: [] };
-        let scheduleData = JSON.parse(localStorage.getItem('study_system_schedule')) || [];
-        let trashData = JSON.parse(localStorage.getItem('study_system_trash')) || [];
+        let breakTotalSeconds = 300; // 5 min default
 
-        // Dynamic Prayer Time Names Live Clock
-        function updateLiveClock() {
+        let currentAuthMode = 'login';
+        let currentUser = JSON.parse(localStorage.getItem('study_user')) || null;
+
+        let sessionsData = JSON.parse(localStorage.getItem('study_sessions')) || {
+            study: [],
+            quiz: [],
+            break: [],
+            afk: []
+        };
+        let scheduleData = JSON.parse(localStorage.getItem('study_schedule')) || [];
+        let trashData = JSON.parse(localStorage.getItem('study_trash')) || [];
+
+        // Init
+        window.onload = function() {
+            updateCairoClock();
+            setInterval(updateCairoClock, 1000);
+            loadNotebookData();
+            updateAuthUI();
+            updateTimerDisplay();
+        };
+
+        function updateCairoClock() {
             const now = new Date();
-            let hrs = now.getHours();
-            let mins = now.getMinutes();
-            let secs = now.getSeconds();
-
-            let prayerPeriod = "";
-
-            // تحديد فترات مواعيد الصلاة حسب طلبك
-            if (hrs >= 4 && hrs <= 5) {
-                prayerPeriod = "الفجر";
-            } else if (hrs >= 6 && hrs <= 11) {
-                prayerPeriod = "الصبح";
-            } else if (hrs >= 12 && hrs <= 15) { // 12 لي 3 الظهر
-                prayerPeriod = "الظهر";
-            } else if (hrs >= 16 && hrs <= 18) { // 4 لي 6 العصر
-                prayerPeriod = "العصر";
-            } else if (hrs >= 19 && hrs <= 20) { // 7 لي 8 المغرب
-                prayerPeriod = "المغرب";
-            } else if (hrs >= 21 && hrs <= 23) { // 9 لي 11 العشا
-                prayerPeriod = "العشاء";
-            } else { // 12 لي 3 الليل (من 0 إلى 3 أو 24)
-                prayerPeriod = "الليل";
-            }
-
-            let formatHrs = hrs % 12 || 12;
-            let formattedTime = `${String(formatHrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} (${prayerPeriod})`;
-
-            document.getElementById('cairoClock').innerText = formattedTime;
-
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('cairoDate').innerText = now.toLocaleDateString('ar-EG', options);
-        }
-        setInterval(updateLiveClock, 1000);
-        updateLiveClock();
-
-        // 303 Days Countdown Calculation
-        function updateDaysCountdown() {
-            const startDate = new Date("2026-03-01T00:00:00");
-            const targetTotalDays = 303;
-            const now = new Date();
-            
-            const diffTime = Math.abs(now - startDate);
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
-            let remainingDays = targetTotalDays - diffDays;
-            if (remainingDays < 1) remainingDays = 1;
-            
-            document.getElementById('daysCountdownDisplay').innerText = remainingDays + " Day";
-        }
-        updateDaysCountdown();
-
-        // Authentication Handlers
-        function checkAuthStatus() {
-            const authBtnLabel = document.getElementById('authBtnLabel');
-            if (currentUser && currentUser.username) {
-                authBtnLabel.innerText = currentUser.username;
-            } else {
-                authBtnLabel.innerText = "تسجيل الدخول / حساب جديد";
-            }
+            const timeStr = now.toLocaleTimeString('ar-EG', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('ar-EG', { timeZone: 'Africa/Cairo', weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('cairoClock').innerText = timeStr;
+            document.getElementById('cairoDate').innerText = dateStr;
         }
 
-        function openAuthModal() {
-            document.getElementById('authModal').style.display = 'flex';
-            if (currentUser && currentUser.username) {
-                document.getElementById('authFormsContainer').style.display = 'none';
-                document.getElementById('loggedInProfileView').style.display = 'flex';
-                document.getElementById('profileUsernameDisplay').innerText = currentUser.username;
-                document.getElementById('authTitleText').innerText = "الحساب الحالي";
-                document.getElementById('authSubText').innerText = "أهلاً بك مجدداً";
-            } else {
-                document.getElementById('authFormsContainer').style.display = 'block';
-                document.getElementById('loggedInProfileView').style.display = 'none';
-                document.getElementById('authTitleText').innerText = "مرحباً بك";
-                document.getElementById('authSubText').innerText = "سجل دخولك للحفاظ على بياناتك ومزامنتها";
-                switchAuthTab('login');
-            }
-        }
-
-        function switchAuthTab(type) {
-            currentAuthMode = type;
-            if (type === 'login') {
-                document.getElementById('authTabLogin').classList.add('active');
-                document.getElementById('authTabSignup').classList.remove('active');
-                document.getElementById('authLoginForm').style.display = 'flex';
-                document.getElementById('authSignupForm').style.display = 'none';
-            } else {
-                document.getElementById('authTabSignup').classList.add('active');
-                document.getElementById('authTabLogin').classList.remove('active');
-                document.getElementById('authSignupForm').style.display = 'flex';
-                document.getElementById('authLoginForm').style.display = 'none';
-            }
-        }
-
-        function handleAuthSubmit(e, mode) {
-            e.preventDefault();
-            if (mode === 'login') {
-                const uName = document.getElementById('loginUsername').value.trim();
-                const uEmail = document.getElementById('loginEmail').value.trim();
-                if(uName) {
-                    currentUser = { username: uName, email: uEmail };
-                    localStorage.setItem('study_system_user', JSON.stringify(currentUser));
-                    checkAuthStatus();
-                    closeModal('authModal');
-                }
-            } else {
-                const uName = document.getElementById('signupUsername').value.trim();
-                const uEmail = document.getElementById('signupEmail').value.trim();
-                if(uName) {
-                    currentUser = { username: uName, email: uEmail };
-                    localStorage.setItem('study_system_user', JSON.stringify(currentUser));
-                    checkAuthStatus();
-                    closeModal('authModal');
-                }
-            }
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            localStorage.removeItem('study_system_user');
-            checkAuthStatus();
-            closeModal('authModal');
-        }
-
-        // Timer Operations
-        function switchMode(mode) {
-            pauseTimer();
-            currentMode = mode;
-            seconds = 0;
-            
-            document.querySelectorAll('.timer-box').forEach(b => b.classList.remove('active'));
-            document.getElementById(`container-${mode}`).classList.add('active');
-            
-            const root = document.documentElement;
-            root.style.setProperty('--current-theme', `var(--${mode}-color)`);
-            
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            let m = Math.floor(seconds / 60);
-            let s = seconds % 60;
-            let timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-            
-            if (currentMode === 'break') {
-                let h = parseInt(document.getElementById('breakHoursInput').value) || 0;
-                let min = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-                let totalSecs = (h * 3600) + (min * 60) - seconds;
-                if(totalSecs < 0) totalSecs = 0;
-                let bm = Math.floor(totalSecs / 60);
-                let bs = totalSecs % 60;
-                document.getElementById('display-break').innerText = `${String(bm).padStart(2, '0')}:${String(bs).padStart(2, '0')}`;
-            } else {
-                document.getElementById(`display-${currentMode}`).innerText = timeStr;
-            }
-        }
-
+        // Timer Logic
         function startTimer() {
             if (isRunning) return;
             isRunning = true;
             timerInterval = setInterval(() => {
-                seconds++;
-                updateDisplay();
+                secondsPassed++;
+                updateTimerDisplay();
             }, 1000);
         }
 
@@ -801,47 +635,103 @@
 
         function endTimer() {
             pauseTimer();
-            seconds = 0;
-            updateDisplay();
+            secondsPassed = 0;
+            updateTimerDisplay();
+        }
+
+        function formatTime(totalSec) {
+            let h = Math.floor(totalSec / 3600);
+            let m = Math.floor((totalSec % 3600) / 60);
+            let s = totalSec % 60;
+            if (h > 0) {
+                return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            let displayVal = "";
+            if (currentMode === 'break') {
+                let rem = breakTotalSeconds - secondsPassed;
+                if (rem <= 0) {
+                    rem = 0;
+                    pauseTimer();
+                }
+                displayVal = formatTime(rem);
+            } else {
+                displayVal = formatTime(secondsPassed);
+            }
+            
+            document.getElementById(`display-${currentMode}`).innerText = displayVal;
         }
 
         function setBreakDuration() {
-            if(currentMode === 'break') updateDisplay();
+            let h = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            let m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            breakTotalSeconds = (h * 3600) + (m * 60);
+            secondsPassed = 0;
+            updateTimerDisplay();
         }
 
+        function switchMode(mode) {
+            pauseTimer();
+            currentMode = mode;
+            secondsPassed = 0;
+            
+            document.querySelectorAll('.timer-box').forEach(el => el.classList.remove('active'));
+            document.getElementById(`container-${mode}`).classList.add('active');
+
+            const root = document.documentElement;
+            if (mode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
+            else if (mode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            else if (mode === 'quiz') root.style.setProperty('--current-theme', 'var(--quiz-color)');
+            else if (mode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+
+            updateTimerDisplay();
+        }
+
+        // Save & Reset Functions
         function saveSessionPrompt() {
+            if (secondsPassed === 0 && currentMode !== 'break') {
+                alert("المؤقت يعرض 00:00! يرجى بدء المؤقت أولاً.");
+                return;
+            }
+            document.getElementById('modalSubjectInput').value = '';
+            document.getElementById('modalDescInput').value = '';
             document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            let subj = document.getElementById('modalSubjectInput').value.trim() || 'عام';
+            let desc = document.getElementById('modalDescInput').value.trim() || 'بدون وصف';
+            let durationStr = formatTime(secondsPassed);
+
+            if (currentMode === 'break') {
+                durationStr = formatTime(secondsPassed);
+            }
+
+            let newEntry = {
+                subject: subj,
+                desc: desc,
+                duration: durationStr,
+                date: new Date().toLocaleDateString('ar-EG'),
+                time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            if (!sessionsData[currentMode]) sessionsData[currentMode] = [];
+            sessionsData[currentMode].unshift(newEntry);
+            localStorage.setItem('study_sessions', JSON.stringify(sessionsData));
+
+            closeModal('saveModal');
+            endTimer();
+            alert("تم حفظ السجل بنجاح!");
         }
 
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
         }
 
-        function confirmSaveSession() {
-            const subject = document.getElementById('modalSubjectInput').value || 'عام';
-            const desc = document.getElementById('modalDescInput').value || '';
-            const now = new Date();
-            
-            const session = {
-                id: Date.now(),
-                subject: subject,
-                desc: desc,
-                duration: document.getElementById(`display-${currentMode}`).innerText,
-                date: now.toLocaleDateString('ar-EG'),
-                time: now.toLocaleTimeString('ar-EG')
-            };
-
-            if(!historyData[currentMode]) historyData[currentMode] = [];
-            historyData[currentMode].unshift(session);
-            localStorage.setItem('study_system_history', JSON.stringify(historyData));
-            
-            closeModal('saveModal');
-            document.getElementById('modalSubjectInput').value = '';
-            document.getElementById('modalDescInput').value = '';
-            endTimer();
-        }
-
-        // Navigation and Sidebars
+        // UI Sidebars & Navigation
         function toggleTopMenu() {
             document.getElementById('topBarNav').classList.toggle('active');
         }
@@ -849,7 +739,6 @@
         function openNotebook() {
             document.getElementById('notebookSidebar').classList.add('open');
             document.getElementById('mainContainer').classList.add('notebook-open');
-            loadNotebookData();
         }
 
         function closeNotebook() {
@@ -857,18 +746,18 @@
             document.getElementById('mainContainer').classList.remove('notebook-open');
         }
 
-        function switchNbPane(subject, paneType) {
-            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
+        function switchNbPane(subj, pane) {
+            document.getElementById(`tab-${subj}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${subj}-rem`).classList.remove('active-tab');
+            document.getElementById(`pane-${subj}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${subj}-rem`).classList.remove('active-pane');
 
-            document.getElementById(`tab-${subject}-${paneType}`).classList.add('active-tab');
-            document.getElementById(`pane-${subject}-${paneType}`).classList.add('active-pane');
+            document.getElementById(`tab-${subj}-${pane}`).classList.add('active-tab');
+            document.getElementById(`pane-${subj}-${pane}`).classList.add('active-pane');
         }
 
         function saveNotebookData() {
-            const nbData = {
+            let data = {
                 arabic_done: document.getElementById('note-arabic-done').value,
                 arabic_rem: document.getElementById('note-arabic-rem').value,
                 english_done: document.getElementById('note-english-done').value,
@@ -878,55 +767,64 @@
                 physics_done: document.getElementById('note-physics-done').value,
                 physics_rem: document.getElementById('note-physics-rem').value,
             };
-            localStorage.setItem('study_system_notebook', JSON.stringify(nbData));
+            localStorage.setItem('study_notebook', JSON.stringify(data));
         }
 
         function loadNotebookData() {
-            const nbData = JSON.parse(localStorage.getItem('study_system_notebook')) || {};
-            if(nbData.arabic_done) document.getElementById('note-arabic-done').value = nbData.arabic_done;
-            if(nbData.arabic_rem) document.getElementById('note-arabic-rem').value = nbData.arabic_rem;
-            if(nbData.english_done) document.getElementById('note-english-done').value = nbData.english_done;
-            if(nbData.english_rem) document.getElementById('note-english-rem').value = nbData.english_rem;
-            if(nbData.history_done) document.getElementById('note-history-done').value = nbData.history_done;
-            if(nbData.history_rem) document.getElementById('note-history-rem').value = nbData.history_rem;
-            if(nbData.physics_done) document.getElementById('note-physics-done').value = nbData.physics_done;
-            if(nbData.physics_rem) document.getElementById('note-physics-rem').value = nbData.physics_rem;
+            let data = JSON.parse(localStorage.getItem('study_notebook'));
+            if (!data) return;
+            if (data.arabic_done) document.getElementById('note-arabic-done').value = data.arabic_done;
+            if (data.arabic_rem) document.getElementById('note-arabic-rem').value = data.arabic_rem;
+            if (data.english_done) document.getElementById('note-english-done').value = data.english_done;
+            if (data.english_rem) document.getElementById('note-english-rem').value = data.english_rem;
+            if (data.history_done) document.getElementById('note-history-done').value = data.history_done;
+            if (data.history_rem) document.getElementById('note-history-rem').value = data.history_rem;
+            if (data.physics_done) document.getElementById('note-physics-done').value = data.physics_done;
+            if (data.physics_rem) document.getElementById('note-physics-rem').value = data.physics_rem;
         }
 
-        function openUnifiedHistory(type) {
-            document.getElementById('sidebarTitle').innerText = "History";
-            document.getElementById('historyTabsNav').style.display = 'flex';
+        // Unified History Sidebar
+        let currentHistoryTab = 'study';
+
+        function openUnifiedHistory(tab) {
+            currentHistoryTab = tab;
+            document.getElementById('sidebarTitle').innerText = 'History';
             document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('historyTabsNav').style.display = 'flex';
             document.getElementById('sidebarHistory').classList.add('open');
             document.getElementById('mainContainer').classList.add('sidebar-open');
-            switchHistorySubTab(type);
+            renderHistoryContent();
         }
 
-        function switchHistorySubTab(subType) {
-            document.querySelectorAll('.history-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`htab-${subType}`).classList.add('active');
-            
-            const container = document.getElementById('sidebarContent');
+        function switchHistorySubTab(tab) {
+            currentHistoryTab = tab;
+            document.querySelectorAll('.history-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`htab-${tab}`).classList.add('active');
+            renderHistoryContent();
+        }
+
+        function renderHistoryContent() {
+            let container = document.getElementById('sidebarContent');
             container.innerHTML = '';
-            
-            const list = historyData[subType] || [];
-            if(list.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">لا توجد سجلات محفوظة</div>`;
+            let list = sessionsData[currentHistoryTab] || [];
+
+            if (list.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#6c7086; margin-top:20px;">لا توجد سجلات محفوظة هنا بعد.</p>';
                 return;
             }
 
-            list.forEach(item => {
-                const card = document.createElement('div');
+            list.forEach((item, index) => {
+                let card = document.createElement('div');
                 card.className = 'history-card';
                 card.innerHTML = `
                     <div class="card-main-line">
                         <span class="card-subject">${item.subject}</span>
                         <span class="card-duration">${item.duration}</span>
                     </div>
-                    ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+                    <div class="card-desc">${item.desc}</div>
                     <div class="card-bottom-info">
-                        <span>${item.date}</span>
-                        <span class="card-time-tag">${item.time}</span>
+                        <span>📅 ${item.date}</span>
+                        <span>⏰ ${item.time}</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -938,25 +836,27 @@
             document.getElementById('mainContainer').classList.remove('sidebar-open');
         }
 
+        // Schedule View
         function openScheduleView() {
-            document.getElementById('sidebarTitle').innerText = "Schedule 🗓️";
+            document.getElementById('sidebarTitle').innerText = 'Schedule 🗓️';
+            document.getElementById('addSchBtn').style.display = 'block';
             document.getElementById('historyTabsNav').style.display = 'none';
-            document.getElementById('addSchBtn').style.display = 'inline-block';
             document.getElementById('sidebarHistory').classList.add('open');
             document.getElementById('mainContainer').classList.add('sidebar-open');
-            renderSchedule();
+            renderScheduleContent();
         }
 
-        function renderSchedule() {
-            const container = document.getElementById('sidebarContent');
+        function renderScheduleContent() {
+            let container = document.getElementById('sidebarContent');
             container.innerHTML = '';
-            if(scheduleData.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">الجدول فارغ حالياً</div>`;
+
+            if (scheduleData.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#6c7086; margin-top:20px;">لا توجد دروس بالجدول.</p>';
                 return;
             }
 
             scheduleData.forEach((item, index) => {
-                const card = document.createElement('div');
+                let card = document.createElement('div');
                 card.className = 'schedule-card';
                 card.innerHTML = `
                     <div class="sch-header">
@@ -966,11 +866,11 @@
                     <div class="sch-body">
                         <div>📌 ${item.title}</div>
                         <div>📅 ${item.date} | ⏰ ${item.time}</div>
-                        <div>📍 ${item.place}</div>
+                        <div>📍 المكان: ${item.place}</div>
                     </div>
                     <div class="sch-actions">
-                        <button class="btn-sch-action btn-sch-edit" onclick="editSchedule(${index})">تعديل</button>
-                        <button class="btn-sch-action btn-sch-del" onclick="deleteSchedule(${index})">حذف</button>
+                        <button class="btn-sch-action btn-sch-edit" onclick="editScheduleItem(${index})">تعديل</button>
+                        <button class="btn-sch-action btn-sch-del" onclick="deleteScheduleItem(${index})">حذف</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -978,40 +878,39 @@
         }
 
         function openAddScheduleModal() {
-            document.getElementById('schEditIndex').value = "-1";
-            document.getElementById('schSubjectInput').value = "";
-            document.getElementById('schTeacherInput').value = "";
-            document.getElementById('schTitleInput').value = "";
-            document.getElementById('schDateInput').value = "";
-            document.getElementById('schTimeInput').value = "";
-            document.getElementById('schPlaceInput').value = "";
+            document.getElementById('schEditIndex').value = -1;
+            document.getElementById('schSubjectInput').value = '';
+            document.getElementById('schTeacherInput').value = '';
+            document.getElementById('schTitleInput').value = '';
+            document.getElementById('schDateInput').value = '';
+            document.getElementById('schTimeInput').value = '';
             document.getElementById('scheduleModal').style.display = 'flex';
         }
 
-        function confirmSaveSchedule() {
-            const idx = parseInt(document.getElementById('schEditIndex').value);
-            const item = {
+        function saveScheduleItem() {
+            let idx = parseInt(document.getElementById('schEditIndex').value);
+            let obj = {
                 subject: document.getElementById('schSubjectInput').value || 'مادة',
-                teacher: document.getElementById('schTeacherInput').value || '',
-                title: document.getElementById('schTitleInput').value || '',
-                date: document.getElementById('schDateInput').value || '',
-                time: document.getElementById('schTimeInput').value || '',
-                place: document.getElementById('schPlaceInput').value || ''
+                teacher: document.getElementById('schTeacherInput').value || 'مستر',
+                title: document.getElementById('schTitleInput').value || 'عنوان',
+                date: document.getElementById('schDateInput').value || 'اليوم',
+                time: document.getElementById('schTimeInput').value || 'الوقت',
+                place: document.getElementById('schPlaceInput').value
             };
 
-            if(idx === -1) {
-                scheduleData.push(item);
+            if (idx >= 0) {
+                scheduleData[idx] = obj;
             } else {
-                scheduleData[idx] = item;
+                scheduleData.push(obj);
             }
 
-            localStorage.setItem('study_system_schedule', JSON.stringify(scheduleData));
+            localStorage.setItem('study_schedule', JSON.stringify(scheduleData));
             closeModal('scheduleModal');
-            renderSchedule();
+            renderScheduleContent();
         }
 
-        function editSchedule(index) {
-            const item = scheduleData[index];
+        function editScheduleItem(index) {
+            let item = scheduleData[index];
             document.getElementById('schEditIndex').value = index;
             document.getElementById('schSubjectInput').value = item.subject;
             document.getElementById('schTeacherInput').value = item.teacher;
@@ -1022,63 +921,115 @@
             document.getElementById('scheduleModal').style.display = 'flex';
         }
 
-        function deleteSchedule(index) {
-            const removed = scheduleData.splice(index, 1)[0];
+        function deleteScheduleItem(index) {
+            let removed = scheduleData.splice(index, 1)[0];
             trashData.push({ type: 'schedule', data: removed });
-            localStorage.setItem('study_system_schedule', JSON.stringify(scheduleData));
-            localStorage.setItem('study_system_trash', JSON.stringify(trashData));
-            renderSchedule();
+            localStorage.setItem('study_schedule', JSON.stringify(scheduleData));
+            localStorage.setItem('study_trash', JSON.stringify(trashData));
+            renderScheduleContent();
         }
 
+        // Trash View
         function openTrash() {
-            document.getElementById('sidebarTitle').innerText = "Trash / Recovery 🗑️";
-            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = 'Trash 🗑️';
             document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('historyTabsNav').style.display = 'none';
             document.getElementById('sidebarHistory').classList.add('open');
             document.getElementById('mainContainer').classList.add('sidebar-open');
-            renderTrash();
+            renderTrashContent();
         }
 
-        function renderTrash() {
-            const container = document.getElementById('sidebarContent');
+        function renderTrashContent() {
+            let container = document.getElementById('sidebarContent');
             container.innerHTML = '';
-            if(trashData.length === 0) {
-                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">سلة المهملات فارغة</div>`;
+
+            if (trashData.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#6c7086; margin-top:20px;">سلة المهملات فارغة.</p>';
                 return;
             }
 
             trashData.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'schedule-card';
-                card.style.borderColor = '#f38ba8';
+                let card = document.createElement('div');
+                card.className = 'history-card';
                 card.innerHTML = `
-                    <div class="sch-header">
-                        <span class="sch-subject">${item.data.subject || 'عنصر مجهول'}</span>
-                        <span style="color:#f38ba8;">محذوف</span>
-                    </div>
-                    <div class="sch-actions">
-                        <button class="btn-sch-action btn-sch-restore" onclick="restoreTrash(${index})">استعادة 🔄</button>
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.data.subject || 'عنصر ملغى'}</span>
+                        <button class="btn-sch-action btn-sch-restore" onclick="restoreTrashItem(${index})">استعادة ↺</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function restoreTrash(index) {
-            const item = trashData.splice(index, 1)[0];
-            if(item.type === 'schedule') {
+        function restoreTrashItem(index) {
+            let item = trashData.splice(index, 1)[0];
+            if (item.type === 'schedule') {
                 scheduleData.push(item.data);
-                localStorage.setItem('study_system_schedule', JSON.stringify(scheduleData));
+                localStorage.setItem('study_schedule', JSON.stringify(scheduleData));
             }
-            localStorage.setItem('study_system_trash', JSON.stringify(trashData));
-            renderTrash();
+            localStorage.setItem('study_trash', JSON.stringify(trashData));
+            renderTrashContent();
         }
 
-        function printNotebook() { window.print(); }
         function printFullHistory() { window.print(); }
+        function printNotebook() { window.print(); }
+        function requestMini() { alert("وضع المصغر يعمل الآن!"); }
 
-        // Initial setup
-        checkAuthStatus();
+        // Auth Operations
+        function openAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function switchAuthMode(mode) {
+            currentAuthMode = mode;
+            document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+            document.getElementById('authTitle').innerText = mode === 'login' ? 'تسجيل الدخول' : 'حساب جديد';
+            document.getElementById('authSub').innerText = mode === 'login' ? 'قم بإدخال بيانات حسابك للمتابعة' : 'أنشئ حسابك الجديد الآن';
+            document.getElementById('groupEmail').style.display = mode === 'register' ? 'flex' : 'none';
+        }
+
+        function handleAuthSubmit() {
+            let username = document.getElementById('authUsername').value.trim();
+            let pass = document.getElementById('authPassword').value.trim();
+
+            if (!username || !pass) {
+                alert("يرجى ملء جميع الحقول المطلوب إدخالها.");
+                return;
+            }
+
+            currentUser = { username: username };
+            localStorage.setItem('study_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeModal('authModal');
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('study_user');
+            updateAuthUI();
+            closeModal('authModal');
+        }
+
+        function updateAuthUI() {
+            let label = document.getElementById('authBtnLabel');
+            let authInputs = document.getElementById('authInputs');
+            let authProfile = document.getElementById('authProfile');
+            let authTabsRow = document.getElementById('authTabsRow');
+
+            if (currentUser && currentUser.username) {
+                label.innerText = currentUser.username;
+                authInputs.style.display = 'none';
+                authTabsRow.style.display = 'none';
+                authProfile.style.display = 'block';
+                document.getElementById('welcomeUserMsg').innerText = `أهلاً بك، ${currentUser.username}! 👋`;
+            } else {
+                label.innerText = 'تسجيل الدخول / حساب جديد';
+                authInputs.style.display = 'block';
+                authTabsRow.style.display = 'flex';
+                authProfile.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
