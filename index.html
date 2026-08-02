@@ -527,10 +527,19 @@
 
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
-    <!-- Firebase Script المحدث -->
+    <!-- Firebase Script المحدث بالكامل -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut, 
+            updateProfile, 
+            setPersistence, 
+            indexedDBLocalPersistence 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -546,8 +555,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // جعل الجلسة تنتهي عند إغلاق النافذة/المتصفح المتخفي لمنع الدخول التلقائي
-        setPersistence(auth, browserSessionPersistence);
+        // إبقاء تسجل الدخول ثابتاً تلقائياً على نفس جهاز المتصفح الأصلي
+        setPersistence(auth, indexedDBLocalPersistence).catch(err => console.error(err));
 
         let activeAuthTab = 'login';
         window.userCloudData = { history: {}, notebook: {} };
