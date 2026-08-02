@@ -1,35 +1,30 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Study System</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style id="dynamicStyle">
         :root {
             --study-color: #a6e3a1;
             --break-color: #cba6f7;
+            --social-color: #89b4fa;
             --quiz-color: #89b4fa;
             --afk-color: #f9e2af;
             --clock-color: #a6adc8; 
             --exam-color: #89b4fa;
+            --schedule-color: #f5e0dc;
             --current-theme: var(--study-color);
             
             --arabic-color: #89b4fa;
             --english-color: #a6e3a1;
             --history-color: #f9e2af;
             --physics-color: #f38ba8;
-            
-            --success-color: #a6e3a1;
-            --danger-color: #f38ba8;
-            --bg-dark: #0f0f16;
-            --card-bg: #181825;
-            --panel-bg: #11111b;
         }
 
         body { 
-            background: var(--bg-dark); 
+            background: #0f0f16; 
             color: var(--current-theme); 
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
             display: flex; 
@@ -46,10 +41,11 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background: var(--card-bg);
+            background: #181825;
             border: 1px solid #313244;
             padding: 8px 14px;
             border-radius: 10px;
+            font-family: 'Segoe UI', sans-serif;
             font-size: 0.85rem;
             color: #6c7086; 
             display: flex;
@@ -65,9 +61,10 @@
             font-weight: bold;
             font-size: 1.1rem;
             letter-spacing: 0.5px;
-            direction: ltr;
+            direction: rtl;
         }
 
+        /* Modern Auth Header Trigger Bar */
         .auth-status-bar {
             position: absolute;
             top: 20px;
@@ -97,7 +94,7 @@
             transform: translateY(-1px);
         }
 
-        .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 20px; color: var(--current-theme); transition: opacity 0.3s ease; }
+        .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
         
         .exam-countdown-container {
             position: absolute;
@@ -119,6 +116,7 @@
             color: var(--exam-color);
             letter-spacing: 1px;
             text-shadow: 0 0 12px rgba(137, 180, 250, 0.3);
+            font-family: 'Segoe UI', sans-serif;
         }
 
         .exam-countdown-sub {
@@ -126,6 +124,7 @@
             color: #a6adc8;
             letter-spacing: 1.5px;
             font-weight: 500;
+            font-family: monospace, 'Segoe UI', sans-serif;
         }
 
         .footer-credits { position: absolute; bottom: 15px; font-size: 0.85rem; color: #585b70; letter-spacing: 0.5px; }
@@ -142,7 +141,7 @@
         .break-input-group { margin-bottom: 15px; display: flex; justify-content: center; gap: 15px; align-items: center; }
         .break-input-group .input-field { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
-        .break-input-group input { background: var(--card-bg); border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
+        .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
 
         .menu-toggle-btn {
             position: absolute;
@@ -166,19 +165,18 @@
         .top-bar {
             position: fixed;
             top: 0;
-            right: -320px;
-            width: 280px;
+            right: -300px;
+            width: 260px;
             height: 100%;
-            background: var(--panel-bg);
+            background: #11111b;
             border-left: 2px solid #313244;
             box-shadow: -5px 0 25px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             padding: 80px 20px 20px 20px;
             z-index: 105;
             transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
         }
         .top-bar.active { right: 0; }
         .top-bar button {
@@ -191,12 +189,9 @@
             border-radius: 8px;
             width: 100%;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
         }
-        .top-bar button:hover {
-            background: var(--card-bg);
-            border-color: var(--current-theme);
-        }
+        .top-bar button:hover { background: #181825; border-color: var(--current-theme); }
         
         .btn-notebook-trigger { border-color: #cba6f7 !important; color: #cba6f7 !important; font-weight: bold; }
         .btn-notebook-trigger:hover { background: #cba6f7 !important; color: #11111b !important; }
@@ -205,66 +200,35 @@
         
         button { padding: 12px 25px; cursor: pointer; border-radius: 25px; border: 1px solid var(--current-theme); background: #1e1e2e; color: var(--current-theme); font-weight: bold; transition: 0.3s; font-family: inherit; }
         button:hover { background: var(--current-theme); color: #11111b; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-        .mode-btn { background: var(--panel-bg); font-size: 0.9rem; }
+        .mode-btn { background: #11111b; font-size: 0.9rem; }
         #btn-study { border-color: var(--study-color); color: var(--study-color); }
         #btn-break { border-color: var(--break-color); color: var(--break-color); }
-        #btn-social { border-color: var(--quiz-color); color: var(--quiz-color); }
+        #btn-quiz { border-color: var(--quiz-color); color: var(--quiz-color); }
         #btn-afk { border-color: var(--afk-color); color: var(--afk-color); }
 
-        .sidebar { position: fixed; right: -450px; top: 0; width: 420px; height: 100%; background: var(--panel-bg); border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
+        .sidebar { position: fixed; right: -400px; top: 0; width: 360px; height: 100%; background: #11111b; border-left: 2px solid var(--current-theme); box-shadow: -5px 0 25px rgba(0,0,0,0.5); transition: right 0.3s ease; z-index: 100; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; }
         .sidebar-header { padding: 15px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: var(--current-theme); }
         .header-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-header-share { background: #313244; border: 1px solid var(--current-theme); color: #fff; padding: 6px 12px; font-size: 0.75rem; border-radius: 5px; cursor: pointer; }
+        .btn-header-share { background: #313244; border: 1px solid var(--current-theme); color: #fff; padding: 4px 10px; font-size: 0.75rem; border-radius: 5px; cursor: pointer; }
         .btn-header-share:hover { background: var(--current-theme); color: #11111b; }
         .close-sidebar-btn { background: none; border: none; color: #888; font-size: 1.3rem; cursor: pointer; }
 
-        .sidebar-content { padding: 15px; flex-grow: 1; overflow-y: auto; }
-        .sidebar-content::-webkit-scrollbar { width: 8px; }
-        .sidebar-content::-webkit-scrollbar-track { background: var(--card-bg); }
-        .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 4px; }
+        .sidebar-content { padding: 12px; flex-grow: 1; overflow-y: scroll; }
+        .sidebar-content::-webkit-scrollbar { width: 14px; }
+        .sidebar-content::-webkit-scrollbar-track { background: #181825; }
+        .sidebar-content::-webkit-scrollbar-thumb { background: var(--current-theme); border-radius: 7px; border: 2px solid #11111b; }
 
-        /* Interactive Elements & Effects */
-        .check-btn-group { display: flex; gap: 8px; margin-top: 5px; }
-        .btn-check-custom {
-            padding: 6px 12px; border-radius: 6px; border: 1px solid #313244; background: #181825; color: #cdd6f4; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .btn-check-custom.active-success {
-            background: var(--success-color) !important; color: #11111b !important; border-color: var(--success-color) !important; transform: scale(1.08); box-shadow: 0 0 12px var(--success-color);
-        }
-        .btn-check-custom.active-danger {
-            background: var(--danger-color) !important; color: #11111b !important; border-color: var(--danger-color) !important; transform: scale(1.08); box-shadow: 0 0 12px var(--danger-color);
-        }
+        /* History Nav Subtabs */
+        .history-tabs-nav { display: flex; gap: 6px; margin-bottom: 12px; background: #181825; padding: 4px; border-radius: 8px; border: 1px solid #313244; }
+        .history-tab-btn { flex: 1; padding: 6px; font-size: 0.75rem; font-weight: bold; border: none; background: transparent; color: #a6adc8; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .history-tab-btn.active { background: var(--current-theme); color: #11111b; }
 
-        .history-tabs-nav { display: flex; gap: 5px; background: #181825; padding: 4px; border-radius: 8px; margin-bottom: 15px; }
-        .history-tab-btn { flex: 1; padding: 6px; font-size: 0.8rem; border: none; background: transparent; color: #a6adc8; border-radius: 6px; cursor: pointer; }
-        .history-tab-btn.active { background: var(--current-theme); color: #11111b; font-weight: bold; }
-
-        .history-card { background: var(--card-bg); border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; }
-        .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
-        .card-subject { font-weight: bold; color: #fff; font-size: 0.95rem; }
-        .card-duration { font-weight: bold; color: var(--current-theme); }
-        .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: var(--panel-bg); padding: 4px 6px; border-radius: 4px; text-align: right; word-wrap: break-word; }
-        
-        /* Stats Styling */
-        .stats-box { background: var(--card-bg); border-radius: 12px; border: 1px solid #313244; padding: 15px; margin-bottom: 15px; }
-        .stats-grade { font-size: 1.2rem; font-weight: bold; text-align: center; padding: 8px; border-radius: 8px; margin-top: 10px; }
-        .grade-excellent { background: rgba(166, 227, 161, 0.2); color: #a6e3a1; border: 1px solid #a6e3a1; }
-        .grade-good { background: rgba(137, 180, 250, 0.2); color: #89b4fa; border: 1px solid #89b4fa; }
-        .grade-acceptable { background: rgba(249, 226, 175, 0.2); color: #f9e2af; border: 1px solid #f9e2af; }
-        .grade-bad { background: rgba(243, 139, 168, 0.2); color: #f38ba8; border: 1px solid #f38ba8; }
-
-        .stats-metric { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.9rem; border-bottom: 1px dashed #313244; padding-bottom: 4px; }
-
-        /* Notification Toast */
-        .notification-toast {
-            position: fixed; top: 20px; right: 50%; transform: translateX(50%); background: #1e1e2e; border: 2px solid var(--current-theme); color: #fff; padding: 12px 24px; border-radius: 12px; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; text-align: center;
-        }
-
-        .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: var(--panel-bg); box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; border-right: 2px solid #cba6f7; }
+        .notebook-sidebar { position: fixed; left: -55vw; top: 0; width: 50vw; height: 100%; background: #11111b; box-shadow: 5px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 150; display: flex; flex-direction: column; border-right: 2px solid #cba6f7; }
         .notebook-sidebar.open { left: 0; }
-        .nb-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; }
+        
+        .nb-header { padding: 15px 20px; border-bottom: 1px solid #313244; display: flex; justify-content: space-between; align-items: center; direction: rtl; }
         .nb-header-right { display: flex; align-items: center; gap: 15px; }
         .nb-title { margin: 0; font-size: 1.4rem; font-weight: bold; }
         .close-nb-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
@@ -273,41 +237,66 @@
         .nb-content::-webkit-scrollbar { width: 8px; }
         .nb-content::-webkit-scrollbar-thumb { background: #313244; border-radius: 4px; }
 
-        .subject-block { background: var(--card-bg); border: 1px solid #313244; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; }
+        .subject-block { background: #181825; border: 1px solid #313244; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; }
         .subject-block.arabic { border-top: 4px solid var(--arabic-color); }
         .subject-block.english { border-top: 4px solid var(--english-color); }
         .subject-block.history { border-top: 4px solid var(--history-color); }
         .subject-block.physics { border-top: 4px solid var(--physics-color); }
         
-        .sub-block-title { font-size: 1.15rem; font-weight: bold; text-align: right; margin: 0; }
+        .sub-block-title { font-size: 1.15rem; font-weight: bold; text-align: right; margin: 0; direction: rtl; }
         .subject-block.arabic .sub-block-title { color: var(--arabic-color); }
         .subject-block.english .sub-block-title { color: var(--english-color); }
         .subject-block.history .sub-block-title { color: var(--history-color); }
         .subject-block.physics .sub-block-title { color: var(--physics-color); }
 
-        .nb-tabs-row { display: flex; gap: 10px; width: 100%; }
-        .nb-tab-btn { flex: 1; padding: 8px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; border: 1px solid #313244; background: var(--panel-bg); cursor: pointer; transition: 0.2s; }
+        .nb-tabs-row { display: flex; gap: 10px; width: 100%; direction: rtl; }
+        .nb-tab-btn { flex: 1; padding: 8px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; border: 1px solid #313244; background: #11111b; cursor: pointer; transition: 0.2s; }
         .nb-tab-btn.btn-done-tab { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.3); }
         .nb-tab-btn.btn-done-tab.active-tab { background: rgba(166, 227, 161, 0.15); border-color: #a6e3a1; }
         .nb-tab-btn.btn-remaining-tab { color: #f38ba8; border-color: rgba(243, 139, 168, 0.3); }
         .nb-tab-btn.btn-remaining-tab.active-tab { background: rgba(243, 139, 168, 0.15); border-color: #f38ba8; }
 
-        .nb-text-container { width: 100%; display: none; }
+        .nb-text-container { width: 100%; display: none; direction: rtl; }
         .nb-text-container.active-pane { display: block; }
         
-        .nb-textarea { width: 100%; height: 110px; background: var(--panel-bg); border: 1px solid #313244; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 0.95rem; line-height: 1.5; outline: none; transition: border-color 0.2s; text-align: right; color: #fff;}
+        .nb-textarea { width: 100%; height: 110px; background: #11111b; border: 1px solid #313244; border-radius: 8px; padding: 10px; box-sizing: border-box; resize: none; font-family: inherit; font-size: 0.95rem; line-height: 1.5; outline: none; transition: border-color 0.2s; text-align: right; }
+        
+        .nb-text-container.done-pane .nb-textarea { color: #a6e3a1; border-color: rgba(166, 227, 161, 0.2); }
+        .nb-text-container.done-pane .nb-textarea:focus { border-color: #a6e3a1; }
+        .nb-text-container.remaining-pane .nb-textarea { color: #f38ba8; border-color: rgba(243, 139, 168, 0.2); }
+        .nb-text-container.remaining-pane .nb-textarea:focus { border-color: #f38ba8; }
+
+        .history-card { background: #181825; border: 1px solid #313244; border-radius: 8px; padding: 10px; margin-bottom: 8px; color: #cdd6f4; font-size: 0.85rem; position: relative; }
+        .card-main-line { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222538; padding-bottom: 4px; margin-bottom: 4px; }
+        .card-subject { font-weight: bold; color: #fff; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+        .card-duration { font-weight: bold; color: var(--current-theme); }
+        .card-desc { color: #a6adc8; font-size: 0.8rem; margin: 4px 0; background: #11111b; padding: 4px 6px; border-radius: 4px; text-align: right; direction: rtl; word-wrap: break-word; }
+        .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
+
+        /* Schedule Card Styling */
+        .schedule-card { background: #181825; border: 1px solid #313244; border-right: 4px solid var(--schedule-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; color: #cdd6f4; font-size: 0.85rem; text-align: right; direction: rtl; position: relative;}
+        .schedule-card .sch-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #28283d; padding-bottom: 6px; margin-bottom: 6px; }
+        .schedule-card .sch-subject { font-size: 1rem; font-weight: bold; color: var(--schedule-color); }
+        .schedule-card .sch-teacher { color: #a6e3a1; font-weight: bold; font-size: 0.85rem; }
+        .schedule-card .sch-body { display: flex; flex-direction: column; gap: 4px; color: #bac2de; font-size: 0.8rem; }
+        .schedule-card .sch-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; border-top: 1px solid #28283d; padding-top: 6px; }
+        .btn-sch-action { padding: 4px 10px; font-size: 0.75rem; border-radius: 5px; cursor: pointer; border: 1px solid #313244; background: #11111b; }
+        .btn-sch-edit { color: #89b4fa; border-color: #89b4fa; }
+        .btn-sch-del { color: #f38ba8; border-color: #f38ba8; }
+        .btn-sch-restore { color: #a6e3a1; border-color: #a6e3a1; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-content { background: #1e1e2e; border: 2px solid var(--current-theme); padding: 20px; border-radius: 12px; width: 340px; text-align: right; color: #cdd6f4; max-height: 90vh; overflow-y: auto;}
+        .modal-content { background: #1e1e2e; border: 2px solid var(--current-theme); padding: 20px; border-radius: 12px; width: 320px; text-align: right; direction: rtl; color: #cdd6f4; }
         .modal-content h3 { margin-top: 0; color: var(--current-theme); text-align: center; font-size: 1.1rem;}
         .modal-content label { display: block; margin: 8px 0 4px; font-size: 0.85rem;}
-        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 8px; background: var(--panel-bg); border: 1px solid #313244; border-radius: 6px; color: #fff; box-sizing: border-box; outline: none; font-family: inherit;}
+        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 8px; background: #11111b; border: 1px solid #313244; border-radius: 6px; color: #fff; box-sizing: border-box; outline: none; font-family: inherit;}
         .modal-content textarea { resize: none; height: 60px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
         .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
 
+        /* Modern Auth Modal UI */
         .auth-card {
-            background: var(--card-bg);
+            background: #181825;
             border: 1px solid #313244;
             border-radius: 20px;
             width: 360px;
@@ -316,29 +305,31 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            direction: rtl;
             position: relative;
         }
         .auth-header { text-align: center; }
         .auth-header h2 { margin: 0; font-size: 1.4rem; color: #fff; font-weight: 700; }
         .auth-header p { margin: 5px 0 0 0; font-size: 0.8rem; color: #a6adc8; }
-        .auth-tabs { display: flex; background: var(--panel-bg); padding: 4px; border-radius: 10px; border: 1px solid #313244; }
+        .auth-tabs { display: flex; background: #11111b; padding: 4px; border-radius: 10px; border: 1px solid #313244; }
         .auth-tab-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #a6adc8; font-size: 0.85rem; border-radius: 8px; cursor: pointer; transition: 0.3s; }
         .auth-tab-btn.active { background: var(--current-theme); color: #11111b; font-weight: bold; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
         .auth-input-group label { font-size: 0.8rem; color: #cdd6f4; font-weight: 600; }
-        .auth-input-group input { background: var(--panel-bg); border: 1px solid #313244; padding: 10px 12px; border-radius: 10px; color: #fff; outline: none; font-size: 0.9rem; transition: 0.3s; }
+        .auth-input-group input { background: #11111b; border: 1px solid #313244; padding: 10px 12px; border-radius: 10px; color: #fff; outline: none; direction: ltr; font-size: 0.9rem; transition: 0.3s; }
         .auth-input-group input:focus { border-color: var(--current-theme); box-shadow: 0 0 8px rgba(166, 227, 161, 0.2); }
         .auth-submit-btn { background: var(--current-theme); color: #11111b; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: 0.3s; margin-top: 5px; }
         .auth-submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .auth-logout-btn { background: rgba(243, 139, 168, 0.1); border: 1px solid #f38ba8; color: #f38ba8; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .auth-logout-btn:hover { background: #f38ba8; color: #11111b; }
         .close-auth-card { position: absolute; top: 15px; left: 15px; background: none; border: none; color: #6c7086; font-size: 1.2rem; cursor: pointer; }
+        .close-auth-card:hover { color: #fff; }
     </style>
 </head>
 <body>
 
-    <div id="notificationToast" class="notification-toast"></div>
-
     <div id="cairoWidget" class="cairo-live-widget">
-        <div id="cairoClock" class="widget-clock">00:00:00</div>
+        <div id="cairoClock" class="widget-clock">جاري الحساب...</div>
         <div id="cairoDate">جاري الحساب...</div>
     </div>
 
@@ -349,24 +340,18 @@
         </button>
     </div>
 
-    <!-- زر القائمة المفرد (☰) -->
+    <!-- زر القائمة -->
     <button class="menu-toggle-btn" onclick="toggleTopMenu()">☰</button>
 
-    <!-- القائمة الرئيسية الشاملة لكل القوائم والفرعيات -->
     <div id="topBarNav" class="top-bar">
         <button class="btn-notebook-trigger" onclick="openNotebook(); toggleTopMenu();">Notebook 📓</button>
-        <button onclick="openHistoryView(); toggleTopMenu();">History 📜</button>
-        <button onclick="openScheduleView(); toggleTopMenu();">Schedule 📅</button>
-        <button onclick="openTasksDayView(); toggleTopMenu();">Tasks day 📑</button>
-        <button onclick="openStatsView(); toggleTopMenu();">Stats 📊</button>
-        <button onclick="openLessonsTaskView(); toggleTopMenu();">Lessons Task 📚</button>
-        <button onclick="openEducationView(); toggleTopMenu();">Education 🏫</button>
-        <button onclick="openPrayerTimesView(); toggleTopMenu();">أوقات الصلاة 🕌</button>
-        <button onclick="openSleepTrackerView(); toggleTopMenu();">Sleep 🌙</button>
+        <button onclick="openUnifiedHistory('study'); toggleTopMenu();">History 📜</button>
+        <button style="border-color: var(--schedule-color); color: var(--schedule-color);" onclick="openScheduleView(); toggleTopMenu();">Schedule 🗓️</button>
+        <button style="border-color:#f38ba8; color:#f38ba8;" onclick="openTrash(); toggleTopMenu();">Trash / Recovery 🗑️</button>
     </div>
 
     <div id="mainContainer">
-        <div id="appTitle" class="brand-title">Quiz Timer</div>
+        <div id="appTitle" class="brand-title">Study Timer</div>
 
         <div id="mainApp">
             <div id="container-study" class="timer-box active">
@@ -376,6 +361,7 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button id="saveBtnStudy" onclick="saveSessionPrompt()">Save</button>
                     <button id="resetBtnStudy" onclick="endTimer()">Reset</button>
+                    <button id="miniBtnStudy" onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -390,16 +376,18 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
-            <div id="container-social" class="timer-box">
-                <div id="display-social" class="timer-display">00:00</div>
+            <div id="container-quiz" class="timer-box">
+                <div id="display-quiz" class="timer-display">00:00</div>
                 <div class="controls">
                     <button onclick="startTimer()">Start</button>
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
@@ -410,24 +398,25 @@
                     <button onclick="pauseTimer()">Pause</button>
                     <button onclick="saveSessionPrompt()">Save</button>
                     <button onclick="endTimer()">Reset</button>
+                    <button onclick="requestMini()">Mini</button>
                 </div>
             </div>
 
             <div id="bottomModeSelectors" class="controls" style="margin-top: 35px; border-top: 1px solid #181825; padding-top: 20px;">
                 <button id="btn-study" class="mode-btn" onclick="switchMode('study')">Study Mode 📚</button>
                 <button id="btn-break" class="mode-btn" onclick="switchMode('break')">Break Mode ☕</button>
-                <button id="btn-social" class="mode-btn" onclick="switchMode('social')">Quiz Timer ⏱️</button>
+                <button id="btn-quiz" class="mode-btn" onclick="switchMode('quiz')">Quiz Timer 📝</button>
                 <button id="btn-afk" class="mode-btn" onclick="switchMode('afk')">AFK Timer ⏳</button>
             </div>
         </div>
     </div>
 
-    <!-- واجهة المفكرة الأصلي -->
+    <!-- واجهة المفكرة -->
     <div id="notebookSidebar" class="notebook-sidebar">
         <div class="nb-header">
             <button class="close-nb-btn" style="color: #f38ba8;" onclick="closeNotebook()">✕</button>
             <div class="nb-header-right">
-                <button class="btn-nb-share" style="background:#181825; border:1px solid #a6e3a1; color:#a6e3a1; padding:6px 14px; font-size:0.85rem; border-radius:20px; font-weight:bold;" onclick="exportToPDF('notebookSidebar', 'Notebook')">Print PDF 📄</button>
+                <button class="btn-nb-share" style="background:#181825; border:1px solid #a6e3a1; color:#a6e3a1; padding:6px 14px; font-size:0.85rem; border-radius:20px; font-weight:bold;" onclick="printNotebook()">Share PDF 📄</button>
                 <h2 class="nb-title" style="color: #cba6f7;">Notebook 📓</h2>
             </div>
         </div>
@@ -487,15 +476,25 @@
         </div>
     </div>
 
-    <!-- القائمة الجانبية الموحدة الشاملة -->
+    <!-- القائمة الجانبية للسجلات والجدول -->
     <div id="sidebarHistory" class="sidebar">
         <div class="sidebar-header">
-            <button class="close-sidebar-btn" onclick="closeSidebar()">✕</button>
+            <button class="close-sidebar-btn" onclick="closeHistory()">✕</button>
             <div class="header-actions">
-                <button id="printSidebarBtn" class="btn-header-share" onclick="printActiveSidebar()">Print PDF 📄</button>
-                <h2 id="sidebarTitle">القائمة</h2>
+                <button id="addSchBtn" class="btn-header-share" style="display:none; border-color: var(--schedule-color); color: var(--schedule-color);" onclick="openAddScheduleModal()">+ إضافة حادي</button>
+                <button id="printHistoryBtn" class="btn-header-share" onclick="printFullHistory()">Share PDF 📄</button>
+                <h2 id="sidebarTitle">History</h2>
             </div>
         </div>
+
+        <!-- History Inner Tabs Navigation -->
+        <div id="historyTabsNav" class="history-tabs-nav" style="margin: 10px 12px 0 12px;">
+            <button id="htab-study" class="history-tab-btn active" onclick="switchHistorySubTab('study')">Study 📚</button>
+            <button id="htab-quiz" class="history-tab-btn" onclick="switchHistorySubTab('quiz')">Quiz 📝</button>
+            <button id="htab-break" class="history-tab-btn" onclick="switchHistorySubTab('break')">Break ☕</button>
+            <button id="htab-afk" class="history-tab-btn" onclick="switchHistorySubTab('afk')">AFK ⏳</button>
+        </div>
+
         <div id="sidebarContent" class="sidebar-content"></div>
     </div>
 
@@ -505,8 +504,8 @@
             <h3 id="modalHeaderTitle">حفظ السجل الجديد</h3>
             <label>اسم المادة / النشاط:</label>
             <input type="text" id="modalSubjectInput" placeholder="مثال: لغة عربية (بلاغة)...">
-            <label>وصف المذاكرة والتفاصيل:</label>
-            <textarea id="modalDescInput" placeholder="اكتب التفاصيل (قراءة، شرح، حل أسئلة...)..."></textarea>
+            <label>وصف المذاكرة:</label>
+            <textarea id="modalDescInput" placeholder="اكتب تفاصيل ما تم إنجازه هنا..."></textarea>
             <div class="modal-actions">
                 <button onclick="confirmSaveSession()">حفظ السجل</button>
                 <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('saveModal')">إلغاء</button>
@@ -514,7 +513,34 @@
         </div>
     </div>
 
-    <!-- Auth Modal -->
+    <!-- مودال الجدول Schedule Modal -->
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <h3 id="schModalTitle">إضافة حصة/درس للجدول</h3>
+            <input type="hidden" id="schEditIndex" value="-1">
+            <label>اسم المادة:</label>
+            <input type="text" id="schSubjectInput" placeholder="مثال: فيزياء">
+            <label>اسم المستر:</label>
+            <input type="text" id="schTeacherInput" placeholder="مثال: أ/ محمد">
+            <label>العنوان / الفصل:</label>
+            <input type="text" id="schTitleInput" placeholder="مثال: الباب الأول - التيار الكهربي">
+            <label>اليوم والميعاد:</label>
+            <input type="text" id="schDateInput" placeholder="مثال: الأحد والاربعاء">
+            <label>الوقت:</label>
+            <input type="text" id="schTimeInput" placeholder="مثال: 04:00 مساءً">
+            <label>المكان:</label>
+            <select id="schPlaceInput">
+                <option value="سنتر">سنتر 🏫</option>
+                <option value="منصة">منصة 💻</option>
+            </select>
+            <div class="modal-actions">
+                <button onclick="saveScheduleItem()">حفظ</button>
+                <button style="color:#f38ba8; border-color:#f38ba8;" onclick="closeModal('scheduleModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Auth Modal UI -->
     <div id="authModal" class="modal">
         <div class="auth-card">
             <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
@@ -529,115 +555,57 @@
             </div>
 
             <div class="auth-input-group">
-                <label>اسم المستخدم</label>
-                <input type="text" id="authUsername" placeholder="Enter username">
+                <label>اسم المستخدم / البريد</label>
+                <input type="text" id="authEmailInput" placeholder="Username / Email">
             </div>
             <div class="auth-input-group">
                 <label>كلمة المرور</label>
-                <input type="password" id="authPassword" placeholder="Enter password">
+                <input type="password" id="authPasswordInput" placeholder="••••••••">
             </div>
-            <button class="auth-submit-btn" onclick="handleAuthSubmit()">تأكيد</button>
+            <button class="auth-submit-btn" onclick="handleAuthSubmit()">متابعة</button>
+            <button class="auth-logout-btn" id="btnLogout" style="display:none;" onclick="handleLogout()">تسجيل الخروج</button>
         </div>
     </div>
 
     <script>
-        // --- State Management ---
+        // Data Structures
         let currentMode = 'study';
+        let currentHistorySubTab = 'study';
+        let isScheduleView = false;
+        let isTrashView = false;
+        
         let timerInterval = null;
-        let secondsPassed = 0;
-        let breakDuration = 300; 
+        let secondsElapsed = 0;
+        let breakDurationSeconds = 300;
         let isRunning = false;
-        let currentSidebarView = '';
 
-        // Local Storage Keys & Data Sets
-        let db = {
-            history: JSON.parse(localStorage.getItem('qt_history') || '{"study":[], "quiz":[], "break":[], "afk":[]}'),
-            schedule: JSON.parse(localStorage.getItem('qt_schedule') || '[]'),
-            tasks: JSON.parse(localStorage.getItem('qt_tasks') || '[]'),
-            lessons: JSON.parse(localStorage.getItem('qt_lessons') || '{"arabic":{}, "english":{}, "history":{}, "physics":{}}'),
-            education: JSON.parse(localStorage.getItem('qt_education') || '[]'),
-            prayers: JSON.parse(localStorage.getItem('qt_prayers') || '{}'),
-            sleep: JSON.parse(localStorage.getItem('qt_sleep') || '[]'),
-            dailyStatusDate: localStorage.getItem('qt_status_date') || ''
+        let historyData = {
+            study: JSON.parse(localStorage.getItem('st_history_study') || '[]'),
+            quiz: JSON.parse(localStorage.getItem('st_history_quiz') || '[]'),
+            break: JSON.parse(localStorage.getItem('st_history_break') || '[]'),
+            afk: JSON.parse(localStorage.getItem('st_history_afk') || '[]')
         };
 
-        const syllabus = {
-            arabic: ["النحو", "البلاغة", "الأدب", "القراءة متحررة", "النصوص متحررة"],
-            english: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5", "Unit 6"],
-            history: ["الفصل الأول", "الفصل الثاني", "الفصل الثالث", "الفصل الرابع"],
-            physics: ["التيار الكهربي وقانون أوم", "قانونا كيرشوف", "المجال المغناطيسي", "أجهزة القياس"]
-        };
+        let scheduleData = JSON.parse(localStorage.getItem('st_schedule') || '[]');
+        let trashData = JSON.parse(localStorage.getItem('st_trash') || '[]');
 
-        const prayerSchedule = [
-            { name: "الفجر", time: "04:30", rakats: 2 },
-            { name: "الظهر", time: "12:00", rakats: 4 },
-            { name: "العصر", time: "15:30", rakats: 4 },
-            { name: "المغرب", time: "18:40", rakats: 3 },
-            { name: "العشاء", time: "20:00", rakats: 4 }
-        ];
-
-        // System Startup
-        window.onload = () => {
-            checkDailyReset();
-            updateClock();
-            setInterval(updateClock, 1000);
-            setInterval(checkPrayerNotifications, 30000);
-            loadNotebookData();
-        };
-
-        function saveData() {
-            localStorage.setItem('qt_history', JSON.stringify(db.history));
-            localStorage.setItem('qt_schedule', JSON.stringify(db.schedule));
-            localStorage.setItem('qt_tasks', JSON.stringify(db.tasks));
-            localStorage.setItem('qt_lessons', JSON.stringify(db.lessons));
-            localStorage.setItem('qt_education', JSON.stringify(db.education));
-            localStorage.setItem('qt_prayers', JSON.stringify(db.prayers));
-            localStorage.setItem('qt_sleep', JSON.stringify(db.sleep));
-            localStorage.setItem('qt_status_date', db.dailyStatusDate);
-        }
-
-        function checkDailyReset() {
-            const todayStr = new Date().toDateString();
-            if (db.dailyStatusDate !== todayStr) {
-                db.dailyStatusDate = todayStr;
-                db.prayers = {}; 
-                db.schedule.forEach(s => s.status = null);
-                db.tasks.forEach(t => t.status = null);
-                saveData();
-            }
-        }
-
-        function updateClock() {
+        // Initialize Cairo Clock Widget
+        function updateCairoClock() {
             const now = new Date();
-            document.getElementById('cairoClock').innerText = now.toLocaleTimeString('ar-EG');
-            document.getElementById('cairoDate').innerText = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            const optionsTime = { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const optionsDate = { timeZone: 'Africa/Cairo', weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            
+            document.getElementById('cairoClock').innerText = now.toLocaleTimeString('ar-EG', optionsTime);
+            document.getElementById('cairoDate').innerText = now.toLocaleDateString('ar-EG', optionsDate);
         }
+        setInterval(updateCairoClock, 1000);
+        updateCairoClock();
 
-        // Notification Mechanism
-        function showNotification(msg) {
-            const toast = document.getElementById('notificationToast');
-            toast.innerText = msg;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 6000);
-        }
-
-        function checkPrayerNotifications() {
-            const now = new Date();
-            const currentHM = now.toTimeString().substring(0, 5);
-            prayerSchedule.forEach(p => {
-                const [h, m] = p.time.split(':').map(Number);
-                const pTime = new Date(); pTime.setHours(h, m - 10, 0);
-                if (now.getHours() === pTime.getHours() && now.getMinutes() === pTime.getMinutes()) {
-                    showNotification(`🕌 تنبيه الصلاة (سوهاج): صلاة ${p.name} تبدأ بعد 10 دقائق!`);
-                }
-            });
-        }
-
-        // Top Navigation & UI Toggles
         function toggleTopMenu() {
             document.getElementById('topBarNav').classList.toggle('active');
         }
 
+        // Mode Switching
         function switchMode(mode) {
             pauseTimer();
             currentMode = mode;
@@ -646,24 +614,41 @@
             
             const root = document.documentElement;
             if (mode === 'study') root.style.setProperty('--current-theme', 'var(--study-color)');
-            if (mode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
-            if (mode === 'social') root.style.setProperty('--current-theme', 'var(--quiz-color)');
-            if (mode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
-            
-            secondsPassed = 0;
-            updateDisplay();
+            else if (mode === 'break') root.style.setProperty('--current-theme', 'var(--break-color)');
+            else if (mode === 'quiz') root.style.setProperty('--current-theme', 'var(--quiz-color)');
+            else if (mode === 'afk') root.style.setProperty('--current-theme', 'var(--afk-color)');
+        }
+
+        // Timer Functions
+        function formatTime(sec) {
+            let m = Math.floor(sec / 60);
+            let s = sec % 60;
+            let h = Math.floor(m / 60);
+            m = m % 60;
+            if (h > 0) {
+                return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            if (currentMode === 'break') {
+                let rem = breakDurationSeconds - secondsElapsed;
+                if (rem <= 0) {
+                    rem = 0;
+                    pauseTimer();
+                }
+                document.getElementById('display-break').innerText = formatTime(rem);
+            } else {
+                document.getElementById(`display-${currentMode}`).innerText = formatTime(secondsElapsed);
+            }
         }
 
         function startTimer() {
             if (isRunning) return;
             isRunning = true;
             timerInterval = setInterval(() => {
-                if (currentMode === 'break') {
-                    if (breakDuration > 0) breakDuration--;
-                    else pauseTimer();
-                } else {
-                    secondsPassed++;
-                }
+                secondsElapsed++;
                 updateDisplay();
             }, 1000);
         }
@@ -675,473 +660,258 @@
 
         function endTimer() {
             pauseTimer();
-            secondsPassed = 0;
+            secondsElapsed = 0;
             updateDisplay();
         }
 
         function setBreakDuration() {
-            const h = parseInt(document.getElementById('breakHoursInput').value) || 0;
-            const m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-            breakDuration = (h * 3600) + (m * 60);
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            let sec = (currentMode === 'break') ? breakDuration : secondsPassed;
-            let hrs = Math.floor(sec / 3600);
-            let mins = Math.floor((sec % 3600) / 60);
-            let secs = sec % 60;
-            let disp = (hrs > 0 ? String(hrs).padStart(2,'0')+':' : '') + String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-            document.getElementById(`display-${currentMode}`).innerText = disp;
-        }
-
-        function saveSessionPrompt() {
-            if (secondsPassed === 0 && currentMode !== 'break') return;
-            document.getElementById('modalSubjectInput').value = '';
-            document.getElementById('modalDescInput').value = '';
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
-        function confirmSaveSession() {
-            const subj = document.getElementById('modalSubjectInput').value || 'عام';
-            const desc = document.getElementById('modalDescInput').value || '';
-            const sec = (currentMode === 'break') ? breakDuration : secondsPassed;
-            
-            const record = {
-                id: Date.now(),
-                subject: subj,
-                desc: desc,
-                duration: sec,
-                timestamp: new Date().toISOString()
-            };
-
-            let key = currentMode === 'social' ? 'quiz' : currentMode;
-            db.history[key].push(record);
-            saveData();
-            closeModal('saveModal');
+            let h = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            let m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            breakDurationSeconds = (h * 3600) + (m * 60);
             endTimer();
-            showNotification('✅ تم حفظ السجل بنجاح!');
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function requestMini() {
+            alert("Mini Player Mode Required Web Pip Support!");
+        }
 
-        // Sidebar Controller
-        function openSidebar(title, htmlContent) {
-            document.getElementById('sidebarTitle').innerText = title;
-            document.getElementById('sidebarContent').innerHTML = htmlContent;
+        // Unified History View System
+        function openUnifiedHistory(subTab = 'study') {
+            isScheduleView = false;
+            isTrashView = false;
+            document.getElementById('historyTabsNav').style.display = 'flex';
+            document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('printHistoryBtn').style.display = 'inline-block';
+            document.getElementById('sidebarTitle').innerText = "History 📜";
+            
+            switchHistorySubTab(subTab);
             document.getElementById('sidebarHistory').classList.add('open');
             document.getElementById('mainContainer').classList.add('sidebar-open');
         }
 
-        function closeSidebar() {
+        function switchHistorySubTab(subTab) {
+            currentHistorySubTab = subTab;
+            document.querySelectorAll('.history-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`htab-${subTab}`).classList.add('active');
+            renderHistoryContent();
+        }
+
+        function renderHistoryContent() {
+            const container = document.getElementById('sidebarContent');
+            const list = historyData[currentHistorySubTab] || [];
+            
+            if (list.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">لا توجد سجلات في قسم (${currentHistorySubTab.toUpperCase()})</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map((item, idx) => `
+                <div class="history-card">
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.subject || 'بدون عنوان'}</span>
+                        <span class="card-duration">${item.duration || '00:00'}</span>
+                    </div>
+                    ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
+                    <div class="card-bottom-info">
+                        <span>📅 ${item.date || ''}</span>
+                        <span>⏰ ${item.time || ''}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Saving Session Prompt
+        function saveSessionPrompt() {
+            if (secondsElapsed === 0) {
+                alert("لا يوجد وقت مسجل للحفظ!");
+                return;
+            }
+            document.getElementById('modalSubjectInput').value = '';
+            document.getElementById('modalDescInput').value = '';
+            document.getElementById('modalHeaderTitle').innerText = `حفظ سجل (${currentMode.toUpperCase()})`;
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            const subj = document.getElementById('modalSubjectInput').value.trim();
+            const desc = document.getElementById('modalDescInput').value.trim();
+            const now = new Date();
+            
+            let durStr = formatTime(secondsElapsed);
+            if (currentMode === 'break') {
+                durStr = formatTime(secondsElapsed);
+            }
+
+            const record = {
+                id: Date.now(),
+                subject: subj || (currentMode.toUpperCase() + " Session"),
+                desc: desc,
+                duration: durStr,
+                date: now.toLocaleDateString('ar-EG'),
+                time: now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            historyData[currentMode].unshift(record);
+            localStorage.setItem(`st_history_${currentMode}`, JSON.stringify(historyData[currentMode]));
+            
+            closeModal('saveModal');
+            endTimer();
+            openUnifiedHistory(currentMode);
+        }
+
+        // Schedule View System
+        function openScheduleView() {
+            isScheduleView = true;
+            isTrashView = false;
+            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('addSchBtn').style.display = 'inline-block';
+            document.getElementById('printHistoryBtn').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = "Schedule 🗓️";
+            
+            renderScheduleContent();
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+        }
+
+        function renderScheduleContent() {
+            const container = document.getElementById('sidebarContent');
+            if (scheduleData.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">جدولك فارغ، اضغط "+ إضافة حادي" للبدء</div>`;
+                return;
+            }
+
+            container.innerHTML = scheduleData.map((item, idx) => `
+                <div class="schedule-card">
+                    <div class="sch-header">
+                        <span class="sch-subject">${item.subject}</span>
+                        <span class="sch-teacher">${item.teacher}</span>
+                    </div>
+                    <div class="sch-body">
+                        <div>📌 <b>العنوان:</b> ${item.title}</div>
+                        <div>📅 <b>الميعاد:</b> ${item.date} (${item.time})</div>
+                        <div>📍 <b>المكان:</b> ${item.place}</div>
+                    </div>
+                    <div class="sch-actions">
+                        <button class="btn-sch-action btn-sch-edit" onclick="editScheduleItem(${idx})">تعديل ✏️</button>
+                        <button class="btn-sch-action btn-sch-del" onclick="deleteScheduleItem(${idx})">حذف 🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddScheduleModal() {
+            document.getElementById('schEditIndex').value = "-1";
+            document.getElementById('schModalTitle').innerText = "إضافة حصة/درس للجدول";
+            document.getElementById('schSubjectInput').value = "";
+            document.getElementById('schTeacherInput').value = "";
+            document.getElementById('schTitleInput').value = "";
+            document.getElementById('schDateInput').value = "";
+            document.getElementById('schTimeInput').value = "";
+            document.getElementById('scheduleModal').style.display = 'flex';
+        }
+
+        function editScheduleItem(idx) {
+            const item = scheduleData[idx];
+            document.getElementById('schEditIndex').value = idx;
+            document.getElementById('schModalTitle').innerText = "تعديل الميعاد";
+            document.getElementById('schSubjectInput').value = item.subject;
+            document.getElementById('schTeacherInput').value = item.teacher;
+            document.getElementById('schTitleInput').value = item.title;
+            document.getElementById('schDateInput').value = item.date;
+            document.getElementById('schTimeInput').value = item.time;
+            document.getElementById('schPlaceInput').value = item.place;
+            document.getElementById('scheduleModal').style.display = 'flex';
+        }
+
+        function saveScheduleItem() {
+            const idx = parseInt(document.getElementById('schEditIndex').value);
+            const item = {
+                id: idx >= 0 ? scheduleData[idx].id : Date.now(),
+                subject: document.getElementById('schSubjectInput').value.trim() || 'بدون مادة',
+                teacher: document.getElementById('schTeacherInput').value.trim() || 'غير محدد',
+                title: document.getElementById('schTitleInput').value.trim() || 'بدون عنوان',
+                date: document.getElementById('schDateInput').value.trim() || 'غير محدد',
+                time: document.getElementById('schTimeInput').value.trim() || 'غير محدد',
+                place: document.getElementById('schPlaceInput').value
+            };
+
+            if (idx >= 0) {
+                scheduleData[idx] = item;
+            } else {
+                scheduleData.push(item);
+            }
+
+            localStorage.setItem('st_schedule', JSON.stringify(scheduleData));
+            closeModal('scheduleModal');
+            renderScheduleContent();
+        }
+
+        function deleteScheduleItem(idx) {
+            const deleted = scheduleData.splice(idx, 1)[0];
+            deleted.trashType = 'schedule';
+            trashData.push(deleted);
+            
+            localStorage.setItem('st_schedule', JSON.stringify(scheduleData));
+            localStorage.setItem('st_trash', JSON.stringify(trashData));
+            renderScheduleContent();
+        }
+
+        // Trash / Recovery View System
+        function openTrash() {
+            isTrashView = true;
+            isScheduleView = false;
+            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('printHistoryBtn').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = "Trash / Recovery 🗑️";
+
+            renderTrashContent();
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+        }
+
+        function renderTrashContent() {
+            const container = document.getElementById('sidebarContent');
+            if (trashData.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#6c7086; margin-top:30px;">سلة المهملات فارغة</div>`;
+                return;
+            }
+
+            container.innerHTML = trashData.map((item, idx) => `
+                <div class="schedule-card" style="border-right-color: #f38ba8;">
+                    <div class="sch-header">
+                        <span class="sch-subject">${item.subject} (${item.teacher || 'محذوف'})</span>
+                    </div>
+                    <div class="sch-body">
+                        <div>📌 <b>العنوان:</b> ${item.title || item.desc || ''}</div>
+                    </div>
+                    <div class="sch-actions">
+                        <button class="btn-sch-action btn-sch-restore" onclick="restoreFromTrash(${idx})">استرجاع 🔄</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function restoreFromTrash(idx) {
+            const item = trashData.splice(idx, 1)[0];
+            delete item.trashType;
+            scheduleData.push(item);
+            
+            localStorage.setItem('st_schedule', JSON.stringify(scheduleData));
+            localStorage.setItem('st_trash', JSON.stringify(trashData));
+            renderTrashContent();
+        }
+
+        function closeHistory() {
             document.getElementById('sidebarHistory').classList.remove('open');
             document.getElementById('mainContainer').classList.remove('sidebar-open');
         }
 
-        // --- View 2: Multi-History View ---
-        function openHistoryView(activeTab = 'study') {
-            currentSidebarView = 'History';
-            const renderTab = (tab) => {
-                let list = db.history[tab] || [];
-                if (!list.length) return `<p style="text-align:center; color:#7f849c;">لا توجد سجلات محفوظة</p>`;
-                return list.map(item => `
-                    <div class="history-card">
-                        <div class="card-main-line">
-                            <span class="card-subject">${item.subject}</span>
-                            <span class="card-duration">${Math.floor(item.duration/60)} دقيقة</span>
-                        </div>
-                        ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
-                        <div class="card-bottom-info">
-                            <span>${new Date(item.timestamp).toLocaleDateString('ar-EG')}</span>
-                            <button style="padding:2px 6px; font-size:0.7rem; border-color:#f38ba8; color:#f38ba8;" onclick="deleteHistoryItem('${tab}', ${item.id})">حذف</button>
-                        </div>
-                    </div>
-                `).join('');
-            };
-
-            const html = `
-                <div class="history-tabs-nav">
-                    <button class="history-tab-btn ${activeTab==='study'?'active':''}" onclick="openHistoryView('study')">Study</button>
-                    <button class="history-tab-btn ${activeTab==='quiz'?'active':''}" onclick="openHistoryView('quiz')">Quiz</button>
-                    <button class="history-tab-btn ${activeTab==='break'?'active':''}" onclick="openHistoryView('break')">Break</button>
-                    <button class="history-tab-btn ${activeTab==='afk'?'active':''}" onclick="openHistoryView('afk')">AFK</button>
-                </div>
-                <div id="historyTabContent">${renderTab(activeTab)}</div>
-            `;
-            openSidebar('History 📜', html);
-        }
-
-        function deleteHistoryItem(tab, id) {
-            db.history[tab] = db.history[tab].filter(i => i.id !== id);
-            saveData();
-            openHistoryView(tab);
-        }
-
-        // --- View 3: Schedule View ---
-        function openScheduleView() {
-            currentSidebarView = 'Schedule';
-            const html = `
-                <button style="width:100%; margin-bottom:15px;" onclick="showAddScheduleModal()">+ إضافة موعد جديد</button>
-                <div id="scheduleList">
-                    ${db.schedule.map((item, idx) => `
-                        <div class="history-card">
-                            <div class="card-main-line">
-                                <span class="card-subject">${item.subject} (${item.day})</span>
-                                <span style="font-size:0.8rem; color:#a6adc8;">${item.time}</span>
-                            </div>
-                            <div class="card-desc">المدرس: ${item.teacher} | المكان: ${item.place} (${item.type})</div>
-                            <div class="check-btn-group">
-                                <button class="btn-check-custom ${item.status === true ? 'active-success' : ''}" onclick="toggleScheduleStatus(${idx}, true)">✔ تم الذهاب/الإنجاز</button>
-                                <button class="btn-check-custom ${item.status === false ? 'active-danger' : ''}" onclick="toggleScheduleStatus(${idx}, false)">✖ لم يتم</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            openSidebar('Schedule 📅', html);
-        }
-
-        function showAddScheduleModal() {
-            const html = `
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <input id="scSubj" placeholder="المادة">
-                    <input id="scDay" placeholder="اليوم (مثلاً: الإثنين)">
-                    <input id="scTime" type="time">
-                    <input id="scPlace" placeholder="المكان">
-                    <input id="scTeacher" placeholder="اسم المستر">
-                    <select id="scType"><option>سنتر</option><option>منصة</option></select>
-                    <button onclick="saveScheduleItem()">إضافة</button>
-                </div>
-            `;
-            document.getElementById('sidebarContent').insertAdjacentHTML('afterbegin', html);
-        }
-
-        function saveScheduleItem() {
-            db.schedule.push({
-                subject: document.getElementById('scSubj').value,
-                day: document.getElementById('scDay').value,
-                time: document.getElementById('scTime').value,
-                place: document.getElementById('scPlace').value,
-                teacher: document.getElementById('scTeacher').value,
-                type: document.getElementById('scType').value,
-                status: null
-            });
-            saveData();
-            openScheduleView();
-        }
-
-        function toggleScheduleStatus(idx, val) {
-            db.schedule[idx].status = val;
-            saveData();
-            openScheduleView();
-        }
-
-        // --- View 4: Tasks Day View ---
-        function openTasksDayView() {
-            currentSidebarView = 'TasksDay';
-            const todayDay = new Date().toLocaleDateString('ar-EG', { weekday: 'long' });
-            const todaySchedule = db.schedule.filter(s => s.day.includes(todayDay) || true); 
-
-            const html = `
-                ${todaySchedule.length ? `
-                    <div style="background:#181825; padding:10px; border-radius:8px; margin-bottom:12px; border:1px solid #89b4fa;">
-                        <span style="color:#89b4fa; font-weight:bold;">💡 مواد مخصصة لليوم من الجدول:</span>
-                        <ul style="margin:5px 0; padding-right:20px; font-size:0.85rem;">
-                            ${todaySchedule.map(s => `<li>${s.subject} - ${s.time} (${s.type})</li>`).join('')}
-                        </ul>
-                    </div>
-                ` : ''}
-                <div style="display:flex; gap:8px; margin-bottom:12px;">
-                    <input id="newTaskInput" placeholder="اكتب مادة/مهمة اليوم..." style="flex:1; padding:8px; border-radius:8px; background:#11111b; border:1px solid #313244; color:#fff;">
-                    <button onclick="addNewTask()">إضافة</button>
-                </div>
-                <div>
-                    ${db.tasks.map((task, idx) => `
-                        <div class="history-card" style="display:flex; justify-content:space-between; align-items:center;">
-                            <span>${task.text}</span>
-                            <div class="check-btn-group">
-                                <button class="btn-check-custom ${task.status === true ? 'active-success' : ''}" onclick="toggleTaskStatus(${idx}, true)">✔</button>
-                                <button class="btn-check-custom ${task.status === false ? 'active-danger' : ''}" onclick="toggleTaskStatus(${idx}, false)">✖</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            openSidebar('Tasks day 📑', html);
-        }
-
-        function addNewTask() {
-            const txt = document.getElementById('newTaskInput').value;
-            if (!txt) return;
-            db.tasks.push({ text: txt, status: null });
-            saveData();
-            openTasksDayView();
-        }
-
-        function toggleTaskStatus(idx, val) {
-            db.tasks[idx].status = val;
-            saveData();
-            openTasksDayView();
-        }
-
-        // --- View 5: Stats View ---
-        function openStatsView() {
-            currentSidebarView = 'Stats';
-            // Time computations
-            const calculateSecs = (list, filterFn) => list.filter(filterFn).reduce((acc, curr) => acc + curr.duration, 0);
-            
-            const now = new Date();
-            const isToday = (ts) => new Date(ts).toDateString() === now.toDateString();
-            const isWeek = (ts) => (now - new Date(ts)) / (1000 * 60 * 60 * 24) <= 7;
-            const isMonth = (ts) => (now - new Date(ts)) / (1000 * 60 * 60 * 24) <= 30;
-
-            const todayStudySec = calculateSecs(db.history.study, i => isToday(i.timestamp));
-            const todayQuizSec = calculateSecs(db.history.quiz, i => isToday(i.timestamp));
-            const todayBreakSec = calculateSecs(db.history.break, i => isToday(i.timestamp));
-            const todayAfkSec = calculateSecs(db.history.afk, i => isToday(i.timestamp));
-
-            const totalTodayStudyHrs = ((todayStudySec + todayQuizSec) / 3600).toFixed(1);
-            const studyPercentage = Math.min(100, Math.round((totalTodayStudyHrs / 24) * 100));
-
-            // System Evaluation (AI Simulated Grade)
-            let gradeClass = 'grade-excellent', gradeText = 'ممتاز 🌟 (أداء استثنائي)';
-            if (totalTodayStudyHrs < 3) { gradeClass = 'grade-bad'; gradeText = 'سيء ⚠️ (تحتاج لمزيد من الالتزام)'; }
-            else if (totalTodayStudyHrs < 6) { gradeClass = 'grade-acceptable'; gradeText = 'مقبول 📈 (يمكنك تقديم أفضل)'; }
-            else if (totalTodayStudyHrs < 9) { gradeClass = 'grade-good'; gradeText = 'جيد 👏 (إنتاجية عالية)'; }
-
-            // Exam Progress
-            const startDate = new Date('2026-08-01');
-            const endDate = new Date('2027-06-01');
-            const examProgress = Math.min(100, Math.max(0, Math.round(((now - startDate) / (endDate - startDate)) * 100)));
-
-            const html = `
-                <div class="stats-box" style="border-color: var(--exam-color);">
-                    <div style="font-weight:bold; color:var(--exam-color); text-align:center;">🎯 مؤشر فترة Exams</div>
-                    <div style="font-size:0.8rem; text-align:center; color:#a6adc8;">من 2026/8/1 إلى 2027/6/1</div>
-                    <div style="background:#11111b; border-radius:10px; height:15px; margin-top:8px; overflow:hidden;">
-                        <div style="background:var(--exam-color); width:${examProgress}%; height:100%;"></div>
-                    </div>
-                    <div style="text-align:center; font-weight:bold; margin-top:4px;">${examProgress}%</div>
-                </div>
-
-                <div class="stats-box">
-                    <h3 style="margin-top:0; color:var(--study-color);">📊 إحصائيات اليوم</h3>
-                    <div class="stats-metric"><span>وقت المذاكرة + Quiz:</span> <strong>${totalTodayStudyHrs} ساعة (${studyPercentage}%)</strong></div>
-                    <div class="stats-metric"><span>وقت الراحة Break:</span> <strong>${(todayBreakSec/3600).toFixed(1)} ساعة</strong></div>
-                    <div class="stats-metric"><span>وقت AFK:</span> <strong>${(todayAfkSec/3600).toFixed(1)} ساعة</strong></div>
-                    <div class="stats-metric"><span>المهام المنجزة:</span> <strong>${db.tasks.filter(t=>t.status===true).length} / ${db.tasks.length}</strong></div>
-                    
-                    <div class="stats-grade ${gradeClass}">التقييم اليومي: ${gradeText}</div>
-                </div>
-
-                <div class="stats-box">
-                    <h3 style="margin-top:0; color:var(--break-color);">🗓️ الإحصائيات التراكمية</h3>
-                    <div class="stats-metric"><span>المذاكرة هذا الأسبوع:</span> <strong>${(calculateSecs(db.history.study, i => isWeek(i.timestamp))/3600).toFixed(1)} ساعة</strong></div>
-                    <div class="stats-metric"><span>المذاكرة هذا الشهر:</span> <strong>${(calculateSecs(db.history.study, i => isMonth(i.timestamp))/3600).toFixed(1)} ساعة</strong></div>
-                </div>
-            `;
-            openSidebar('Stats 📊', html);
-        }
-
-        // --- View 6: Lessons Task View ---
-        function openLessonsTaskView(activeSubj = 'arabic') {
-            currentSidebarView = 'LessonsTask';
-            const renderSubject = (subj) => {
-                const list = syllabus[subj];
-                return list.map((lesson, lIdx) => {
-                    const state = db.lessons[subj][lIdx] || {};
-                    return `
-                        <div class="history-card">
-                            <div style="font-weight:bold; color:var(--current-theme);">${lesson}</div>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:8px; font-size:0.75rem;">
-                                <button class="btn-check-custom ${state.listen ? 'active-success' : ''}" onclick="toggleLessonOpt('${subj}', ${lIdx}, 'listen')">🎧 سماع الشرح</button>
-                                <button class="btn-check-custom ${state.write ? 'active-success' : ''}" onclick="toggleLessonOpt('${subj}', ${lIdx}, 'write')">✍️ كتابة الدرس</button>
-                                <button class="btn-check-custom ${state.solve ? 'active-success' : ''}" onclick="toggleLessonOpt('${subj}', ${lIdx}, 'solve')">🧩 حل الأسئلة</button>
-                                <button class="btn-check-custom ${state.platform ? 'active-success' : ''}" onclick="toggleLessonOpt('${subj}', ${lIdx}, 'platform')">💻 منصة</button>
-                                <button class="btn-check-custom ${state.center ? 'active-success' : ''}" onclick="toggleLessonOpt('${subj}', ${lIdx}, 'center')">🏢 سنتر</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            };
-
-            const html = `
-                <div class="history-tabs-nav">
-                    <button class="history-tab-btn ${activeSubj==='arabic'?'active':''}" onclick="openLessonsTaskView('arabic')">عربي</button>
-                    <button class="history-tab-btn ${activeSubj==='english'?'active':''}" onclick="openLessonsTaskView('english')">إنجليزي</button>
-                    <button class="history-tab-btn ${activeSubj==='history'?'active':''}" onclick="openLessonsTaskView('history')">تاريخ</button>
-                    <button class="history-tab-btn ${activeSubj==='physics'?'active':''}" onclick="openLessonsTaskView('physics')">فيزياء</button>
-                </div>
-                <div>${renderSubject(activeSubj)}</div>
-            `;
-            openSidebar('Lessons Task 📚', html);
-        }
-
-        function toggleLessonOpt(subj, lIdx, key) {
-            if (!db.lessons[subj][lIdx]) db.lessons[subj][lIdx] = {};
-            db.lessons[subj][lIdx][key] = !db.lessons[subj][lIdx][key];
-            saveData();
-            openLessonsTaskView(subj);
-        }
-
-        // --- View 7: Education View ---
-        function openEducationView() {
-            currentSidebarView = 'Education';
-            const html = `
-                <button style="width:100%; margin-bottom:12px;" onclick="showAddEduModal()">+ إضافة حصة سنتر/خارجية</button>
-                <div>
-                    ${db.education.map(item => `
-                        <div class="history-card">
-                            <div class="card-main-line">
-                                <span class="card-subject">${item.subject} (${item.teacher})</span>
-                                <span class="card-duration">${item.calcHours} ساعة</span>
-                            </div>
-                            <div class="card-desc">الدرس: ${item.lesson} | الحضور: ${item.goTime} - العودة: ${item.returnTime}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            openSidebar('Education 🏫', html);
-        }
-
-        function showAddEduModal() {
-            const html = `
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <input id="edSubj" placeholder="المادة">
-                    <input id="edTeacher" placeholder="اسم المدرس">
-                    <input id="edLesson" placeholder="اسم الدرس">
-                    <label style="font-size:0.75rem; color:#a6adc8;">وقت الذهاب:</label>
-                    <input id="edGo" type="time">
-                    <label style="font-size:0.75rem; color:#a6adc8;">وقت العودة:</label>
-                    <input id="edReturn" type="time">
-                    <button onclick="saveEduItem()">حفظ</button>
-                </div>
-            `;
-            document.getElementById('sidebarContent').insertAdjacentHTML('afterbegin', html);
-        }
-
-        function saveEduItem() {
-            const go = document.getElementById('edGo').value;
-            const ret = document.getElementById('edReturn').value;
-            let hrs = 0;
-            if (go && ret) {
-                const [gH, gM] = go.split(':').map(Number);
-                const [rH, rM] = ret.split(':').map(Number);
-                hrs = (((rH * 60 + rM) - (gH * 60 + gM)) / 60).toFixed(1);
-            }
-
-            db.education.push({
-                subject: document.getElementById('edSubj').value,
-                teacher: document.getElementById('edTeacher').value,
-                lesson: document.getElementById('edLesson').value,
-                goTime: go,
-                returnTime: ret,
-                calcHours: hrs > 0 ? hrs : 0
-            });
-            saveData();
-            openEducationView();
-        }
-
-        // --- View 11: Prayer Times View ---
-        function openPrayerTimesView() {
-            currentSidebarView = 'PrayerTimes';
-            const html = `
-                <div style="text-align:center; color:#89b4fa; font-weight:bold; margin-bottom:10px;">📍 مواقيت الصلاة بمحافظة سوهاج</div>
-                <div>
-                    ${prayerSchedule.map(p => {
-                        const isDone = db.prayers[p.name];
-                        return `
-                            <div class="history-card" style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <div style="font-weight:bold; font-size:1rem;">صلاة ${p.name}</div>
-                                    <div style="font-size:0.8rem; color:#a6adc8;">الموعد: ${p.time} | عدد الركعات: ${p.rakats}</div>
-                                </div>
-                                <div class="check-btn-group">
-                                    <button class="btn-check-custom ${isDone === true ? 'active-success' : ''}" onclick="togglePrayer('${p.name}', true)">✔</button>
-                                    <button class="btn-check-custom ${isDone === false ? 'active-danger' : ''}" onclick="togglePrayer('${p.name}', false)">✖</button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            openSidebar('أوقات الصلاة 🕌', html);
-        }
-
-        function togglePrayer(name, val) {
-            db.prayers[name] = val;
-            saveData();
-            openPrayerTimesView();
-        }
-
-        // --- View 13: Sleep Tracker View ---
-        function openSleepTrackerView() {
-            currentSidebarView = 'SleepTracker';
-            const html = `
-                <div style="display:flex; flex-direction:column; gap:8px; background:#181825; padding:10px; border-radius:8px; margin-bottom:12px;">
-                    <label style="font-size:0.8rem;">نمت الساعة:</label>
-                    <input id="sleepTime" type="time">
-                    <label style="font-size:0.8rem;">صحيت الساعة:</label>
-                    <input id="wakeTime" type="time">
-                    <button onclick="saveSleepItem()">حساب وتسجيل النوم</button>
-                </div>
-                <div>
-                    ${db.sleep.map(s => `
-                        <div class="history-card">
-                            <div class="card-main-line">
-                                <span>📅 ${s.date}</span>
-                                <span class="card-duration">${s.hours} ساعة نوم</span>
-                            </div>
-                            <div class="card-desc">من ${s.sleep} إلى ${s.wake}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            openSidebar('Sleep 🌙', html);
-        }
-
-        function saveSleepItem() {
-            const st = document.getElementById('sleepTime').value;
-            const wt = document.getElementById('wakeTime').value;
-            if (!st || !wt) return;
-
-            const [sH, sM] = st.split(':').map(Number);
-            const [wH, wM] = wt.split(':').map(Number);
-            let diff = (wH * 60 + wM) - (sH * 60 + sM);
-            if (diff < 0) diff += 24 * 60; 
-            const hrs = (diff / 60).toFixed(1);
-
-            db.sleep.push({
-                date: new Date().toLocaleDateString('ar-EG'),
-                sleep: st,
-                wake: wt,
-                hours: hrs
-            });
-            saveData();
-            openSleepTrackerView();
-        }
-
-        // --- View 16: PDF Printing System ---
-        function printActiveSidebar() {
-            exportToPDF('sidebarContent', currentSidebarView || 'Report');
-        }
-
-        function exportToPDF(elementId, title) {
-            const element = document.getElementById(elementId);
-            const opt = {
-                margin:       10,
-                filename:     `${title}_Report.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, backgroundColor: '#0f0f16' },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-
-        // Notebook Navigation Helpers
+        // Notebook Functions
         function openNotebook() {
             document.getElementById('notebookSidebar').classList.add('open');
             document.getElementById('mainContainer').classList.add('notebook-open');
+            loadNotebookData();
         }
 
         function closeNotebook() {
@@ -1149,56 +919,76 @@
             document.getElementById('mainContainer').classList.remove('notebook-open');
         }
 
-        function switchNbPane(subj, pane) {
-            document.getElementById(`tab-${subj}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${subj}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${subj}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${subj}-rem`).classList.remove('active-pane');
-
-            document.getElementById(`tab-${subj}-${pane}`).classList.add('active-tab');
-            document.getElementById(`pane-${subj}-${pane}`).classList.add('active-pane');
+        function switchNbPane(sub, type) {
+            document.querySelectorAll(`#pane-${sub}-done, #pane-${sub}-rem`).forEach(p => p.classList.remove('active-pane'));
+            document.querySelectorAll(`#tab-${sub}-done, #tab-${sub}-rem`).forEach(t => t.classList.remove('active-tab'));
+            
+            document.getElementById(`pane-${sub}-${type}`).classList.add('active-pane');
+            document.getElementById(`tab-${sub}-${type}`).classList.add('active-tab');
         }
 
         function saveNotebookData() {
             const nbData = {
-                arDone: document.getElementById('note-arabic-done').value,
-                arRem: document.getElementById('note-arabic-rem').value,
-                enDone: document.getElementById('note-english-done').value,
-                enRem: document.getElementById('note-english-rem').value,
-                hiDone: document.getElementById('note-history-done').value,
-                hiRem: document.getElementById('note-history-rem').value,
-                phDone: document.getElementById('note-physics-done').value,
-                phRem: document.getElementById('note-physics-rem').value
+                ar_done: document.getElementById('note-arabic-done').value,
+                ar_rem: document.getElementById('note-arabic-rem').value,
+                en_done: document.getElementById('note-english-done').value,
+                en_rem: document.getElementById('note-english-rem').value,
+                hi_done: document.getElementById('note-history-done').value,
+                hi_rem: document.getElementById('note-history-rem').value,
+                ph_done: document.getElementById('note-physics-done').value,
+                ph_rem: document.getElementById('note-physics-rem').value,
             };
-            localStorage.setItem('qt_notebook', JSON.stringify(nbData));
+            localStorage.setItem('st_notebook', JSON.stringify(nbData));
         }
 
         function loadNotebookData() {
-            const nbData = JSON.parse(localStorage.getItem('qt_notebook') || '{}');
-            if (nbData.arDone) document.getElementById('note-arabic-done').value = nbData.arDone;
-            if (nbData.arRem) document.getElementById('note-arabic-rem').value = nbData.arRem;
-            if (nbData.enDone) document.getElementById('note-english-done').value = nbData.enDone;
-            if (nbData.enRem) document.getElementById('note-english-rem').value = nbData.enRem;
-            if (nbData.hiDone) document.getElementById('note-history-done').value = nbData.hiDone;
-            if (nbData.hiRem) document.getElementById('note-history-rem').value = nbData.hiRem;
-            if (nbData.phDone) document.getElementById('note-physics-done').value = nbData.phDone;
-            if (nbData.phRem) document.getElementById('note-physics-rem').value = nbData.phRem;
+            const nbData = JSON.parse(localStorage.getItem('st_notebook') || '{}');
+            document.getElementById('note-arabic-done').value = nbData.ar_done || '';
+            document.getElementById('note-arabic-rem').value = nbData.ar_rem || '';
+            document.getElementById('note-english-done').value = nbData.en_done || '';
+            document.getElementById('note-english-rem').value = nbData.en_rem || '';
+            document.getElementById('note-history-done').value = nbData.hi_done || '';
+            document.getElementById('note-history-rem').value = nbData.hi_rem || '';
+            document.getElementById('note-physics-done').value = nbData.ph_done || '';
+            document.getElementById('note-physics-rem').value = nbData.ph_rem || '';
         }
 
-        // Auth Modal Operations
-        function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
-        function setAuthTab(mode) {
-            document.getElementById('tabModeLogin').classList.toggle('active', mode==='login');
-            document.getElementById('tabModeSignup').classList.toggle('active', mode==='signup');
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
-        function handleAuthSubmit() {
-            const user = document.getElementById('authUsername').value;
-            if (user) {
-                document.getElementById('authBtnLabel').innerText = user;
-                closeModal('authModal');
-                showNotification(`مرحباً بك ${user}! تم المزامنة بنجاح.`);
+
+        // Auth Modal Controls
+        function openAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        function setAuthTab(mode) {
+            if (mode === 'login') {
+                document.getElementById('tabModeLogin').classList.add('active');
+                document.getElementById('tabModeSignup').classList.remove('active');
+            } else {
+                document.getElementById('tabModeSignup').classList.add('active');
+                document.getElementById('tabModeLogin').classList.remove('active');
             }
         }
+
+        function handleAuthSubmit() {
+            const email = document.getElementById('authEmailInput').value.trim();
+            if (email) {
+                document.getElementById('authBtnLabel').innerText = email;
+                document.getElementById('btnLogout').style.display = 'block';
+                closeModal('authModal');
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('authBtnLabel').innerText = "تسجيل الدخول / حساب جديد";
+            document.getElementById('btnLogout').style.display = 'none';
+            closeModal('authModal');
+        }
+
+        function printNotebook() { window.print(); }
+        function printFullHistory() { window.print(); }
     </script>
 </body>
 </html>
