@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Study Timer</title>
+    <title>Study System</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/KxRJyWnp/st-photo-png.png">
     
     <style id="dynamicStyle">
@@ -62,6 +62,38 @@
             direction: rtl;
         }
 
+        /* Firebase Auth Widget Bar */
+        .firebase-auth-widget {
+            position: absolute;
+            top: 20px;
+            left: 200px;
+            background: #181825;
+            border: 1px solid #313244;
+            padding: 6px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 15;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 0.8rem;
+        }
+        .firebase-auth-widget input {
+            background: #11111b;
+            border: 1px solid #313244;
+            color: #cdd6f4;
+            padding: 4px 8px;
+            border-radius: 5px;
+            width: 110px;
+            font-size: 0.75rem;
+            outline: none;
+        }
+        .firebase-auth-widget button {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
         .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
         
         .exam-countdown-container {
@@ -111,7 +143,6 @@
         .break-input-group label { font-size: 0.85rem; opacity: 0.8; color: #cdd6f4;}
         .break-input-group input { background: #181825; border: 1px solid #313244; padding: 8px 12px; border-radius: 8px; color: #cdd6f4; width: 60px; text-align: center; font-size: 1rem; }
 
-        /* تعديل القائمة العلوية لتصبح في الجانب الأيمن مع زر 3 نقاط وتأثير انيميشن */
         .menu-toggle-btn {
             position: absolute;
             top: 20px;
@@ -275,6 +306,20 @@
     <div id="cairoWidget" class="cairo-live-widget">
         <div id="cairoClock" class="widget-clock">جاري الحساب...</div>
         <div id="cairoDate">جاري الحساب...</div>
+    </div>
+
+    <!-- Firebase Auth Status / Login Bar -->
+    <div class="firebase-auth-widget" id="fbAuthWidget">
+        <div id="authLoggedOut" style="display:flex; gap:5px; align-items:center;">
+            <input type="email" id="fbEmail" placeholder="Email">
+            <input type="password" id="fbPass" placeholder="Password">
+            <button onclick="fbLogin()" style="border-color:#a6e3a1; color:#a6e3a1;">Login</button>
+            <button onclick="fbSignUp()" style="border-color:#89b4fa; color:#89b4fa;">Sign Up</button>
+        </div>
+        <div id="authLoggedIn" style="display:none; gap:8px; align-items:center;">
+            <span id="fbUserEmail" style="color:#a6e3a1; font-weight:bold;"></span>
+            <button onclick="fbLogout()" style="border-color:#f38ba8; color:#f38ba8;">Logout</button>
+        </div>
     </div>
 
     <!-- زر الثلاث نقاط لإظهار القوائم الجانبية -->
@@ -474,6 +519,78 @@
     <canvas id="videoCanvas" width="400" height="160" style="display:none;"></canvas>
     <video id="pipVideo" autoplay muted playsinline style="display:none;"></video>
 
+    <!-- كود المكونات البرمجية والربط السحابي -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAZ3ruVrV622gqKsvWbS8gPYCaVhXJs8us",
+            authDomain: "study-system-ss.firebaseapp.com",
+            projectId: "study-system-ss",
+            storageBucket: "study-system-ss.firebasestorage.app",
+            messagingSenderId: "311066486238",
+            appId: "1:311066486238:web:3a0dcd7e6455724792694f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.fbLogin = async () => {
+            const email = document.getElementById('fbEmail').value;
+            const pass = document.getElementById('fbPass').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (e) { alert(e.message); }
+        };
+
+        window.fbSignUp = async () => {
+            const email = document.getElementById('fbEmail').value;
+            const pass = document.getElementById('fbPass').value;
+            try {
+                await createUserWithEmailAndPassword(auth, email, pass);
+                alert("تم إنشاء الحساب بنجاح!");
+            } catch (e) { alert(e.message); }
+        };
+
+        window.fbLogout = () => signOut(auth);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('authLoggedOut').style.display = 'none';
+                document.getElementById('authLoggedIn').style.display = 'flex';
+                document.getElementById('fbUserEmail').innerText = user.email;
+
+                // Sync data from cloud
+                const docRef = doc(db, "userData", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.history) localStorage.setItem('studyHistoryData', JSON.stringify(data.history));
+                    if(data.notebook) {
+                        localStorage.setItem('studyNotebookData', JSON.stringify(data.notebook));
+                        loadNotebookData();
+                    }
+                }
+            } else {
+                document.getElementById('authLoggedOut').style.display = 'flex';
+                document.getElementById('authLoggedIn').style.display = 'none';
+            }
+        });
+
+        // Cloud Auto Sync Function
+        window.syncToCloud = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const history = JSON.parse(localStorage.getItem('studyHistoryData') || '{}');
+                const notebook = JSON.parse(localStorage.getItem('studyNotebookData') || '{}');
+                await setDoc(doc(db, "userData", user.uid), { history, notebook }, { merge: true });
+            }
+        };
+    </script>
+
     <script>
         let currentMode = 'study';
         let timerInterval = null;
@@ -587,35 +704,25 @@
             updateDisplay('break');
         }
 
-        // المفكرة والسجلات
+        // Notebook UI Functions
         function openNotebook() {
             document.getElementById('notebookSidebar').classList.add('open');
             document.getElementById('mainContainer').classList.add('notebook-open');
         }
-
         function closeNotebook() {
             document.getElementById('notebookSidebar').classList.remove('open');
             document.getElementById('mainContainer').classList.remove('notebook-open');
         }
-
         function switchNbPane(subject, pane) {
-            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
-            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
-            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
-            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
-
-            if(pane === 'done') {
-                document.getElementById(`tab-${subject}-done`).classList.add('active-tab');
-                document.getElementById(`pane-${subject}-done`).classList.add('active-pane');
-            } else {
-                document.getElementById(`tab-${subject}-rem`).classList.add('active-tab');
-                document.getElementById(`pane-${subject}-rem`).classList.add('active-pane');
-            }
+            document.querySelectorAll(`.subject-block.${subject} .nb-tab-btn`).forEach(b => b.classList.remove('active-tab'));
+            document.querySelectorAll(`.subject-block.${subject} .nb-text-container`).forEach(p => p.classList.remove('active-pane'));
+            
+            document.getElementById(`tab-${subject}-${pane}`).classList.add('active-tab');
+            document.getElementById(`pane-${subject}-${pane}`).classList.add('active-pane');
         }
 
         function saveNotebookData() {
-            // حفظ بيانات المفكرة محلياً
-            let data = {
+            const data = {
                 arabicDone: document.getElementById('note-arabic-done').value,
                 arabicRem: document.getElementById('note-arabic-rem').value,
                 englishDone: document.getElementById('note-english-done').value,
@@ -625,46 +732,68 @@
                 physicsDone: document.getElementById('note-physics-done').value,
                 physicsRem: document.getElementById('note-physics-rem').value,
             };
-            localStorage.setItem('notebookData', JSON.stringify(data));
+            localStorage.setItem('studyNotebookData', JSON.stringify(data));
+            if(window.syncToCloud) window.syncToCloud();
         }
 
-        // تحميل بيانات المفكرة عند البدء
-        window.addEventListener('DOMContentLoaded', () => {
-            let savedNb = localStorage.getItem('notebookData');
-            if(savedNb) {
-                let data = JSON.parse(savedNb);
-                document.getElementById('note-arabic-done').value = data.arabicDone || '';
-                document.getElementById('note-arabic-rem').value = data.arabicRem || '';
-                document.getElementById('note-english-done').value = data.englishDone || '';
-                document.getElementById('note-english-rem').value = data.englishRem || '';
-                document.getElementById('note-history-done').value = data.historyDone || '';
-                document.getElementById('note-history-rem').value = data.historyRem || '';
-                document.getElementById('note-physics-done').value = data.physicsDone || '';
-                document.getElementById('note-physics-rem').value = data.physicsRem || '';
-            }
-        });
+        function loadNotebookData() {
+            const data = JSON.parse(localStorage.getItem('studyNotebookData') || '{}');
+            if(data.arabicDone) document.getElementById('note-arabic-done').value = data.arabicDone;
+            if(data.arabicRem) document.getElementById('note-arabic-rem').value = data.arabicRem;
+            if(data.englishDone) document.getElementById('note-english-done').value = data.englishDone;
+            if(data.englishRem) document.getElementById('note-english-rem').value = data.englishRem;
+            if(data.historyDone) document.getElementById('note-history-done').value = data.historyDone;
+            if(data.historyRem) document.getElementById('note-history-rem').value = data.historyRem;
+            if(data.physicsDone) document.getElementById('note-physics-done').value = data.physicsDone;
+            if(data.physicsRem) document.getElementById('note-physics-rem').value = data.physicsRem;
+        }
+
+        // Modal Controls
+        function saveSessionPrompt() {
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function confirmSaveSession() {
+            const subj = document.getElementById('modalSubjectInput').value || 'عام';
+            const desc = document.getElementById('modalDescInput').value || '';
+            
+            let historyData = JSON.parse(localStorage.getItem('studyHistoryData') || '{}');
+            if(!historyData[currentMode]) historyData[currentMode] = [];
+
+            const now = new Date();
+            const record = {
+                subject: subj,
+                desc: desc,
+                duration: document.getElementById(`display-${currentMode}`).innerText,
+                day: now.toLocaleDateString('ar-EG', { weekday: 'long' }),
+                date: now.toLocaleDateString('ar-EG'),
+                time: now.toLocaleTimeString('ar-EG')
+            };
+
+            historyData[currentMode].push(record);
+            localStorage.setItem('studyHistoryData', JSON.stringify(historyData));
+            
+            closeModal('saveModal');
+            endTimer();
+            if(window.syncToCloud) window.syncToCloud();
+            alert("تم الحفظ سحابياً ومحلياً بنجاح!");
+        }
 
         function openHistory(type) {
             currentHistoryType = type;
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('mergeTabsRow').style.display = 'none';
             document.getElementById('sidebarTitle').innerText = `${type.toUpperCase()} History`;
-            renderHistoryContent(type);
-        }
-
-        function openMergeHistory() {
-            currentHistoryType = 'social-afk';
+            document.getElementById('mergeTabsRow').style.display = 'none';
             document.getElementById('sidebarHistory').classList.add('open');
             document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('mergeTabsRow').style.display = 'flex';
-            document.getElementById('sidebarTitle').innerText = `Social & AFK History`;
-            renderHistoryContent(mergeActiveTab);
+            renderHistoryContent();
         }
 
-        function switchMergeView(tab) {
-            mergeActiveTab = tab;
-            renderHistoryContent(tab);
+        function openMergeHistory(defaultTab) {
+            openHistory(defaultTab);
+            document.getElementById('mergeTabsRow').style.display = 'flex';
         }
 
         function closeHistory() {
@@ -672,60 +801,26 @@
             document.getElementById('mainContainer').classList.remove('sidebar-open');
         }
 
-        function renderHistoryContent(type) {
-            let container = document.getElementById('sidebarContent');
-            let historyData = JSON.parse(localStorage.getItem(`${type}History`)) || [];
-            if(historyData.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#6c7086; margin-top:20px;">لا توجد سجلات بعد</p>';
-                return;
-            }
-            container.innerHTML = historyData.map((item, index) => `
+        function renderHistoryContent() {
+            const historyData = JSON.parse(localStorage.getItem('studyHistoryData') || '{}');
+            const items = historyData[currentHistoryType] || [];
+            let html = '';
+
+            items.forEach((item, idx) => {
+                html += `
                 <div class="history-card">
                     <div class="card-main-line">
-                        <span class="card-subject">${item.subject || 'نشاط'}</span>
-                        <span class="card-duration">${item.duration || '00:00'}</span>
+                        <span class="card-subject">${item.subject}</span>
+                        <span class="card-duration">${item.duration}</span>
                     </div>
-                    <div class="card-desc">${item.desc || 'بدون وصف'}</div>
+                    <div class="card-desc">${item.desc}</div>
                     <div class="card-bottom-info">
-                        <span>${item.date || ''}</span>
+                        <span>${item.day} ${item.date}</span>
+                        <span>${item.time}</span>
                     </div>
-                    <div class="card-actions">
-                        <button class="btn-delete" onclick="deleteHistoryItem('${type}', ${index})">حذف</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function deleteHistoryItem(type, index) {
-            let historyData = JSON.parse(localStorage.getItem(`${type}History`)) || [];
-            historyData.splice(index, 1);
-            localStorage.setItem(`${type}History`, JSON.stringify(historyData));
-            renderHistoryContent(type);
-        }
-
-        function saveSessionPrompt() {
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function confirmSaveSession() {
-            let subject = document.getElementById('modalSubjectInput').value;
-            let desc = document.getElementById('modalDescInput').value;
-            let duration = document.getElementById(`display-${currentMode}`).innerText;
-            let date = new Date().toLocaleDateString('ar-EG');
-
-            let newItem = { subject, desc, duration, date };
-            let historyData = JSON.parse(localStorage.getItem(`${currentMode}History`)) || [];
-            historyData.unshift(newItem);
-            localStorage.setItem(`${currentMode}History`, JSON.stringify(historyData));
-
-            closeModal('saveModal');
-            document.getElementById('modalSubjectInput').value = '';
-            document.getElementById('modalDescInput').value = '';
-            alert('تم حفظ السجل بنجاح!');
+                </div>`;
+            });
+            document.getElementById('sidebarContent').innerHTML = html || '<p style="text-align:center; color:#6c7086;">لا توجد سجلات محفوظة</p>';
         }
 
         function printNotebook() {
@@ -734,13 +829,10 @@
             document.body.classList.remove('printing-notebook');
         }
 
-        function printFullHistory() {
-            window.print();
-        }
+        function printFullHistory() { window.print(); }
+        function requestMini() { alert("Mini mode active!"); }
 
-        function requestMini() {
-            alert('تم تفعيل وضع Mini Mode');
-        }
+        loadNotebookData();
     </script>
 </body>
 </html>
