@@ -176,9 +176,7 @@
             z-index: 105;
             transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .top-bar.active {
-            right: 0;
-        }
+        .top-bar.active { right: 0; }
         .top-bar button {
             background: #1e1e2e;
             border: 1px solid #313244;
@@ -289,108 +287,21 @@
             direction: rtl;
             position: relative;
         }
-        .auth-header {
-            text-align: center;
-        }
-        .auth-header h2 {
-            margin: 0;
-            font-size: 1.4rem;
-            color: #fff;
-            font-weight: 700;
-        }
-        .auth-header p {
-            margin: 5px 0 0 0;
-            font-size: 0.8rem;
-            color: #a6adc8;
-        }
-        .auth-tabs {
-            display: flex;
-            background: #11111b;
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid #313244;
-        }
-        .auth-tab-btn {
-            flex: 1;
-            padding: 8px;
-            background: transparent;
-            border: none;
-            color: #a6adc8;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .auth-tab-btn.active {
-            background: var(--current-theme);
-            color: #11111b;
-            font-weight: bold;
-        }
-        .auth-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .auth-input-group label {
-            font-size: 0.8rem;
-            color: #cdd6f4;
-            font-weight: 600;
-        }
-        .auth-input-group input {
-            background: #11111b;
-            border: 1px solid #313244;
-            padding: 10px 12px;
-            border-radius: 10px;
-            color: #fff;
-            outline: none;
-            direction: ltr;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-        .auth-input-group input:focus {
-            border-color: var(--current-theme);
-            box-shadow: 0 0 8px rgba(166, 227, 161, 0.2);
-        }
-        .auth-submit-btn {
-            background: var(--current-theme);
-            color: #11111b;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 5px;
-        }
-        .auth-submit-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        .auth-logout-btn {
-            background: rgba(243, 139, 168, 0.1);
-            border: 1px solid #f38ba8;
-            color: #f38ba8;
-            padding: 10px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .auth-logout-btn:hover {
-            background: #f38ba8;
-            color: #11111b;
-        }
-        .close-auth-card {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: none;
-            border: none;
-            color: #6c7086;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
+        .auth-header { text-align: center; }
+        .auth-header h2 { margin: 0; font-size: 1.4rem; color: #fff; font-weight: 700; }
+        .auth-header p { margin: 5px 0 0 0; font-size: 0.8rem; color: #a6adc8; }
+        .auth-tabs { display: flex; background: #11111b; padding: 4px; border-radius: 10px; border: 1px solid #313244; }
+        .auth-tab-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #a6adc8; font-size: 0.85rem; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .auth-tab-btn.active { background: var(--current-theme); color: #11111b; font-weight: bold; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
+        .auth-input-group label { font-size: 0.8rem; color: #cdd6f4; font-weight: 600; }
+        .auth-input-group input { background: #11111b; border: 1px solid #313244; padding: 10px 12px; border-radius: 10px; color: #fff; outline: none; direction: ltr; font-size: 0.9rem; transition: 0.3s; }
+        .auth-input-group input:focus { border-color: var(--current-theme); box-shadow: 0 0 8px rgba(166, 227, 161, 0.2); }
+        .auth-submit-btn { background: var(--current-theme); color: #11111b; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: 0.3s; margin-top: 5px; }
+        .auth-submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .auth-logout-btn { background: rgba(243, 139, 168, 0.1); border: 1px solid #f38ba8; color: #f38ba8; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .auth-logout-btn:hover { background: #f38ba8; color: #11111b; }
+        .close-auth-card { position: absolute; top: 15px; left: 15px; background: none; border: none; color: #6c7086; font-size: 1.2rem; cursor: pointer; }
         .close-auth-card:hover { color: #fff; }
     </style>
 </head>
@@ -616,10 +527,10 @@
 
     <div class="footer-credits">© 2026 Amr Abdelhalim . All Rights Reserved</div>
 
-    <!-- كود الـ Firebase والمزامنة -->
+    <!-- Firebase Script المحدث -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -635,7 +546,11 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // جعل الجلسة تنتهي عند إغلاق النافذة/المتصفح المتخفي لمنع الدخول التلقائي
+        setPersistence(auth, browserSessionPersistence);
+
         let activeAuthTab = 'login';
+        window.userCloudData = { history: {}, notebook: {} };
 
         window.setAuthTab = (mode) => {
             activeAuthTab = mode;
@@ -660,13 +575,7 @@
                 alert("تم تسجيل الدخول بنجاح! 🚀");
                 closeModal('authModal');
             } catch (e) {
-                if(e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
-                    alert("البريد الإلكتروني أو كلمة المرور غير صحيحة!");
-                } else if(e.code === 'auth/invalid-email') {
-                    alert("صيغة البريد الإلكتروني غير صحيحة!");
-                } else {
-                    alert("تعذر تسجيل الدخول: " + e.message);
-                }
+                alert("تعذر تسجيل الدخول: " + e.message);
             }
         };
 
@@ -681,19 +590,11 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
                 await updateProfile(userCredential.user, { displayName: uname });
-                await setDoc(doc(db, "userData", userCredential.user.uid), { username: uname, history: {}, notebook: {} }, { merge: true });
+                await setDoc(doc(db, "userData", userCredential.user.uid), { username: uname, history: {}, notebook: {} });
                 alert("تم إنشاء الحساب وحفظ اسم المستخدم بنجاح! 🎉");
                 closeModal('authModal');
             } catch (e) {
-                if (e.code === 'auth/email-already-in-use') {
-                    alert("هذا البريد الإلكتروني مُسجل بالفعل! اضغط على تبويب (تسجيل الدخول).");
-                } else if (e.code === 'auth/weak-password') {
-                    alert("كلمة المرور ضعيفة جداً! يجب أن تكون 6 أرقام/حروف على الأقل.");
-                } else if (e.code === 'auth/invalid-email') {
-                    alert("بريد إلكتروني غير صالح! يرجى كتابة بريد مثل: name@example.com");
-                } else {
-                    alert("تعذر إنشاء الحساب: " + e.message);
-                }
+                alert("تعذر إنشاء الحساب: " + e.message);
             }
         };
 
@@ -716,10 +617,8 @@
 
         window.fbLogout = () => {
             signOut(auth);
-            localStorage.removeItem('studyHistoryData');
-            localStorage.removeItem('studyNotebookData');
-            clearNotebookUI();
-            alert("تم تسجيل الخروج وتفرغ البيانات بنجاح.");
+            clearAllUIData();
+            alert("تم تسجيل الخروج بنجاح.");
             closeModal('authModal');
         };
 
@@ -748,6 +647,9 @@
                 emailGroup.style.display = 'none';
                 passGroup.style.display = 'none';
                 authSubTitle.innerText = "يمكنك تعديل اسم المستخدم الخاص بك هنا";
+                
+                // سحب بيانات هذا الحساب تحديداً من Firestore
+                await loadCloudUserData(user.uid);
             } else {
                 label.innerText = "تسجيل الدخول / حساب جديد";
                 logoutBtn.style.display = 'none';
@@ -758,20 +660,51 @@
                 passGroup.style.display = 'flex';
                 usernameGroup.style.display = (activeAuthTab === 'signup') ? 'flex' : 'none';
                 authSubTitle.innerText = "قم بمزامنة سجلاتك ومذكراتك من أي جهاز";
-                localStorage.removeItem('studyHistoryData');
-                localStorage.removeItem('studyNotebookData');
-                clearNotebookUI();
+                
+                clearAllUIData();
             }
         });
+
+        async function loadCloudUserData(uid) {
+            try {
+                const docSnap = await getDoc(doc(db, "userData", uid));
+                if (docSnap.exists()) {
+                    window.userCloudData = docSnap.data();
+                    fillNotebookUI(window.userCloudData.notebook || {});
+                } else {
+                    window.userCloudData = { history: {}, notebook: {} };
+                    clearAllUIData();
+                }
+            } catch(e) {
+                console.error("Error loading user data", e);
+            }
+        }
 
         window.syncToCloud = async () => {
             const user = auth.currentUser;
             if (user) {
-                const history = JSON.parse(localStorage.getItem('studyHistoryData') || '{}');
-                const notebook = JSON.parse(localStorage.getItem('studyNotebookData') || '{}');
-                await setDoc(doc(db, "userData", user.uid), { history, notebook }, { merge: true });
+                await setDoc(doc(db, "userData", user.uid), window.userCloudData, { merge: true });
             }
         };
+
+        function fillNotebookUI(nb) {
+            document.getElementById('note-arabic-done').value = nb.arabicDone || '';
+            document.getElementById('note-arabic-rem').value = nb.arabicRem || '';
+            document.getElementById('note-english-done').value = nb.englishDone || '';
+            document.getElementById('note-english-rem').value = nb.englishRem || '';
+            document.getElementById('note-history-done').value = nb.historyDone || '';
+            document.getElementById('note-history-rem').value = nb.historyRem || '';
+            document.getElementById('note-physics-done').value = nb.physicsDone || '';
+            document.getElementById('note-physics-rem').value = nb.physicsRem || '';
+        }
+
+        function clearAllUIData() {
+            window.userCloudData = { history: {}, notebook: {} };
+            document.querySelectorAll('.nb-textarea').forEach(t => t.value = '');
+            if(document.getElementById('sidebarHistory').classList.contains('open')) {
+                renderHistoryContent();
+            }
+        }
     </script>
 
     <script>
@@ -865,7 +798,8 @@
         }
 
         function saveNotebookData() {
-            const data = {
+            if(!window.userCloudData.notebook) window.userCloudData.notebook = {};
+            window.userCloudData.notebook = {
                 arabicDone: document.getElementById('note-arabic-done').value,
                 arabicRem: document.getElementById('note-arabic-rem').value,
                 englishDone: document.getElementById('note-english-done').value,
@@ -875,36 +809,35 @@
                 physicsDone: document.getElementById('note-physics-done').value,
                 physicsRem: document.getElementById('note-physics-rem').value,
             };
-            localStorage.setItem('studyNotebookData', JSON.stringify(data));
             if(window.syncToCloud) window.syncToCloud();
         }
 
-        function clearNotebookUI() {
-            document.querySelectorAll('.nb-textarea').forEach(t => t.value = '');
-        }
-
         function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
-        function saveSessionPrompt() { document.getElementById('saveModal').style.display = 'flex'; }
+        function saveSessionPrompt() { 
+            if(!window.userCloudData || !window.userCloudData.history) {
+                return alert("يرجى تسجيل الدخول للحساب أولاً لحفظ السجلات ومزامنتها!");
+            }
+            document.getElementById('saveModal').style.display = 'flex'; 
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function confirmSaveSession() {
             const subj = document.getElementById('modalSubjectInput').value || 'عام';
             const desc = document.getElementById('modalDescInput').value || '';
             
-            let historyData = JSON.parse(localStorage.getItem('studyHistoryData') || '{}');
-            if(!historyData[currentMode]) historyData[currentMode] = [];
+            if(!window.userCloudData.history) window.userCloudData.history = {};
+            if(!window.userCloudData.history[currentMode]) window.userCloudData.history[currentMode] = [];
 
             const now = new Date();
-            historyData[currentMode].push({
+            window.userCloudData.history[currentMode].push({
                 subject: subj, desc: desc, duration: document.getElementById(`display-${currentMode}`).innerText,
                 day: now.toLocaleDateString('ar-EG', { weekday: 'long' }), date: now.toLocaleDateString('ar-EG'), time: now.toLocaleTimeString('ar-EG')
             });
 
-            localStorage.setItem('studyHistoryData', JSON.stringify(historyData));
             closeModal('saveModal');
             endTimer();
             if(window.syncToCloud) window.syncToCloud();
-            alert("تم الحفظ وسحب السجل سحابياً بنجاح!");
+            alert("تم حفظ السجل ومزامنتة بحسابك سحابياً بنجاح!");
         }
 
         function openHistory(type) {
@@ -921,8 +854,7 @@
         }
 
         function renderHistoryContent() {
-            const historyData = JSON.parse(localStorage.getItem('studyHistoryData') || '{}');
-            const items = historyData[currentHistoryType] || [];
+            const items = (window.userCloudData && window.userCloudData.history) ? (window.userCloudData.history[currentHistoryType] || []) : [];
             let html = '';
             items.forEach(item => {
                 html += `
