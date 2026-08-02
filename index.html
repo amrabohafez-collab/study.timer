@@ -62,31 +62,34 @@
             direction: rtl;
         }
 
-        /* Firebase Auth Trigger Button & Badge */
+        /* Modern Auth Header Trigger Bar */
         .auth-status-bar {
             position: absolute;
             top: 20px;
-            left: 200px;
+            left: 210px;
             z-index: 15;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         .auth-btn-trigger {
-            background: #181825;
-            border: 1px solid #313244;
-            color: var(--current-theme);
-            padding: 8px 16px;
-            border-radius: 10px;
+            background: rgba(24, 24, 37, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cdd6f4;
+            padding: 8px 18px;
+            border-radius: 20px;
             font-size: 0.85rem;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .auth-btn-trigger:hover {
             border-color: var(--current-theme);
-            background: #1e1e2e;
+            color: var(--current-theme);
+            box-shadow: 0 0 12px var(--current-theme);
+            transform: translateY(-1px);
         }
 
         .brand-title { font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; color: var(--current-theme); transition: opacity 0.3s ease; }
@@ -263,7 +266,7 @@
         
         .card-bottom-info { font-size: 0.75rem; color: #7f849c; display: flex; justify-content: space-between; margin-top: 6px; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-content { background: #1e1e2e; border: 2px solid var(--current-theme); padding: 20px; border-radius: 12px; width: 320px; text-align: right; direction: rtl; color: #cdd6f4; }
         .modal-content h3 { margin-top: 0; color: var(--current-theme); text-align: center; font-size: 1.1rem;}
         .modal-content label { display: block; margin: 8px 0 4px; font-size: 0.85rem;}
@@ -272,24 +275,56 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center;}
         .modal-actions button { padding: 6px 16px; font-size: 0.85rem;}
 
-        /* Auth Modern Modal UI */
-        .auth-modal-content {
+        /* Modern Auth Modal UI */
+        .auth-card {
             background: #181825;
             border: 1px solid #313244;
-            border-radius: 16px;
-            width: 350px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border-radius: 20px;
+            width: 360px;
+            padding: 30px 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
             direction: rtl;
+            position: relative;
         }
-        .auth-modal-content h2 {
-            margin: 0;
+        .auth-header {
             text-align: center;
+        }
+        .auth-header h2 {
+            margin: 0;
             font-size: 1.4rem;
-            color: var(--current-theme);
+            color: #fff;
+            font-weight: 700;
+        }
+        .auth-header p {
+            margin: 5px 0 0 0;
+            font-size: 0.8rem;
+            color: #a6adc8;
+        }
+        .auth-tabs {
+            display: flex;
+            background: #11111b;
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid #313244;
+        }
+        .auth-tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            color: #a6adc8;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .auth-tab-btn.active {
+            background: var(--current-theme);
+            color: #11111b;
+            font-weight: bold;
         }
         .auth-input-group {
             display: flex;
@@ -298,31 +333,65 @@
         }
         .auth-input-group label {
             font-size: 0.8rem;
-            color: #a6adc8;
+            color: #cdd6f4;
+            font-weight: 600;
         }
         .auth-input-group input {
             background: #11111b;
             border: 1px solid #313244;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             color: #fff;
             outline: none;
             direction: ltr;
+            font-size: 0.9rem;
+            transition: 0.3s;
         }
         .auth-input-group input:focus {
             border-color: var(--current-theme);
+            box-shadow: 0 0 8px rgba(166, 227, 161, 0.2);
         }
-        .auth-modal-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .auth-modal-actions button {
-            width: 100%;
+        .auth-submit-btn {
+            background: var(--current-theme);
+            color: #11111b;
+            border: none;
+            padding: 12px;
             border-radius: 10px;
-            padding: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 5px;
         }
+        .auth-submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .auth-logout-btn {
+            background: rgba(243, 139, 168, 0.1);
+            border: 1px solid #f38ba8;
+            color: #f38ba8;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .auth-logout-btn:hover {
+            background: #f38ba8;
+            color: #11111b;
+        }
+        .close-auth-card {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: none;
+            border: none;
+            color: #6c7086;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .close-auth-card:hover { color: #fff; }
     </style>
 </head>
 <body>
@@ -332,9 +401,11 @@
         <div id="cairoDate">جاري الحساب...</div>
     </div>
 
-    <!-- Auth Status Bar -->
+    <!-- Auth Status Trigger -->
     <div class="auth-status-bar">
-        <button id="authModalBtn" class="auth-btn-trigger" onclick="openAuthModal()">🔑 تسجيل الدخول / حساب جديد</button>
+        <button id="authModalBtn" class="auth-btn-trigger" onclick="openAuthModal()">
+            <span>🔑</span> <span id="authBtnLabel">تسجيل الدخول / حساب جديد</span>
+        </button>
     </div>
 
     <!-- زر القائمة -->
@@ -483,10 +554,6 @@
                 <h2 id="sidebarTitle">History</h2>
             </div>
         </div>
-        <div id="mergeTabsRow" class="nb-tabs-row" style="padding: 10px; display: none;">
-            <button id="mergeTabSocial" class="nb-tab-btn" style="color: #89b4fa; border-color: #89b4fa;" onclick="switchMergeView('social')">Social History 📱</button>
-            <button id="mergeTabAfk" class="nb-tab-btn" style="color: #f9e2af; border-color: #f9e2af;" onclick="switchMergeView('afk')">AFK History ⏳</button>
-        </div>
         <div id="sidebarContent" class="sidebar-content"></div>
     </div>
 
@@ -505,24 +572,32 @@
         </div>
     </div>
 
-    <!-- Auth Modal النافذة الاحترافية لتسجيل الدخول -->
+    <!-- Modern Auth Modal UI -->
     <div id="authModal" class="modal">
-        <div class="auth-modal-content">
-            <h2>إدارة الحساب السحابي ☁️</h2>
+        <div class="auth-card">
+            <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
+            <div class="auth-header">
+                <h2>الحساب السحابي ☁️</h2>
+                <p>قم بمزامنة سجلاتك ومذكراتك من أي جهاز</p>
+            </div>
+            
+            <div id="authTabBox" class="auth-tabs">
+                <button id="tabModeLogin" class="auth-tab-btn active" onclick="setAuthTab('login')">تسجيل الدخول</button>
+                <button id="tabModeSignup" class="auth-tab-btn" onclick="setAuthTab('signup')">حساب جديد</button>
+            </div>
+
             <div class="auth-input-group">
                 <label>البريد الإلكتروني</label>
-                <input type="email" id="fbEmail" placeholder="name@example.com">
+                <input type="email" id="fbEmail" placeholder="example@mail.com">
             </div>
+
             <div class="auth-input-group">
-                <label>كلمة المرور</label>
+                <label>كلمة المرور (6 أرقام/حروف فأكثر)</label>
                 <input type="password" id="fbPass" placeholder="••••••••">
             </div>
-            <div class="auth-modal-actions">
-                <button onclick="fbLogin()" style="border-color:#a6e3a1; color:#a6e3a1;">دخول للحساب</button>
-                <button onclick="fbSignUp()" style="border-color:#89b4fa; color:#89b4fa;">إنشاء حساب جديد</button>
-                <button id="logoutBtn" onclick="fbLogout()" style="border-color:#f38ba8; color:#f38ba8; display:none;">تسجيل الخروج</button>
-                <button onclick="closeModal('authModal')" style="border-color:#585b70; color:#cdd6f4;">إغلاق</button>
-            </div>
+
+            <button id="authActionSubmit" class="auth-submit-btn" onclick="handleAuthAction()">دخول الحساب</button>
+            <button id="logoutBtn" class="auth-logout-btn" onclick="fbLogout()" style="display:none;">تسجيل الخروج من الحساب</button>
         </div>
     </div>
 
@@ -553,28 +628,61 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        let activeAuthTab = 'login';
+
+        window.setAuthTab = (mode) => {
+            activeAuthTab = mode;
+            document.getElementById('tabModeLogin').classList.toggle('active', mode === 'login');
+            document.getElementById('tabModeSignup').classList.toggle('active', mode === 'signup');
+            document.getElementById('authActionSubmit').innerText = mode === 'login' ? 'دخول الحساب' : 'إنشاء الحساب الآن';
+        };
+
+        window.handleAuthAction = () => {
+            if(activeAuthTab === 'login') fbLogin();
+            else fbSignUp();
+        };
+
         window.fbLogin = async () => {
-            const email = document.getElementById('fbEmail').value;
+            const email = document.getElementById('fbEmail').value.trim();
             const pass = document.getElementById('fbPass').value;
-            if(!email || !pass) return alert("يرجى إدخال البريد الإلكتروني وكلمة المرور!");
+            if(!email || !pass) return alert("يرجى كتابة البريد الإلكتروني وكلمة المرور!");
+            
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
-                alert("تم تسجيل الدخول بنجاح!");
+                alert("تم تسجيل الدخول بنجاح! 🚀");
                 closeModal('authModal');
-            } catch (e) { alert("خطأ في تسجيل الدخول: " + e.message); }
+            } catch (e) {
+                if(e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+                    alert("البريد الإلكتروني أو كلمة المرور غير صحيحة!");
+                } else if(e.code === 'auth/invalid-email') {
+                    alert("صيغة البريد الإلكتروني غير صحيحة!");
+                } else {
+                    alert("تعذر تسجيل الدخول: " + e.message);
+                }
+            }
         };
 
         window.fbSignUp = async () => {
-            const email = document.getElementById('fbEmail').value;
+            const email = document.getElementById('fbEmail').value.trim();
             const pass = document.getElementById('fbPass').value;
-            if(!email || !pass) return alert("يرجى إدخال البريد الإلكتروني وكلمة المرور!");
+            if(!email || !pass) return alert("يرجى كتابة البريد الإلكتروني وكلمة المرور!");
+
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                // إنشاء وثيقة مبدئية للمستخدم في Firestore
                 await setDoc(doc(db, "userData", userCredential.user.uid), { history: {}, notebook: {} });
-                alert("تم إنشاء الحساب بنجاح وتسجيله في السيرفر!");
+                alert("تم إنشاء الحساب بنجاح وتأمينه في السيرفر! 🎉");
                 closeModal('authModal');
-            } catch (e) { alert("خطأ في إنشاء الحساب: " + e.message); }
+            } catch (e) {
+                if (e.code === 'auth/email-already-in-use') {
+                    alert("هذا البريد الإلكتروني مُسجل بالفعل! اضغط على تبويب (تسجيل الدخول).");
+                } else if (e.code === 'auth/weak-password') {
+                    alert("كلمة المرور ضعيفة جداً! يجب أن تكون 6 أرقام/حروف على الأقل.");
+                } else if (e.code === 'auth/invalid-email') {
+                    alert("بريد إلكتروني غير صالح! يرجى كتابة بريد مثل: name@example.com");
+                } else {
+                    alert("تعذر إنشاء الحساب: " + e.message);
+                }
+            }
         };
 
         window.fbLogout = () => {
@@ -582,32 +690,26 @@
             localStorage.removeItem('studyHistoryData');
             localStorage.removeItem('studyNotebookData');
             clearNotebookUI();
-            alert("تم تسجيل الخروج وتفريغ البيانات المحلية.");
+            alert("تم تسجيل الخروج وتفرغ البيانات بنجاح.");
             closeModal('authModal');
         };
 
         onAuthStateChanged(auth, async (user) => {
-            const btn = document.getElementById('authModalBtn');
+            const label = document.getElementById('authBtnLabel');
             const logoutBtn = document.getElementById('logoutBtn');
+            const authTabBox = document.getElementById('authTabBox');
+            const authSubmit = document.getElementById('authActionSubmit');
             
             if (user) {
-                btn.innerText = `👤 ${user.email}`;
+                label.innerText = user.email;
                 logoutBtn.style.display = 'block';
-
-                // سحب بيانات المستخدم المسجل فقط
-                const docRef = doc(db, "userData", user.uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(data.history) localStorage.setItem('studyHistoryData', JSON.stringify(data.history));
-                    if(data.notebook) {
-                        localStorage.setItem('studyNotebookData', JSON.stringify(data.notebook));
-                        loadNotebookData();
-                    }
-                }
+                authTabBox.style.display = 'none';
+                authSubmit.style.display = 'none';
             } else {
-                btn.innerText = "🔑 تسجيل الدخول / حساب جديد";
+                label.innerText = "تسجيل الدخول / حساب جديد";
                 logoutBtn.style.display = 'none';
+                authTabBox.style.display = 'flex';
+                authSubmit.style.display = 'block';
                 localStorage.removeItem('studyHistoryData');
                 localStorage.removeItem('studyNotebookData');
                 clearNotebookUI();
@@ -727,18 +829,6 @@
             };
             localStorage.setItem('studyNotebookData', JSON.stringify(data));
             if(window.syncToCloud) window.syncToCloud();
-        }
-
-        function loadNotebookData() {
-            const data = JSON.parse(localStorage.getItem('studyNotebookData') || '{}');
-            document.getElementById('note-arabic-done').value = data.arabicDone || '';
-            document.getElementById('note-arabic-rem').value = data.arabicRem || '';
-            document.getElementById('note-english-done').value = data.englishDone || '';
-            document.getElementById('note-english-rem').value = data.englishRem || '';
-            document.getElementById('note-history-done').value = data.historyDone || '';
-            document.getElementById('note-history-rem').value = data.historyRem || '';
-            document.getElementById('note-physics-done').value = data.physicsDone || '';
-            document.getElementById('note-physics-rem').value = data.physicsRem || '';
         }
 
         function clearNotebookUI() {
