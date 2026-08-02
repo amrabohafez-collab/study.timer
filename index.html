@@ -285,7 +285,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             direction: rtl;
             position: relative;
         }
@@ -339,7 +339,7 @@
         .auth-input-group input {
             background: #11111b;
             border: 1px solid #313244;
-            padding: 12px;
+            padding: 10px 12px;
             border-radius: 10px;
             color: #fff;
             outline: none;
@@ -404,7 +404,7 @@
     <!-- Auth Status Trigger -->
     <div class="auth-status-bar">
         <button id="authModalBtn" class="auth-btn-trigger" onclick="openAuthModal()">
-            <span>🔑</span> <span id="authBtnLabel">تسجيل الدخول / حساب جديد</span>
+            <span>👤</span> <span id="authBtnLabel">تسجيل الدخول / حساب جديد</span>
         </button>
     </div>
 
@@ -577,8 +577,8 @@
         <div class="auth-card">
             <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
             <div class="auth-header">
-                <h2>الحساب السحابي ☁️</h2>
-                <p>قم بمزامنة سجلاتك ومذكراتك من أي جهاز</p>
+                <h2>إدارة الحساب ☁️</h2>
+                <p id="authSubTitle">قم بمزامنة سجلاتك ومذكراتك من أي جهاز</p>
             </div>
             
             <div id="authTabBox" class="auth-tabs">
@@ -586,17 +586,24 @@
                 <button id="tabModeSignup" class="auth-tab-btn" onclick="setAuthTab('signup')">حساب جديد</button>
             </div>
 
-            <div class="auth-input-group">
+            <!-- Username Group -->
+            <div class="auth-input-group" id="usernameGroup" style="display:none;">
+                <label>اسم المستخدم (Username)</label>
+                <input type="text" id="fbUsername" placeholder="مثال: Amr_Abdelhalim">
+            </div>
+
+            <div class="auth-input-group" id="emailGroup">
                 <label>البريد الإلكتروني</label>
                 <input type="email" id="fbEmail" placeholder="example@mail.com">
             </div>
 
-            <div class="auth-input-group">
+            <div class="auth-input-group" id="passGroup">
                 <label>كلمة المرور (6 أرقام/حروف فأكثر)</label>
                 <input type="password" id="fbPass" placeholder="••••••••">
             </div>
 
             <button id="authActionSubmit" class="auth-submit-btn" onclick="handleAuthAction()">دخول الحساب</button>
+            <button id="updateUserBtn" class="auth-submit-btn" onclick="saveUsernameOnly()" style="display:none; background:#89b4fa;">حفظ اسم المستخدم 💾</button>
             <button id="logoutBtn" class="auth-logout-btn" onclick="fbLogout()" style="display:none;">تسجيل الخروج من الحساب</button>
         </div>
     </div>
@@ -612,7 +619,7 @@
     <!-- كود الـ Firebase والمزامنة -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -634,6 +641,7 @@
             activeAuthTab = mode;
             document.getElementById('tabModeLogin').classList.toggle('active', mode === 'login');
             document.getElementById('tabModeSignup').classList.toggle('active', mode === 'signup');
+            document.getElementById('usernameGroup').style.display = (mode === 'signup') ? 'flex' : 'none';
             document.getElementById('authActionSubmit').innerText = mode === 'login' ? 'دخول الحساب' : 'إنشاء الحساب الآن';
         };
 
@@ -663,14 +671,18 @@
         };
 
         window.fbSignUp = async () => {
+            const uname = document.getElementById('fbUsername').value.trim();
             const email = document.getElementById('fbEmail').value.trim();
             const pass = document.getElementById('fbPass').value;
+
+            if(!uname) return alert("يرجى إدخال اسم المستخدم (Username)!");
             if(!email || !pass) return alert("يرجى كتابة البريد الإلكتروني وكلمة المرور!");
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "userData", userCredential.user.uid), { history: {}, notebook: {} });
-                alert("تم إنشاء الحساب بنجاح وتأمينه في السيرفر! 🎉");
+                await updateProfile(userCredential.user, { displayName: uname });
+                await setDoc(doc(db, "userData", userCredential.user.uid), { username: uname, history: {}, notebook: {} }, { merge: true });
+                alert("تم إنشاء الحساب وحفظ اسم المستخدم بنجاح! 🎉");
                 closeModal('authModal');
             } catch (e) {
                 if (e.code === 'auth/email-already-in-use') {
@@ -681,6 +693,23 @@
                     alert("بريد إلكتروني غير صالح! يرجى كتابة بريد مثل: name@example.com");
                 } else {
                     alert("تعذر إنشاء الحساب: " + e.message);
+                }
+            }
+        };
+
+        window.saveUsernameOnly = async () => {
+            const uname = document.getElementById('fbUsername').value.trim();
+            const user = auth.currentUser;
+            if(!uname) return alert("يرجى كتابة اسم المستخدم أولاً!");
+            if(user) {
+                try {
+                    await updateProfile(user, { displayName: uname });
+                    await setDoc(doc(db, "userData", user.uid), { username: uname }, { merge: true });
+                    document.getElementById('authBtnLabel').innerText = uname;
+                    alert("تم حفظ وتحديث اسم المستخدم بنجاح! ✨");
+                    closeModal('authModal');
+                } catch(e) {
+                    alert("حدث خطأ أثناء الحفظ: " + e.message);
                 }
             }
         };
@@ -699,17 +728,36 @@
             const logoutBtn = document.getElementById('logoutBtn');
             const authTabBox = document.getElementById('authTabBox');
             const authSubmit = document.getElementById('authActionSubmit');
+            const updateUserBtn = document.getElementById('updateUserBtn');
+            const usernameGroup = document.getElementById('usernameGroup');
+            const emailGroup = document.getElementById('emailGroup');
+            const passGroup = document.getElementById('passGroup');
+            const authSubTitle = document.getElementById('authSubTitle');
             
             if (user) {
-                label.innerText = user.email;
+                const displayName = user.displayName || user.email.split('@')[0];
+                label.innerText = displayName;
+                document.getElementById('fbUsername').value = user.displayName || '';
+                
                 logoutBtn.style.display = 'block';
+                updateUserBtn.style.display = 'block';
+                usernameGroup.style.display = 'flex';
+                
                 authTabBox.style.display = 'none';
                 authSubmit.style.display = 'none';
+                emailGroup.style.display = 'none';
+                passGroup.style.display = 'none';
+                authSubTitle.innerText = "يمكنك تعديل اسم المستخدم الخاص بك هنا";
             } else {
                 label.innerText = "تسجيل الدخول / حساب جديد";
                 logoutBtn.style.display = 'none';
+                updateUserBtn.style.display = 'none';
                 authTabBox.style.display = 'flex';
                 authSubmit.style.display = 'block';
+                emailGroup.style.display = 'flex';
+                passGroup.style.display = 'flex';
+                usernameGroup.style.display = (activeAuthTab === 'signup') ? 'flex' : 'none';
+                authSubTitle.innerText = "قم بمزامنة سجلاتك ومذكراتك من أي جهاز";
                 localStorage.removeItem('studyHistoryData');
                 localStorage.removeItem('studyNotebookData');
                 clearNotebookUI();
