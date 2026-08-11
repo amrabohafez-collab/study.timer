@@ -336,8 +336,8 @@
     </div>
 
     <!-- Auth Status Trigger -->
-    <div class="auth-status-bar">
-        <button id="authModalBtn" class="auth-btn-trigger" onclick="openAuthModal()">
+    <div class="auth-status-bar" style="display:none;">
+        <button id="authModalBtn" class="auth-btn-trigger">
             <span>👤</span> <span id="authBtnLabel">تسجيل الدخول / حساب جديد</span>
         </button>
     </div>
@@ -542,35 +542,6 @@
         </div>
     </div>
 
-    <!-- مودال تسجيل الدخول -->
-    <div id="authModal" class="modal">
-        <div class="auth-card">
-            <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
-            <div class="auth-header">
-                <h2>حسابك الشخصي</h2>
-                <p>سجل حسابك لحفظ بياناتك وسجلاتك بدقة</p>
-            </div>
-            <div class="auth-tabs">
-                <button id="authTabLogin" class="auth-tab-btn active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
-                <button id="authTabRegister" class="auth-tab-btn" onclick="switchAuthTab('register')">حساب جديد</button>
-            </div>
-            <div id="authFormArea" style="display:flex; flex-direction:column; gap:12px;">
-                <div class="auth-input-group">
-                    <label>البريد الإلكتروني</label>
-                    <input type="email" id="authEmail" placeholder="name@example.com">
-                </div>
-                <div class="auth-input-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="authPassword" placeholder="••••••••">
-                </div>
-                <button id="authSubmitBtn" class="auth-submit-btn" onclick="handleAuthSubmit()">دخول</button>
-                <button class="auth-google-btn" onclick="simulateGoogleAuth()">
-                    <span>🌐</span> متابعة باستخدام Google
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // System variables and states
         let currentMode = 'study';
@@ -590,7 +561,6 @@
         let histories = { study: [], quiz: [], break: [], afk: [] };
         let scheduleItems = [];
         let trashItems = [];
-        let currentUser = null;
 
         // Initialize App on load
         window.onload = function() {
@@ -992,35 +962,6 @@
 
         function requestMini() {
             alert('خاصية نافذة المصغرة غير مدعومة مباشرة في متصفحك الحالي، يمكنك تصغير نافذة المتصفح.');
-        }
-
-        function openAuthModal() {
-            document.getElementById('authModal').style.display = 'flex';
-        }
-
-        function switchAuthTab(tab) {
-            document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
-            document.getElementById('authTabRegister').classList.toggle('active', tab === 'register');
-            document.getElementById('authSubmitBtn').innerText = tab === 'login' ? 'دخول' : 'إنشاء الحساب';
-        }
-
-        function handleAuthSubmit() {
-            let email = document.getElementById('authEmail').value;
-            if(!email) {
-                alert('الرجاء إدخال البريد الإلكتروني');
-                return;
-            }
-            currentUser = email;
-            document.getElementById('authBtnLabel').innerText = email;
-            closeModal('authModal');
-            alert('تم تسجيل الدخول بنجاح!');
-        }
-
-        function simulateGoogleAuth() {
-            currentUser = 'Google User';
-            document.getElementById('authBtnLabel').innerText = 'حساب Google';
-            closeModal('authModal');
-            alert('تم الاتصال بحساب Google بنجاح!');
         }
     </script>
 </body>
