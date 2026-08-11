@@ -545,170 +545,372 @@
     <!-- مودال تسجيل الدخول -->
     <div id="authModal" class="modal">
         <div class="auth-card">
-            <button class="close-auth-card" onclick="closeAuthModal()">✕</button>
+            <button class="close-auth-card" onclick="closeModal('authModal')">✕</button>
             <div class="auth-header">
-                <h2 id="authModalTitle">تسجيل الدخول</h2>
-              <p>تابع تقدمك وقم بمزامنة بياناتك عبر الأجهزة</p>
+                <h2>حسابك الشخصي</h2>
+                <p>سجل حسابك لحفظ بياناتك وسجلاتك بدقة</p>
             </div>
             <div class="auth-tabs">
-                <button id="authTabLogin" class="auth-tab-btn active" onclick="switchAuthTab('login')">تسجيل دخول</button>
+                <button id="authTabLogin" class="auth-tab-btn active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
                 <button id="authTabRegister" class="auth-tab-btn" onclick="switchAuthTab('register')">حساب جديد</button>
             </div>
-            <div class="auth-input-group">
-                <label>البريد الإلكتروني</label>
-                <input type="email5" id="authEmailInput" placeholder="name@example.com">
-            </div>
-            <div class="auth-input-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="authPassInput" placeholder="••••••••">
-            </div>
-            <button id="authSubmitBtn" class="auth-submit-btn" onclick="handleAuthSubmit()">دخول</button>
-            <button class="auth-google-btn" onclick="handleGoogleAuth()">
-                <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.2 8.9 5 12 5zm6.8 8.1c0-.5-.1-1-.2-1.4H12v2.8h3.8c-.2 1-.8 1.9-1.7 2.5l2.7 2.1c1.6-1.5 2.7-3.8 2-6zm-6.8 7.9c3.2 0 6-1.1 8-3l-2.7-2.1c-1.1.7-2.5 1.2-5.3 1.2-3.1 0-5.8-2.2-6.7-5.2L1.6 16.5C3.5 20.3 7.4 22.9 12 22.9z"/></svg>
-                المتابعة بواسطة Google
-            </button>
-            <div id="logoutSection" style="display:none; flex-direction:column; gap:10px;">
-                <button class="auth-logout-btn" onclick="handleLogout()">تسجيل الخروج</button>
+            <div id="authFormArea" style="display:flex; flex-direction:column; gap:12px;">
+                <div class="auth-input-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="authEmail" placeholder="name@example.com">
+                </div>
+                <div class="auth-input-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="authPassword" placeholder="••••••••">
+                </div>
+                <button id="authSubmitBtn" class="auth-submit-btn" onclick="handleAuthSubmit()">دخول</button>
+                <button class="auth-google-btn" onclick="simulateGoogleAuth()">
+                    <span>🌐</span> متابعة باستخدام Google
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // المشكلة كانت أن المتصفحات الحديثة تقوم بتقليل (Throttle) أو إيقاف تنفيذ الدوال الزمنية (setInterval) 
-        // في علامات التبويب غير النشطة (Background Tabs) لتوفير طاقة البطارية والموارد.
-        // الحل هو الاعتماد على الطابع الزمني الفعلي (Date.now()) ومقارنته بالوقت الذي بدأ فيه المؤقت أو وقت آخر تحديث،
-        // بدلاً من الاعتماد على عداد الثواني الوهمي الذي يتأثر بسبات المتصفح.
-
+        // System variables and states
         let currentMode = 'study';
         let timerInterval = null;
         let totalSeconds = 0;
         let isRunning = false;
-        let targetEndTime = 0; // تم إضافة هذا المتغير لتخزين وقت الانتهاء المستهدف بناءً على التوقيت الحقيقي
-        let breakDurationSeconds = 300; 
+        
+        // Mode durations (in seconds, used mainly for countdown modes like break)
+        let modeTimes = {
+            study: 0,
+            break: 300,
+            quiz: 0,
+            afk: 0
+        };
 
-        let studyHistory = JSON.parse(localStorage.getItem('studyHistory')) || [];
-        let quizHistory = JSON.parse(localStorage.getItem('quizHistory')) || [];
-        let breakHistory = JSON.parse(localStorage.getItem('breakHistory')) || [];
-        let afkHistory = JSON.parse(localStorage.getItem('afkHistory')) || [];
-        let scheduleList = JSON.parse(localStorage.getItem('scheduleList')) || [];
-        let trashList = JSON.parse(localStorage.getItem('trashList')) || [];
-        let currentHistoryTab = 'study';
+        // Storage arrays
+        let histories = { study: [], quiz: [], break: [], afk: [] };
+        let scheduleItems = [];
+        let trashItems = [];
+        let currentUser = null;
 
-        function updateCairoClock() {
+        // Initialize App on load
+        window.onload = function() {
+            updateClockWidget();
+            setInterval(updateClockWidget, 1000);
+            loadLocalStorageData();
+            updateDisplay();
+        };
+
+        function updateClockWidget() {
             const now = new Date();
-            document.getElementById('cairoClock').innerText = now.toLocaleTimeString('ar-EG');
-            document.getElementById('cairoDate').innerText = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+            let ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            let timeStr = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')} ${ampm}`;
+            
+            let options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+            let dateStr = now.toLocaleDateString('ar-EG', options);
+            
+            document.getElementById('cairoClock').innerText = timeStr;
+            document.getElementById('cairoDate').innerText = dateStr;
         }
-        setInterval(updateCairoClock, 1000);
-        updateCairoClock();
 
         function switchMode(mode) {
-            if (isRunning) {
-                alert("يرجى إيقاف المؤقت الحالي أولاً قبل تغيير النمط!");
-                return;
-            }
+            pauseTimer();
             currentMode = mode;
-            document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
-            document.getElementById('container-' + mode).classList.add('active');
-
-            const rootStyle = getComputedStyle(document.documentElement);
-            let themeColor = rootStyle.getPropertyValue('--study-color').trim();
-            if (mode === 'break') themeColor = rootStyle.getPropertyValue('--break-color').trim();
-            if (mode === 'quiz') themeColor = rootStyle.getPropertyValue('--quiz-color').trim();
-            if (mode === 'afk') themeColor = rootStyle.getPropertyValue('--afk-color').trim();
-
-            document.documentElement.style.setProperty('--current-theme', themeColor);
             
-            if (mode === 'break') {
-                setBreakDuration();
-            } else {
-                totalSeconds = 0;
-                updateDisplay();
-            }
-        }
-
-        function setBreakDuration() {
-            const h = parseInt(document.getElementById('breakHoursInput').value) || 0;
-            const m = parseInt(document.getElementById('breakMinutesInput').value) || 0;
-            breakDurationSeconds = (h * 3600) + (m * 60);
-            totalSeconds = breakDurationSeconds;
+            // Update active timer boxes
+            document.querySelectorAll('.timer-box').forEach(box => box.classList.remove('active'));
+            document.getElementById(`container-${mode}`).classList.add('active');
+            
+            // Update root theme color variables
+            let themeVar = `var(--${mode}-color)`;
+            if(mode === 'quiz') themeVar = 'var(--quiz-color)';
+            document.documentElement.style.setProperty('--current-theme', themeVar);
+            
+            // Update titles or specific mode inputs
             updateDisplay();
         }
 
-        function updateDisplay() {
-            const displayElem = document.getElementById('display-' + currentMode);
-            let displaySecs = totalSeconds;
-            
-            if (currentMode === 'study' || currentMode === 'quiz' || currentMode === 'afk') {
-                const m = Math.floor(displaySecs / 60);
-                const s = displaySecs % 60;
-                displayElem.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        function formatTimeDisplay(seconds) {
+            let hrs = Math.floor(seconds / 3600);
+            let mins = Math.floor((seconds % 3600) / 60);
+            let secs = seconds % 60;
+
+            if (hrs > 0) {
+                return `${hrs}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             } else {
-                const h = Math.floor(displaySecs / 3600);
-                const m = Math.floor((displaySecs % 3600) / 60);
-                const s = displaySecs % 60;
-                if (h > 0) {
-                    displayElem.innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                } else {
-                    displayElem.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                }
+                return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+        }
+
+        function updateDisplay() {
+            let displayElement = document.getElementById(`display-${currentMode}`);
+            if (displayElement) {
+                displayElement.innerText = formatTimeDisplay(totalSeconds);
             }
         }
 
         function startTimer() {
             if (isRunning) return;
-            if (currentMode === 'break' && totalSeconds <= 0) {
-                setBreakDuration();
-            }
             isRunning = true;
-            
-            // حساب وقت الانتهاء الدقيق بناءً على الوقت الحقيقي للساعة (لحل مشكلة التبويب في الخلفية)
-            if (currentMode === 'break') {
-                targetEndTime = Date.now() + (totalSeconds * 1000);
-            } else {
-                targetEndTime = Date.now() + (totalSeconds * 1000); // للعد الإزديادي أو التنازلي العام
-            }
-
-            let startBaseSeconds = totalSeconds;
-            let startTimeStamp = Date.now();
-
             timerInterval = setInterval(() => {
-                const now = Date.now();
-              const elapsedSeconds = Math.floor((now - startTimeStamp) / 1000);
-
-              if (currentMode === 'study' || currentMode === 'quiz' || currentMode === 'afk') {
-                  totalSeconds = startBaseSeconds + elapsedSeconds;
-              } else {
-                  totalSeconds = Math.max(0, startBaseSeconds - elapsedSeconds);
-                  if (totalSeconds === 0) {
-                      clearInterval(timerInterval);
-                      isRunning = false;
-                      alert("انتهى الوقت المحدد للراحة!");
-                  }
-              }
-              updateDisplay();
-          }, 1000);
+                if (currentMode === 'break' && modeTimes.break > 0) {
+                    if (totalSeconds > 0) {
+                        totalSeconds--;
+                    } else {
+                        pauseTimer();
+                        alert('انتهى وقت الراحة!');
+                    }
+                } else {
+                    totalSeconds++;
+                }
+                updateDisplay();
+            }, 1000);
         }
 
         function pauseTimer() {
-            if (!isRunning) return;
-            clearInterval(timerInterval);
             isRunning = false;
+            clearInterval(timerInterval);
         }
 
         function endTimer() {
-            clearInterval(timerInterval);
-            isRunning = false;
-            if (currentMode === 'break') {
-                setBreakDuration();
+            pauseTimer();
+            if(currentMode === 'break') {
+                totalSeconds = parseInt(document.getElementById('breakMinutesInput').value || 5) * 60;
             } else {
                 totalSeconds = 0;
-                updateDisplay();
             }
+            updateDisplay();
+        }
+
+        function setBreakDuration() {
+            let hrs = parseInt(document.getElementById('breakHoursInput').value) || 0;
+            let mins = parseInt(document.getElementById('breakMinutesInput').value) || 0;
+            modeTimes.break = (hrs * 3600) + (mins * 60);
+            totalSeconds = modeTimes.break;
+            updateDisplay();
         }
 
         function toggleTopMenu() {
             document.getElementById('topBarNav').classList.toggle('active');
+        }
+
+        function saveSessionPrompt() {
+            if(totalSeconds === 0) {
+                alert('لا يوجد وقت مسجل للحفظ!');
+                return;
+            }
+            document.getElementById('modalHeaderTitle').innerText = `حفظ جلسة (${currentMode.toUpperCase()})`;
+            document.getElementById('modalSubjectInput').value = '';
+            document.getElementById('modalDescInput').value = '';
+            document.getElementById('saveModal').style.display = 'flex';
+        }
+
+        function confirmSaveSession() {
+            let subj = document.getElementById('modalSubjectInput').value.trim() || 'جلسة بدون عنوان';
+            let desc = document.getElementById('modalDescInput').value.trim();
+            let durationStr = formatTimeDisplay(totalSeconds);
+            
+            let record = {
+                id: Date.now(),
+                subject: subj,
+                duration: durationStr,
+                description: desc,
+                date: new Date().toLocaleDateString()
+            };
+
+            histories[currentMode].push(record);
+            saveLocalStorageData();
+            closeModal('saveModal');
+            alert('تم حفظ الجلسة بنجاح في السجلات!');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openUnifiedHistory(mode) {
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('historyTabsNav').style.display = 'flex';
+            document.getElementById('sidebarTitle').innerText = 'History Records';
+            switchHistorySubTab(mode);
+        }
+
+        function closeHistory() {
+            document.getElementById('sidebarHistory').classList.remove('open');
+            document.getElementById('mainContainer').classList.remove('sidebar-open');
+        }
+
+        function switchHistorySubTab(mode) {
+            document.querySelectorAll('.history-tab-btn').forEach(btn => btn.classList.remove('active'));
+            let activeBtn = document.getElementById(`htab-${mode}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            let container = document.getElementById('sidebarContent');
+            container.innerHTML = '';
+
+            let records = histories[mode] || [];
+            if(records.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#6c7086; margin-top:20px;">لا توجد سجلات بعد.</p>`;
+                return;
+            }
+
+            records.slice().reverse().forEach(item => {
+                let card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="card-main-line">
+                        <span class="card-subject">${item.subject}</span>
+                        <span class="card-duration">${item.duration}</span>
+                    </div>
+                    ${item.description ? `<div class="card-desc">${item.description}</div>` : ''}
+                    <div class="card-bottom-info">
+                        <span>${item.date}</span>
+                        <span style="cursor:pointer; color:#f38ba8;" onclick="deleteHistoryRecord('${mode}', ${item.id})">حذف</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteHistoryRecord(mode, id) {
+            histories[mode] = histories[mode].filter(item => item.id !== id);
+            saveLocalStorageData();
+            switchHistorySubTab(mode);
+        }
+
+        function openScheduleView() {
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('addSchBtn').style.display = 'block';
+            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = 'Schedule List';
+            
+            let container = document.getElementById('sidebarContent');
+            container.innerHTML = '';
+
+            if(scheduleItems.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#6c7086; margin-top:20px;">الجدول فارغ تماماً.</p>`;
+                return;
+            }
+
+            scheduleItems.forEach((sch, idx) => {
+                let card = document.createElement('div');
+                card.className = 'schedule-card';
+                card.innerHTML = `
+                    <div class="sch-header">
+                        <span class="sch-subject">${sch.subject}</span>
+                        <span class="sch-teacher">${sch.teacher}</span>
+                    </div>
+                    <div class="sch-body">
+                        <div>العنوان: ${sch.title}</div>
+                        <div>الميعاد: ${sch.date} (${sch.time})</div>
+                        <div>المكان: ${sch.place}</div>
+                    </div>
+                    <div class="sch-actions">
+                        <button class="btn-sch-action btn-sch-edit" onclick="editScheduleItem(${idx})">تعديل</button>
+                        <button class="btn-sch-action btn-sch-del" onclick="deleteScheduleItem(${idx})">حذف</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openAddScheduleModal() {
+            document.getElementById('schModalTitle').innerText = 'إضافة حصة/درس للجدول';
+            document.getElementById('schEditIndex').value = -1;
+            document.getElementById('schSubjectInput').value = '';
+            document.getElementById('schTeacherInput').value = '';
+            document.getElementById('schTitleInput').value = '';
+            document.getElementById('schDateInput').value = '';
+            document.getElementById('schTimeInput').value = '';
+            document.getElementById('scheduleModal').style.display = 'flex';
+        }
+
+        function saveScheduleItem() {
+            let idx = parseInt(document.getElementById('schEditIndex').value);
+            let item = {
+                subject: document.getElementById('schSubjectInput').value,
+                teacher: document.getElementById('schTeacherInput').value,
+                title: document.getElementById('schTitleInput').value,
+                date: document.getElementById('schDateInput').value,
+                time: document.getElementById('schTimeInput').value,
+                place: document.getElementById('schPlaceInput').value
+            };
+
+            if(idx === -1) {
+                scheduleItems.push(item);
+            } else {
+                scheduleItems[idx] = item;
+            }
+            saveLocalStorageData();
+            closeModal('scheduleModal');
+            openScheduleView();
+        }
+
+        function editScheduleItem(idx) {
+            let sch = scheduleItems[idx];
+            document.getElementById('schModalTitle').innerText = 'تعديل الحصة الدراسية';
+            document.getElementById('schEditIndex').value = idx;
+            document.getElementById('schSubjectInput').value = sch.subject;
+            document.getElementById('schTeacherInput').value = sch.teacher;
+            document.getElementById('schTitleInput').value = sch.title;
+            document.getElementById('schDateInput').value = sch.date;
+            document.getElementById('schTimeInput').value = sch.time;
+            document.getElementById('schPlaceInput').value = sch.place;
+            document.getElementById('scheduleModal').style.display = 'flex';
+        }
+
+        function deleteScheduleItem(idx) {
+            let removed = scheduleItems.splice(idx, 1)[0];
+            trashItems.push(removed);
+            saveLocalStorageData();
+            openScheduleView();
+        }
+
+        function openTrash() {
+            document.getElementById('sidebarHistory').classList.add('open');
+            document.getElementById('mainContainer').classList.add('sidebar-open');
+            document.getElementById('addSchBtn').style.display = 'none';
+            document.getElementById('historyTabsNav').style.display = 'none';
+            document.getElementById('sidebarTitle').innerText = 'Trash / Recovery';
+
+            let container = document.getElementById('sidebarContent');
+            container.innerHTML = '';
+
+            if(trashItems.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#6c7086; margin-top:20px;">سلة المحذوفات فارغة.</p>`;
+                return;
+            }
+
+            trashItems.forEach((trh, idx) => {
+                let card = document.createElement('div');
+                card.className = 'schedule-card';
+                card.innerHTML = `
+                    <div class="sch-header">
+                        <span class="sch-subject">${trh.subject || 'عنصر محذوف'}</span>
+                    </div>
+                    <div class="sch-body">
+                        <div>التفاصيل: ${trh.title || trh.description || 'لا توجد تفاصيل'}</div>
+                    </div>
+                    <div class="sch-actions">
+                        <button class="btn-sch-action btn-sch-restore" onclick="restoreTrashItem(${idx})">استرجاع</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function restoreTrashItem(idx) {
+            let restored = trashItems.splice(idx, 1)[0];
+            scheduleItems.push(restored);
+            saveLocalStorageData();
+            openTrash();
         }
 
         function openNotebook() {
@@ -722,352 +924,103 @@
         }
 
         function switchNbPane(subject, paneType) {
-            const doneBtn = document.getElementById(`tab-${subject}-done`);
-            const remBtn = document.getElementById(`tab-${subject}-rem`);
-            const donePane = document.getElementById(`pane-${subject}-done`);
-            const remPane = document.getElementById(`pane-${subject}-rem`);
+            document.getElementById(`tab-${subject}-done`).classList.remove('active-tab');
+            document.getElementById(`tab-${subject}-rem`).classList.remove('active-tab');
+            document.getElementById(`pane-${subject}-done`).classList.remove('active-pane');
+            document.getElementById(`pane-${subject}-rem`).classList.remove('active-pane');
 
-            if (paneType === 'done') {
-                doneBtn.classList.add('active-tab');
-                remBtn.classList.remove('active-tab');
-                donePane.classList.add('active-pane');
-                remPane.classList.remove('active-pane');
-            } else {
-                remBtn.classList.add('active-tab');
-                doneBtn.classList.remove('active-tab');
-                remPane.classList.add('active-pane');
-                donePane.classList.remove('active-pane');
-            }
+            document.getElementById(`tab-${subject}-${paneType === 'done' ? 'done' : 'rem'}`).classList.add('active-tab');
+            document.getElementById(`pane-${subject}-${paneType === 'done' ? 'done' : 'rem'}`).classList.add('active-pane');
         }
 
         function saveNotebookData() {
-            const subjects = ['arabic', 'english', 'history', 'physics'];
-            const data = {};
-            subjects.forEach(sub => {
-                data[sub + '_done'] = document.getElementById(`note-${sub}-done`).value;
-                data[sub + '_rem'] = document.getElementById(`note-${sub}-rem`).value;
-            });
-            localStorage.setItem('notebookData', JSON.stringify(data));
+            let data = {
+                arabicDone: document.getElementById('note-arabic-done').value,
+                arabicRem: document.getElementById('note-arabic-rem').value,
+                englishDone: document.getElementById('note-english-done').value,
+                englishRem: document.getElementById('note-english-rem').value,
+                historyDone: document.getElementById('note-history-done').value,
+                historyRem: document.getElementById('note-history-rem').value,
+                physicsDone: document.getElementById('note-physics-done').value,
+                physicsRem: document.getElementById('note-physics-rem').value
+            };
+            localStorage.setItem('study_notebook_data', JSON.stringify(data));
         }
 
-        function loadNotebookData() {
-            const saved = JSON.parse(localStorage.getItem('notebookData'));
-            if (!saved) return;
-            const subjects = ['arabic', 'english', 'history', 'physics'];
-            subjects.forEach(sub => {
-                if (saved[sub + '_done']) document.getElementById(`note-${sub}-done`).value = saved[sub + '_done'];
-                if (saved[sub + '_rem']) document.getElementById(`note-${sub}-rem`).value = saved[sub + '_rem'];
-            });
+        function loadLocalStorageData() {
+            let savedHistories = localStorage.getItem('study_histories');
+            if(savedHistories) {
+                try { histories = JSON.parse(savedHistories); } catch(e){}
+            }
+            let savedSchedule = localStorage.getItem('study_schedule');
+            if(savedSchedule) {
+                try { scheduleItems = JSON.parse(savedSchedule); } catch(e){}
+            }
+            let savedTrash = localStorage.getItem('study_trash');
+            if(savedTrash) {
+                try { trashItems = JSON.parse(savedTrash); } catch(e){}
+            }
+            let savedNb = localStorage.getItem('study_notebook_data');
+            if(savedNb) {
+                try {
+                    let d = JSON.parse(savedNb);
+                    document.getElementById('note-arabic-done').value = d.arabicDone || '';
+                    document.getElementById('note-arabic-rem').value = d.arabicRem || '';
+                    document.getElementById('note-english-done').value = d.englishDone || '';
+                    document.getElementById('note-english-rem').value = d.englishRem || '';
+                    document.getElementById('note-history-done').value = d.historyDone || '';
+                    document.getElementById('note-history-rem').value = d.historyRem || '';
+                    document.getElementById('note-physics-done').value = d.physicsDone || '';
+                    document.getElementById('note-physics-rem').value = d.physicsRem || '';
+                } catch(e){}
+            }
         }
-        loadNotebookData();
+
+        function saveLocalStorageData() {
+            localStorage.setItem('study_histories', JSON.stringify(histories));
+            localStorage.setItem('study_schedule', JSON.stringify(scheduleItems));
+            localStorage.setItem('study_trash', JSON.stringify(trashItems));
+        }
 
         function printNotebook() {
             window.print();
         }
 
-        function openUnifiedHistory(tab) {
-            currentHistoryTab = tab;
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('historyTabsNav').style.display = 'flex';
-            document.getElementById('addSchBtn').style.display = 'none';
-            document.getElementById('sidebarTitle').innerText = 'History Records';
-            document.querySelectorAll('.history-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('htab-' + tab).classList.add('active');
-            renderHistoryContent(tab);
-        }
-
-        function switchHistorySubTab(tab) {
-            currentHistoryTab = tab;
-            document.querySelectorAll('.history-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('htab-' + tab).classList.add('active');
-            renderHistoryContent(tab);
-        }
-
-        function renderHistoryContent(tab) {
-            const container = document.getElementById('sidebarContent');
-            let list = studyHistory;
-            if (tab === 'quiz') list = quizHistory;
-            if (tab === 'break') list = breakHistory;
-            if (tab === 'afk') list = afkHistory;
-
-            container.innerHTML = '';
-            if (list.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#7f849c; margin-top:20px;">لا توجد سجلات مسجلة بعد</p>';
-                return;
-            }
-
-            list.forEach((item, index) => {
-                container.innerHTML += `
-                    <div class="history-card">
-                        <div class="card-main-line">
-                            <span class="card-subject">${item.subject}</span>
-                            <span class="card-duration">${item.duration}</span>
-                        </div>
-                        ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ''}
-                        <div class="card-bottom-info">
-                            <span>${item.date}</span>
-                            <button style="padding:2px 8px; font-size:0.7rem; background:#11111b; border:1px solid #f38ba8; color:#f38ba8; border-radius:4px; cursor:pointer;" onclick="deleteHistoryItem('${tab}', ${index})">حذف</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function deleteHistoryItem(tab, index) {
-            let list = studyHistory;
-            if (tab === 'quiz') list = quizHistory;
-            if (tab === 'break') list = breakHistory;
-            if (tab === 'afk') list = afkHistory;
-
-            const removed = list.splice(index, 1)[0];
-            removed.type = tab;
-            trashList.push(removed);
-
-            localStorage.setItem('studyHistory', JSON.stringify(studyHistory));
-            localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
-            localStorage.setItem('breakHistory', JSON.stringify(breakHistory));
-            localStorage.setItem('afkHistory', JSON.stringify(afkHistory));
-            localStorage.setItem('trashList', JSON.stringify(trashList));
-
-            renderHistoryContent(tab);
-        }
-
-        function closeHistory() {
-            document.getElementById('sidebarHistory').classList.remove('open');
-            document.getElementById('mainContainer').classList.remove('sidebar-open');
-        }
-
-        function saveSessionPrompt() {
-            if (totalSeconds <= 0) {
-                alert("لا يوجد وقت مسجل للحفظ!");
-                return;
-            }
-            document.getElementById('modalSubjectInput').value = '';
-            document.getElementById('modalDescInput').value = '';
-            document.getElementById('saveModal').style.display = 'flex';
-        }
-
-        function confirmSaveSession() {
-            const subject = document.getElementById('modalSubjectInput').value.trim() || 'جلسة بدون عنوان';
-            const desc = document.getElementById('modalDescInput').value.trim();
-            
-            const m = Math.floor(totalSeconds / 60);
-            const s = totalSeconds % 60;
-            const durationStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            const dateStr = new Date().toLocaleDateString('ar-EG');
-
-            const sessionData = { subject, desc, duration: durationStr, date: dateStr };
-
-            if (currentMode === 'study') studyHistory.unshift(sessionData);
-            else if (currentMode === 'quiz') quizHistory.unshift(sessionData);
-            else if (currentMode === 'break') breakHistory.unshift(sessionData);
-            else if (currentMode === 'afk') afkHistory.unshift(sessionData);
-
-            localStorage.setItem('studyHistory', JSON.stringify(studyHistory));
-            localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
-            localStorage.setItem('breakHistory', JSON.stringify(breakHistory));
-            localStorage.setItem('afkHistory', JSON.stringify(afkHistory));
-
-            closeModal('saveModal');
-            alert("تم حفظ الجلسة بنجاح في السجلات!");
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function openScheduleView() {
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('historyTabsNav').style.display = 'none';
-            document.getElementById('addSchBtn').style.display = 'inline-block';
-            document.getElementById('sidebarTitle').innerText = 'Schedule 🗓️';
-            renderScheduleContent();
-        }
-
-        function renderScheduleContent() {
-            const container = document.getElementById('sidebarContent');
-            container.innerHTML = '';
-            if (scheduleList.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#7f849c; margin-top:20px;">لا توجد حصص مضافة في الجدول</p>';
-                return;
-            }
-            scheduleList.forEach((sch, index) => {
-                container.innerHTML += `
-                    <div class="schedule-card">
-                        <div class="sch-header">
-                            <span class="sch-subject">${sch.subject}</span>
-                            <span class="sch-teacher">${sch.teacher}</span>
-                        </div>
-                        <div class="sch-body">
-                            <span>العنوان: ${sch.title}</span>
-                            <span>الميعاد: ${sch.date} (${sch.time})</span>
-                            <span>المكان: ${sch.place}</span>
-                        </div>
-                        <div class="sch-actions">
-                            <button class="btn-sch-action btn-sch-edit" onclick="editScheduleItem(${index})">تعديل</button>
-                            <button class="btn-sch-action btn-sch-del" onclick="deleteScheduleItem(${index})">حذف</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function openAddScheduleModal() {
-            document.getElementById('schEditIndex').value = '-1';
-            document.getElementById('schSubjectInput').value = '';
-            document.getElementById('schTeacherInput').value = '';
-            document.getElementById('schTitleInput').value = '';
-            document.getElementById('schDateInput').value = '';
-            document.getElementById('schTimeInput').value = '';
-            document.getElementById('scheduleModal').style.display = 'flex';
-        }
-
-        function saveScheduleItem() {
-            const idx = parseInt(document.getElementById('schEditIndex').value);
-            const subject = document.getElementById('schSubjectInput').value;
-            const teacher = document.getElementById('schTeacherInput').value;
-            const title = document.getElementById('schTitleInput').value;
-            const date = document.getElementById('schDateInput').value;
-            const time = document.getElementById('schTimeInput').value;
-            const place = document.getElementById('schPlaceInput').value;
-
-            const obj = { subject, teacher, title, date, time, place };
-            if (idx === -1) {
-                scheduleList.push(obj);
-            } else {
-                scheduleList[idx] = obj;
-            }
-            localStorage.setItem('scheduleList', JSON.stringify(scheduleList));
-            closeModal('scheduleModal');
-            renderScheduleContent();
-        }
-
-        function editScheduleItem(index) {
-            const sch = scheduleList[index];
-            document.getElementById('schEditIndex').value = index;
-            document.getElementById('schSubjectInput').value = sch.subject;
-            document.getElementById('schTeacherInput').value = sch.teacher;
-            document.getElementById('schTitleInput').value = sch.title;
-            document.getElementById('schDateInput').value = sch.date;
-            document.getElementById('schTimeInput').value = sch.time;
-            document.getElementById('schPlaceInput').value = sch.place;
-            document.getElementById('scheduleModal').style.display = 'flex';
-        }
-
-        function deleteScheduleItem(index) {
-            const removed = scheduleList.splice(index, 1)[0];
-            removed.type = 'schedule';
-            trashList.push(removed);
-            localStorage.setItem('scheduleList', JSON.stringify(scheduleList));
-            localStorage.setItem('trashList', JSON.stringify(trashList));
-            renderScheduleContent();
-        }
-
-        function openTrash() {
-            document.getElementById('sidebarHistory').classList.add('open');
-            document.getElementById('mainContainer').classList.add('sidebar-open');
-            document.getElementById('historyTabsNav').style.display = 'none';
-            document.getElementById('addSchBtn').style.display = 'none';
-            document.getElementById('sidebarTitle').innerText = 'Trash / Recovery 🗑️';
-            renderTrashContent();
-        }
-
-        function renderTrashContent() {
-            const container = document.getElementById('sidebarContent');
-            container.innerHTML = '';
-            if (trashList.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#7f849c; margin-top:20px;">سلة المحذوفات فارغة</p>';
-              return;
-            }
-            trashList.forEach((item, index) => {
-                container.innerHTML += `
-                    <div class="schedule-card">
-                        <div class="sch-header">
-                            <span class="sch-subject">${item.subject || 'عنصر محذوف'}</span>
-                        </div>
-                        <div class="sch-actions">
-                          <button class="btn-sch-action btn-sch-restore" onclick="restoreTrashItem(${index})">استرجاع</button>
-                      </div>
-                    </div>
-                `;
-            });
-        }
-
-        function restoreTrashItem(index) {
-            const item = trashList.splice(index, 1)[0];
-            if (item.type === 'schedule') {
-                scheduleList.push(item);
-                localStorage.setItem('scheduleList', JSON.stringify(scheduleList));
-            } else if (item.type && item.type !== 'schedule') {
-                if (item.type === 'study') studyHistory.push(item);
-                else if (item.type === 'quiz') quizHistory.push(item);
-                else if (item.type === 'break') breakHistory.push(item);
-                else if (item.type === 'afk') afkHistory.push(item);
-
-                localStorage.setItem('studyHistory', JSON.stringify(studyHistory));
-                localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
-                localStorage.setItem('breakHistory', JSON.stringify(breakHistory));
-                localStorage.setItem('afkHistory', JSON.stringify(afkHistory));
-          }
-          localStorage.setItem('trashList', JSON.stringify(trashList));
-          renderTrashContent();
-      }
-
         function printFullHistory() {
             window.print();
         }
 
-        let authMode = 'login';
+        function requestMini() {
+            alert('خاصية نافذة المصغرة غير مدعومة مباشرة في متصفحك الحالي، يمكنك تصغير نافذة المتصفح.');
+        }
+
         function openAuthModal() {
             document.getElementById('authModal').style.display = 'flex';
         }
-        function closeAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
-        }
-        function switchAuthTab(mode) {
-            authMode = mode;
-            if (mode === 'login') {
-                document.getElementById('authTabLogin').classList.add('active');
-                document.getElementById('authTabRegister').classList.remove('active');
-                document.getElementById('authModalTitle').innerText = 'تسجيل الدخول';
-                document.getElementById('authSubmitBtn').innerText = 'دخول';
-            } else {
-                document.getElementById('authTabRegister').classList.add('active');
-                document.getElementById('authTabLogin').classList.remove('active');
-                document.getElementById('authModalTitle').innerText = 'إنشاء حساب جديد';
-                document.getElementById('authSubmitBtn').innerText = 'تسجيل';
-            }
-        }
-        function handleAuthSubmit() {
-            const email = document.getElementById('authEmailInput').value;
-            if (!email) {
-                alert('يرجى إدخال البريد الإلكتروني');
-                return;
-            }
-            localStorage.setItem('currentUserEmail', email);
-            document.getElementById('authBtnLabel').innerText = email.split('@')[0];
-            document.getElementById('logoutSection').style.display = 'flex';
-            closeAuthModal();
-          }
-        function handleGoogleAuth() {
-            localStorage.setItem('currentUserEmail', 'Google User');
-            document.getElementById('authBtnLabel').innerText = 'Google User';
-            document.getElementById('logoutSection').style.display = 'flex';
-            closeAuthModal();
-        }
-        function handleLogout() {
-            localStorage.removeItem('currentUserEmail');
-            document.getElementById('authBtnLabel').innerText = 'تسجيل الدخول / حساب جديد';
-            document.getElementById('logoutSection').style.display = 'none';
-          closeAuthModal();
+
+        function switchAuthTab(tab) {
+            document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('authTabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('authSubmitBtn').innerText = tab === 'login' ? 'دخول' : 'إنشاء الحساب';
         }
 
-        const savedUser = localStorage.getItem('currentUserEmail');
-        if (savedUser) {
-            document.getElementById('authBtnLabel').innerText = savedUser.includes('@') ? savedUser.split('@')[0] : savedUser;
-            document.getElementById('logoutSection').style.display = 'flex';
+        function handleAuthSubmit() {
+            let email = document.getElementById('authEmail').value;
+            if(!email) {
+                alert('الرجاء إدخال البريد الإلكتروني');
+                return;
+            }
+            currentUser = email;
+            document.getElementById('authBtnLabel').innerText = email;
+            closeModal('authModal');
+            alert('تم تسجيل الدخول بنجاح!');
+        }
+
+        function simulateGoogleAuth() {
+            currentUser = 'Google User';
+            document.getElementById('authBtnLabel').innerText = 'حساب Google';
+            closeModal('authModal');
+            alert('تم الاتصال بحساب Google بنجاح!');
         }
     </script>
 </body>
